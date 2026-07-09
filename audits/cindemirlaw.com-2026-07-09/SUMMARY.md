@@ -135,7 +135,7 @@ Deployable package in [`fixes/`](../../fixes/INSTALL.md):
 Outbound only. No deploy was made to av.tr. Broken `howtodivorce.html` fixed on the **linking** side (cindemirlaw.com).
 
 
-## Completion pass (2026-07-09 night) — v1.5.0
+## Completion pass (2026-07-09 night) — v1.5.1
 
 mu-plugin now:
 - Rewrites **all** Ahrefs "links to redirect" internal targets to their final URLs (incl. WPML `?lang=ru|zh-hans`, `/link2-4`, short `fde…` aliases)
@@ -147,3 +147,5 @@ mu-plugin now:
 Still outside this site's control:
 - `cindemir.av.tr/howtodivorce.html` remains 404 on av.tr (no longer linked from cindemirlaw.com)
 - External 403s (barobirlik) / social robots blocks
+
+Also v1.5.1: generic `fde…` / Cyrillic path → `?lang=ru` href+redirect resolver.
