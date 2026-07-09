@@ -8,7 +8,7 @@ WordPress admin / FTP access is required. This repo has no live server credentia
 |-------|-----|
 | EN URLs 301 → wrong RU pages | Cancel bad Redirection rules + mu-plugin guard |
 | `/link9/` → `/press/` → external (2 hops) | Single 301 to `cindemir.av.tr` |
-| Menu/footer hrefs to `/press/`, `/author/admin/` | v1.4 HTML rewrite + menu custom links |
+| Menu/footer hrefs to `/press/`, `/author/admin/` | v1.5 HTML rewrite + menu custom links |
 | `www` → apex chain | `.htaccess` one-hop rule |
 | Missing H1 (heritage, RU pages, etc.) | Inject H1 (content + full-page buffer) |
 | Multiple H1 (home, long articles) | Keep first H1, demote rest to H2 |

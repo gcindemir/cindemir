@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Cindemir SEO Fixes
- * Description: Cancel wrong EN→RU redirects; flatten press/link9; rewrite redirect hrefs; fix H1s, orphans, alts.
- * Version: 1.4.0
+ * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
+ * Version: 1.5.0
  * Author: Cindemir Law Office
  */
 
@@ -22,47 +22,114 @@ final class Cindemir_SEO_Fixes {
 		'/exemptions-on-the-legislation-of-the-documents-in-turkey',
 	);
 
-	private static $flatten = array(
+	/** One-hop 301 + href rewrite map (path without trailing slash). */
+	private static $redirects = array(
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbdfde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbdfde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-3' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-3/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd82fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd82fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-3' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-3/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb3fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb3fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb4fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb4fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb5fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb5fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb6fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb6fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb7fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb7fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbafde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbdfde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbdfde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd82fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd82fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/cindemir-hukuk-burosu-cindemir-law-office-kusdili-caddesi-osmanaga-mahallesi-artunc-apartmani-no173-34714-kadikoy-istanbul' => 'https://cindemirlaw.com/cindemir/',
+		'/pig-butchering-cryptocurrency-scam-key-risks-and-legal-considerations-for-investors-in-turkey' => 'https://cindemirlaw.com/pig-butchering-cryptocurrency-scam-key-risks-and-legal-considerations-for-investors-in-turkey/?lang=ru',
+		'/eu-ai-act-compliance-for-non-eu-companies-legal-requirements-under-the-destination-principle' => 'https://cindemirlaw.com/eu-ai-act-compliance-for-non-eu-companies-legal-requirements-under-the-destination-principle/?lang=ru',
+		'/obtaining-an-e-devlet-password-in-turkey-through-a-power-of-attorney' => 'https://cindemirlaw.com/obtaining-an-e-devlet-password-in-turkey-through-a-power-of-attorney/?lang=ru',
+		'/репатриация-активов-в-турцию-в-2026-году-п' => 'https://cindemirlaw.com/%d1%80%d0%b5%d0%bf%d0%b0%d1%82%d1%80%d0%b8%d0%b0%d1%86%d0%b8%d1%8f-%d0%b0%d0%ba%d1%82%d0%b8%d0%b2%d0%be%d0%b2-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d1%8e-%d0%b2-2026-%d0%b3%d0%be%d0%b4%d1%83-%d0%bf/?lang=ru',
+		'/что-такое-заявление-в-еспч-кто-может-по' => 'https://cindemirlaw.com/%d1%87%d1%82%d0%be-%d1%82%d0%b0%d0%ba%d0%be%d0%b5-%d0%b7%d0%b0%d1%8f%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2-%d0%b5%d1%81%d0%bf%d1%87-%d0%ba%d1%82%d0%be-%d0%bc%d0%be%d0%b6%d0%b5%d1%82-%d0%bf%d0%be/?lang=ru',
+		'/гуманитарный-вид-на-жительство-в-турц' => 'https://cindemirlaw.com/%d0%b3%d1%83%d0%bc%d0%b0%d0%bd%d0%b8%d1%82%d0%b0%d1%80%d0%bd%d1%8b%d0%b9-%d0%b2%d0%b8%d0%b4-%d0%bd%d0%b0-%d0%b6%d0%b8%d1%82%d0%b5%d0%bb%d1%8c%d1%81%d1%82%d0%b2%d0%be-%d0%b2-%d1%82%d1%83%d1%80%d1%86/?lang=ru',
+		'/иск-об-установлении-отцовства-в-турци' => 'https://cindemirlaw.com/%d0%b8%d1%81%d0%ba-%d0%be%d0%b1-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d0%b8-%d0%be%d1%82%d1%86%d0%be%d0%b2%d1%81%d1%82%d0%b2%d0%b0-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8/?lang=ru',
+		'/как-открыть-компанию-в-турции-пошагов' => 'https://cindemirlaw.com/%d0%ba%d0%b0%d0%ba-%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d1%8c-%d0%ba%d0%be%d0%bc%d0%bf%d0%b0%d0%bd%d0%b8%d1%8e-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8-%d0%bf%d0%be%d1%88%d0%b0%d0%b3%d0%be%d0%b2/?lang=ru',
+		'/как-получить-справку-о-наличии-судимо' => 'https://cindemirlaw.com/%d0%ba%d0%b0%d0%ba-%d0%bf%d0%be%d0%bb%d1%83%d1%87%d0%b8%d1%82%d1%8c-%d1%81%d0%bf%d1%80%d0%b0%d0%b2%d0%ba%d1%83-%d0%be-%d0%bd%d0%b0%d0%bb%d0%b8%d1%87%d0%b8%d0%b8-%d1%81%d1%83%d0%b4%d0%b8%d0%bc%d0%be/?lang=ru',
+		'/удаление-судимости-в-турции-для-иност' => 'https://cindemirlaw.com/%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%81%d1%83%d0%b4%d0%b8%d0%bc%d0%be%d1%81%d1%82%d0%b8-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8-%d0%b4%d0%bb%d1%8f-%d0%b8%d0%bd%d0%be%d1%81%d1%82/?lang=ru',
+		'/задержание-в-аэропорту-турции-правов' => 'https://cindemirlaw.com/%d0%b7%d0%b0%d0%b4%d0%b5%d1%80%d0%b6%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b2-%d0%b0%d1%8d%d1%80%d0%be%d0%bf%d0%be%d1%80%d1%82%d1%83-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8-%d0%bf%d1%80%d0%b0%d0%b2%d0%be%d0%b2/?lang=ru',
+		'/открытие-банковского-счета-для-росси' => 'https://cindemirlaw.com/%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d0%b8%d0%b5-%d0%b1%d0%b0%d0%bd%d0%ba%d0%be%d0%b2%d1%81%d0%ba%d0%be%d0%b3%d0%be-%d1%81%d1%87%d0%b5%d1%82%d0%b0-%d0%b4%d0%bb%d1%8f-%d1%80%d0%be%d1%81%d1%81%d0%b8/?lang=ru',
+		'/создание-компании-с-ограниченной-отв' => 'https://cindemirlaw.com/%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%ba%d0%be%d0%bc%d0%bf%d0%b0%d0%bd%d0%b8%d0%b8-%d1%81-%d0%be%d0%b3%d1%80%d0%b0%d0%bd%d0%b8%d1%87%d0%b5%d0%bd%d0%bd%d0%be%d0%b9-%d0%be%d1%82%d0%b2/?lang=ru',
+		'/юридическая-помощь-при-отправке-веще' => 'https://cindemirlaw.com/%d1%8e%d1%80%d0%b8%d0%b4%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b0%d1%8f-%d0%bf%d0%be%d0%bc%d0%be%d1%89%d1%8c-%d0%bf%d1%80%d0%b8-%d0%be%d1%82%d0%bf%d1%80%d0%b0%d0%b2%d0%ba%d0%b5-%d0%b2%d0%b5%d1%89%d0%b5/?lang=ru',
+		'/компенсации-положенные-в-результате' => 'https://cindemirlaw.com/%d0%ba%d0%be%d0%bc%d0%bf%d0%b5%d0%bd%d1%81%d0%b0%d1%86%d0%b8%d0%b8-%d0%bf%d0%be%d0%bb%d0%be%d0%b6%d0%b5%d0%bd%d0%bd%d1%8b%d0%b5-%d0%b2-%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d0%b5/?lang=ru',
+		'/открытие-банковского-счета-в-турции' => 'https://cindemirlaw.com/%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d0%b8%d0%b5-%d0%b1%d0%b0%d0%bd%d0%ba%d0%be%d0%b2%d1%81%d0%ba%d0%be%d0%b3%d0%be-%d1%81%d1%87%d0%b5%d1%82%d0%b0-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/открытие-банковского-счета-русскими' => 'https://cindemirlaw.com/%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d0%b8%d0%b5-%d0%b1%d0%b0%d0%bd%d0%ba%d0%be%d0%b2%d1%81%d0%ba%d0%be%d0%b3%d0%be-%d1%81%d1%87%d0%b5%d1%82%d0%b0-%d1%80%d1%83%d1%81%d1%81%d0%ba%d0%b8%d0%bc%d0%b8/?lang=ru',
+		'/посещение-иностранных-заключённых-в' => 'https://cindemirlaw.com/%d0%bf%d0%be%d1%81%d0%b5%d1%89%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%bd%d0%be%d1%81%d1%82%d1%80%d0%b0%d0%bd%d0%bd%d1%8b%d1%85-%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d1%91%d0%bd%d0%bd%d1%8b%d1%85-%d0%b2/?lang=ru',
+		'/профессиональные-юридические-консул' => 'https://cindemirlaw.com/%d0%bf%d1%80%d0%be%d1%84%d0%b5%d1%81%d1%81%d0%b8%d0%be%d0%bd%d0%b0%d0%bb%d1%8c%d0%bd%d1%8b%d0%b5-%d1%8e%d1%80%d0%b8%d0%b4%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b8%d0%b5-%d0%ba%d0%be%d0%bd%d1%81%d1%83%d0%bb/?lang=ru',
+		'/руководство-по-приобретению-иностра' => 'https://cindemirlaw.com/%d1%80%d1%83%d0%ba%d0%be%d0%b2%d0%be%d0%b4%d1%81%d1%82%d0%b2%d0%be-%d0%bf%d0%be-%d0%bf%d1%80%d0%b8%d0%be%d0%b1%d1%80%d0%b5%d1%82%d0%b5%d0%bd%d0%b8%d1%8e-%d0%b8%d0%bd%d0%be%d1%81%d1%82%d1%80%d0%b0/?lang=ru',
+		'/русскоязычный-юрист-в-турции-юридич' => 'https://cindemirlaw.com/%d1%80%d1%83%d1%81%d1%81%d0%ba%d0%be%d1%8f%d0%b7%d1%8b%d1%87%d0%bd%d1%8b%d0%b9-%d1%8e%d1%80%d0%b8%d1%81%d1%82-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8-%d1%8e%d1%80%d0%b8%d0%b4%d0%b8%d1%87/?lang=ru',
+		'/gokhan-cindemir-attorney-at-law-2-2' => 'https://cindemirlaw.com/gokhan-cindemir-attorney-at-law-2-2/?lang=zh-hans',
+		'/как-получить-судимость-в-турции' => 'https://cindemirlaw.com/%d0%ba%d0%b0%d0%ba-%d0%bf%d0%be%d0%bb%d1%83%d1%87%d0%b8%d1%82%d1%8c-%d1%81%d1%83%d0%b4%d0%b8%d0%bc%d0%be%d1%81%d1%82%d1%8c-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/наследственное-право-турции-2' => 'https://cindemirlaw.com/%d0%bd%d0%b0%d1%81%d0%bb%d0%b5%d0%b4%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%b0%d0%b2%d0%be-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8-2/?lang=ru',
+		'/как-открыть-филиал-в-турции' => 'https://cindemirlaw.com/%d0%ba%d0%b0%d0%ba-%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d1%8c-%d1%84%d0%b8%d0%bb%d0%b8%d0%b0%d0%bb-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/наследственное-право-турции' => 'https://cindemirlaw.com/%d0%bd%d0%b0%d1%81%d0%bb%d0%b5%d0%b4%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%b0%d0%b2%d0%be-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/статус-условного-беженца' => 'https://cindemirlaw.com/%d1%81%d1%82%d0%b0%d1%82%d1%83%d1%81-%d1%83%d1%81%d0%bb%d0%be%d0%b2%d0%bd%d0%be%d0%b3%d0%be-%d0%b1%d0%b5%d0%b6%d0%b5%d0%bd%d1%86%d0%b0/?lang=ru',
+		'/как-развестись-в-турции' => 'https://cindemirlaw.com/%d0%ba%d0%b0%d0%ba-%d1%80%d0%b0%d0%b7%d0%b2%d0%b5%d1%81%d1%82%d0%b8%d1%81%d1%8c-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/статус-беженца-в-турции' => 'https://cindemirlaw.com/%d1%81%d1%82%d0%b0%d1%82%d1%83%d1%81-%d0%b1%d0%b5%d0%b6%d0%b5%d0%bd%d1%86%d0%b0-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/виды-компании-в-турции' => 'https://cindemirlaw.com/%d0%b2%d0%b8%d0%b4%d1%8b-%d0%ba%d0%be%d0%bc%d0%bf%d0%b0%d0%bd%d0%b8%d0%b8-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/типы-компаний-в-турции' => 'https://cindemirlaw.com/%d1%82%d0%b8%d0%bf%d1%8b-%d0%ba%d0%be%d0%bc%d0%bf%d0%b0%d0%bd%d0%b8%d0%b9-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d0%b8/?lang=ru',
+		'/права-и-обязанности' => 'https://cindemirlaw.com/%d0%bf%d1%80%d0%b0%d0%b2%d0%b0-%d0%b8-%d0%be%d0%b1%d1%8f%d0%b7%d0%b0%d0%bd%d0%bd%d0%be%d1%81%d1%82%d0%b8/?lang=ru',
+		'/вторичная-защита' => 'https://cindemirlaw.com/%d0%b2%d1%82%d0%be%d1%80%d0%b8%d1%87%d0%bd%d0%b0%d1%8f-%d0%b7%d0%b0%d1%89%d0%b8%d1%82%d0%b0/?lang=ru',
+		'/cindemir-hukuk' => 'https://cindemirlaw.com/cindemir-hukuk/?lang=zh-hans',
+		'/cindemir-law-2' => 'https://cindemirlaw.com/cindemir-law-2/?lang=ru',
+		'/author/admin' => 'https://cindemirlaw.com/',
+		'/fde1068e3' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdb0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
+		'/fde1068e' => 'https://cindemirlaw.com/fde1068e/?lang=ru',
+		'/link11' => 'https://cindemirlaw.com/link11/?lang=zh-hans',
+		'/link13' => 'https://cindemirlaw.com/link13/?lang=zh-hans',
+		'/link15' => 'https://cindemirlaw.com/link15/?lang=zh-hans',
+		'/link25' => 'https://cindemirlaw.com/link25/?lang=zh-hans',
 		'/link9' => 'https://cindemir.av.tr/en/we-are-in-news/',
 		'/press' => 'https://cindemir.av.tr/en/we-are-in-news/',
+		'/link2' => 'https://cindemirlaw.com/about-us/',
+		'/link3' => 'https://cindemirlaw.com/support/',
+		'/link4' => 'https://cindemirlaw.com/services/',
+		'/hakan' => 'https://cindemirlaw.com/hakan/?lang=zh-hans',
+		'/fde1' => 'https://cindemirlaw.com/fde1/?lang=ru',
 	);
 
-	/** Internal paths that should never appear as href targets (Ahrefs "links to redirect"). */
-	private static $href_rewrite = array(
-		'/press/'         => 'https://cindemir.av.tr/en/we-are-in-news/',
-		'/press'          => 'https://cindemir.av.tr/en/we-are-in-news/',
-		'/link9/'         => 'https://cindemir.av.tr/en/we-are-in-news/',
-		'/link9'          => 'https://cindemir.av.tr/en/we-are-in-news/',
-		'/author/admin/'  => '/',
-		'/author/admin'   => '/',
+	private static $url_replace = array(
+		'http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg' => 'https://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg',
+		'https://mersis.gtb.gov.tr/' => 'https://mersis.ticaret.gov.tr/',
+		'https://mersis.gtb.gov.tr' => 'https://mersis.ticaret.gov.tr/',
+		'https://turkodeme.com.tr/Tahsilat/Default.aspx?k=697795e3-b10e-4cbb-8251-e0c7a1b8ce76' => 'https://pos.param.com.tr/Tahsilat/Default.aspx?k=697795e3-b10e-4cbb-8251-e0c7a1b8ce76',
+		'https://www.istanbulbarosu.org.tr/AttorneySearch.aspx' => 'https://istanbulbarosu.org.tr/AttorneySearch.aspx',
+		'https://www.cindemirlaw.com/' => 'https://cindemirlaw.com/',
+		'https://www.cindemirlaw.com' => 'https://cindemirlaw.com/',
 	);
 
 	private static $missing_h1 = array(
-		3874   => 'Family Heritage',
-		3884   => 'Who is Hafız Hüseyin Hüsnü Efendi?',
-		51     => 'News & Events',
-		43     => 'Our Videos',
-		378    => 'Appointment',
-		4665   => 'Embed List',
-		2      => 'О нас',
-		105    => 'Статьи',
-		2427   => 'Наша команда',
-		2446   => 'Контакты',
-		103    => 'Поддержка',
-		56     => 'Услуги',
+		3874 => 'Family Heritage',
+		3884 => 'Who is Hafız Hüseyin Hüsnü Efendi?',
+		51 => 'News & Events',
+		43 => 'Our Videos',
+		378 => 'Appointment',
+		4665 => 'Embed List',
+		2 => 'О нас',
+		105 => 'Статьи',
+		2427 => 'Наша команда',
+		2446 => 'Контакты',
+		103 => 'Поддержка',
+		56 => 'Услуги',
 		900030 => 'Assistant',
 	);
 
 	private static $alt_map = array(
-		'white-1-copy'                  => 'Cindemir Law Office',
-		'white-2-copy'                  => 'Cindemir Law Office',
-		'white-5-copy'                  => 'Cindemir Law Office',
-		'white3-copy'                   => 'Cindemir Law Office',
-		'footlaw_banner'                => 'Cindemir Law Office legal services banner',
-		'540664430'                     => 'Istanbul skyline representing Cindemir Law Office',
+		'white-1-copy' => 'Cindemir Law Office',
+		'white-2-copy' => 'Cindemir Law Office',
+		'white-5-copy' => 'Cindemir Law Office',
+		'white3-copy' => 'Cindemir Law Office',
+		'footlaw_banner' => 'Cindemir Law Office legal services banner',
+		'540664430' => 'Istanbul skyline representing Cindemir Law Office',
 		'Gokhan_Cindemir_AttorneyAtLaw' => 'Gökhan Cindemir, Attorney at Law',
-		'Hakan_Cindemir_AttorneyatLaw'  => 'Dr. Hakan Cindemir, Attorney at Law',
-		'2e20a321-6694-44e0-ae3e'       => 'Legal scales and gavel artwork',
+		'Hakan_Cindemir_AttorneyatLaw' => 'Dr. Hakan Cindemir, Attorney at Law',
+		'2e20a321-6694-44e0-ae3e' => 'Legal scales and gavel artwork',
 	);
 
 	private static $h1_done = false;
@@ -70,6 +137,7 @@ final class Cindemir_SEO_Fixes {
 	public static function boot() {
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 1 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
@@ -79,6 +147,18 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'fix_empty_alts' ), 20 );
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
+		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
+	}
+
+	public static function kill_author_rewrites( $rules ) {
+		return array();
+	}
+
+	public static function disable_author_archives() {
+		if ( is_author() ) {
+			wp_redirect( home_url( '/' ), 301 );
+			exit;
+		}
 	}
 
 	public static function cancel_broken( $target, $url ) {
@@ -86,8 +166,8 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( $path, self::$broken, true ) ) {
 			return false;
 		}
-		if ( isset( self::$flatten[ $path ] ) ) {
-			return self::$flatten[ $path ];
+		if ( isset( self::$redirects[ $path ] ) ) {
+			return self::$redirects[ $path ];
 		}
 		return $target;
 	}
@@ -97,10 +177,28 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		$path = self::path();
-		if ( isset( self::$flatten[ $path ] ) ) {
-			wp_redirect( self::$flatten[ $path ], 301 );
-			exit;
+		if ( in_array( $path, self::$broken, true ) ) {
+			return;
 		}
+		if ( ! isset( self::$redirects[ $path ] ) ) {
+			return;
+		}
+		$dest = self::$redirects[ $path ];
+		$req  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$req_parts = wp_parse_url( $req );
+		$req_q = isset( $req_parts['query'] ) ? $req_parts['query'] : '';
+		$dest_parts = wp_parse_url( $dest );
+		$dest_path = isset( $dest_parts['path'] ) ? untrailingslashit( rawurldecode( $dest_parts['path'] ) ) : '';
+		$dest_path = '' === $dest_path ? '/' : $dest_path;
+		$dest_q = isset( $dest_parts['query'] ) ? $dest_parts['query'] : '';
+		if ( $path === $dest_path && $dest_q && $req_q && false !== strpos( $req_q, $dest_q ) ) {
+			return;
+		}
+		if ( $path === $dest_path && ! $dest_q ) {
+			return;
+		}
+		wp_redirect( $dest, 301 );
+		exit;
 	}
 
 	public static function start_buffer() {
@@ -117,6 +215,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::rewrite_hrefs_in_html( $html );
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
+		$html = self::shorten_title_tag( $html );
 		return $html;
 	}
 
@@ -125,10 +224,7 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	public static function author_to_home( $link ) {
-		if ( is_string( $link ) && false !== stripos( $link, '/author/admin' ) ) {
-			return home_url( '/' );
-		}
-		return $link;
+		return home_url( '/' );
 	}
 
 	public static function nav_href( $atts, $item ) {
@@ -183,6 +279,9 @@ final class Cindemir_SEO_Fixes {
 		if ( function_exists( 'is_page' ) && is_page( array( 'antimanual-assistant', 'embed-list' ) ) ) {
 			echo "<meta name=\"robots\" content=\"noindex,follow\" />\n";
 		}
+		if ( is_tag() ) {
+			echo "<meta name=\"robots\" content=\"noindex,follow\" />\n";
+		}
 	}
 
 	public static function fix_alt_attr( $attr, $attachment ) {
@@ -205,41 +304,25 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	private static function rewrite_hrefs_in_html( $html ) {
-		$home = untrailingslashit( home_url() );
-		$replacements = array(
-			$home . '/press/'        => 'https://cindemir.av.tr/en/we-are-in-news/',
-			$home . '/press'         => 'https://cindemir.av.tr/en/we-are-in-news/',
-			$home . '/link9/'        => 'https://cindemir.av.tr/en/we-are-in-news/',
-			$home . '/link9'         => 'https://cindemir.av.tr/en/we-are-in-news/',
-			$home . '/author/admin/' => $home . '/',
-			$home . '/author/admin'  => $home . '/',
-			'https://www.cindemirlaw.com/press/' => 'https://cindemir.av.tr/en/we-are-in-news/',
-			'https://www.cindemirlaw.com/link9/' => 'https://cindemir.av.tr/en/we-are-in-news/',
-			'https://www.cindemirlaw.com/author/admin/' => $home . '/',
-		);
-		// Also relative paths in href attributes.
-		$html = preg_replace(
-			'#(\shref=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/press/?(\2)#i',
-			'$1https://cindemir.av.tr/en/we-are-in-news/$2',
-			$html
-		);
-		$html = preg_replace(
-			'#(\shref=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/link9/?(\2)#i',
-			'$1https://cindemir.av.tr/en/we-are-in-news/$2',
-			$html
-		);
-		$html = preg_replace(
-			'#(\shref=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/author/admin/?(\2)#i',
-			'$1' . esc_url( $home . '/' ) . '$2',
-			$html
-		);
-		foreach ( $replacements as $from => $to ) {
+		foreach ( self::$url_replace as $from => $to ) {
 			$html = str_replace( $from, $to, $html );
 		}
-		// Strip lang query leftovers on press custom links if any remain as /press/?lang=
-		$html = preg_replace(
-			'#https?://(?:www\.)?cindemirlaw\.com/press/?\?[^"\'\s<>]*#i',
-			'https://cindemir.av.tr/en/we-are-in-news/',
+		$html = preg_replace_callback(
+			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)?(/[^"\']*)(\2)#i',
+			function ( $m ) {
+				$quote = $m[2];
+				$pathq = $m[4];
+				$parts = wp_parse_url( 'https://cindemirlaw.com' . $pathq );
+				$path  = isset( $parts['path'] ) ? untrailingslashit( rawurldecode( $parts['path'] ) ) : '';
+				$path  = '' === $path ? '/' : $path;
+				if ( isset( self::$redirects[ $path ] ) ) {
+					return ' href=' . $quote . esc_url( self::$redirects[ $path ] ) . $quote;
+				}
+				if ( '/author/admin' === $path ) {
+					return ' href=' . $quote . esc_url( home_url( '/' ) ) . $quote;
+				}
+				return $m[0];
+			},
 			$html
 		);
 		return $html;
@@ -247,30 +330,41 @@ final class Cindemir_SEO_Fixes {
 
 	private static function map_href( $href ) {
 		$path = self::normalize_path( $href );
-		if ( isset( self::$flatten[ $path ] ) ) {
-			return self::$flatten[ $path ];
+		if ( isset( self::$redirects[ $path ] ) ) {
+			return self::$redirects[ $path ];
 		}
 		if ( '/author/admin' === $path ) {
 			return home_url( '/' );
+		}
+		foreach ( self::$url_replace as $from => $to ) {
+			if ( 0 === strpos( $href, $from ) ) {
+				return $to;
+			}
 		}
 		return $href;
 	}
 
 	private static function ensure_missing_h1_html( $html ) {
-		if ( ! is_singular() || preg_match( '/<h1[\s>]/i', $html ) ) {
+		if ( preg_match( '/<h1[\s>]/i', $html ) ) {
 			return $html;
 		}
-		$id = get_queried_object_id();
-		if ( ! $id || ! isset( self::$missing_h1[ $id ] ) ) {
+		$title = '';
+		$id    = function_exists( 'get_queried_object_id' ) ? get_queried_object_id() : 0;
+		if ( $id && isset( self::$missing_h1[ $id ] ) ) {
+			$title = self::$missing_h1[ $id ];
+		} elseif ( is_singular() ) {
+			$title = wp_strip_all_tags( get_the_title( $id ) );
+		} elseif ( preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
+			$title = trim( preg_replace( '/\s*[-|].*$/', '', wp_strip_all_tags( $tm[1] ) ) );
+		}
+		if ( ! $title ) {
 			return $html;
 		}
-		$title = esc_html( self::$missing_h1[ $id ] );
-		$h1    = '<h1 class="cindemir-seo-h1">' . $title . '</h1>';
-		// Prefer injecting after main content openers used by Enfold.
+		$h1 = '<h1 class="cindemir-seo-h1">' . esc_html( $title ) . '</h1>';
 		$patterns = array(
 			'/(<main\b[^>]*>)/i',
-			'/(<div[^>]*class="[^"]*\bcontainer\b[^"]*"[^>]*>)/i',
 			'/(<div[^>]*id="main"[^>]*>)/i',
+			'/(<div[^>]*class="[^"]*\bcontainer\b[^"]*"[^>]*>)/i',
 			'/(<body\b[^>]*>)/i',
 		);
 		foreach ( $patterns as $pattern ) {
@@ -304,6 +398,56 @@ final class Cindemir_SEO_Fixes {
 				return preg_replace( '/\salt\s*=\s*([\'"])\s*\1/i', 'alt="' . esc_attr( $alt ) . '"', $tag, 1 );
 			},
 			$html
+		);
+	}
+
+	private static function shorten_title_tag( $html ) {
+		return preg_replace_callback(
+			'/<title>(.*?)<\/title>/is',
+			function ( $m ) {
+				$raw = wp_strip_all_tags( $m[1] );
+				$raw = html_entity_decode( $raw, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				$raw = preg_replace( '/\s+/', ' ', trim( $raw ) );
+				if ( function_exists( 'mb_strlen' ) ) {
+					$len = mb_strlen( $raw );
+				} else {
+					$len = strlen( $raw );
+				}
+				if ( $len <= 60 ) {
+					return '<title>' . esc_html( $raw ) . '</title>';
+				}
+				$brand = 'Cindemir Law Office';
+				$base  = preg_replace( '/\s*[-|–—]\s*Cindemir Law Office\s*$/u', '', $raw );
+				$base  = trim( $base );
+				$max   = 55;
+				if ( function_exists( 'mb_strlen' ) && mb_strlen( $base ) > $max ) {
+					$cut = mb_substr( $base, 0, $max );
+					$pos = mb_strrpos( $cut, ' ' );
+					if ( false !== $pos ) {
+						$cut = mb_substr( $cut, 0, $pos );
+					}
+					$base = $cut . '…';
+				} elseif ( strlen( $base ) > $max ) {
+					$cut = substr( $base, 0, $max );
+					$pos = strrpos( $cut, ' ' );
+					if ( false !== $pos ) {
+						$cut = substr( $cut, 0, $pos );
+					}
+					$base = $cut . '...';
+				}
+				$new = $base . ' - ' . $brand;
+				$new_len = function_exists( 'mb_strlen' ) ? mb_strlen( $new ) : strlen( $new );
+				if ( $new_len > 60 ) {
+					if ( function_exists( 'mb_substr' ) ) {
+						$new = mb_substr( $base, 0, 48 ) . '… | Cindemir';
+					} else {
+						$new = substr( $base, 0, 48 ) . '... | Cindemir';
+					}
+				}
+				return '<title>' . esc_html( $new ) . '</title>';
+			},
+			$html,
+			1
 		);
 	}
 

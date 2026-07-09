@@ -133,3 +133,17 @@ Deployable package in [`fixes/`](../../fixes/INSTALL.md):
 
 ### Note on cindemir.av.tr
 Outbound only. No deploy was made to av.tr. Broken `howtodivorce.html` fixed on the **linking** side (cindemirlaw.com).
+
+
+## Completion pass (2026-07-09 night) — v1.5.0
+
+mu-plugin now:
+- Rewrites **all** Ahrefs "links to redirect" internal targets to their final URLs (incl. WPML `?lang=ru|zh-hans`, `/link2-4`, short `fde…` aliases)
+- Disables author archives (`/author/admin/` → home)
+- Trims `<title>` tags longer than 60 chars in HTML output
+- Injects missing H1s from title when theme omits them
+- Rewrites known external redirect URLs (mersis, turkodeme, istanbul barosu www, mixed-content image)
+
+Still outside this site's control:
+- `cindemir.av.tr/howtodivorce.html` remains 404 on av.tr (no longer linked from cindemirlaw.com)
+- External 403s (barobirlik) / social robots blocks
