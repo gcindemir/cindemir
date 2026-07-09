@@ -106,16 +106,30 @@ Deployable package in [`fixes/`](../../fixes/INSTALL.md):
 | External links | 1412 | Low (mostly social / Google) |
 | Blocked by robots.txt | 233 | Info (LinkedIn etc.) |
 
-### Fix now
-1. **404:** `https://cindemir.av.tr/howtodivorce.html` linked from `/introduction-to-jurisdiction-of-divorce-in-turkey/` → point to a live divorce page (or restore file on av.tr).
-2. **Mixed content:** replace `http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg` with `https://…` on:
-   - `/definition-regarding-conflict-of-laws-in-turkey/`
-   - `/trade-law-of-turkey/`
-3. **Internal links to redirects (top):**
-   - 305 links → `/press/` (should go to final `cindemir.av.tr/en/we-are-in-news/` or a local News page)
-   - 271 links → `/author/admin/`
-   - many hash/`fde…` RU slugs still linked instead of canonical URLs
-4. **External 403:** `barobirlik.org.tr` (bot-blocked; optional link change, not a site bug)
+### Fix now → **done live (2026-07-09 evening)**
+1. **404:** post 472 content updated: `howtodivorce.html` → `https://cindemir.av.tr/en/how-to-divorce-in-turkey/`.
+2. **Mixed content:** posts 2256 & 2247 image URLs upgraded to `https://cindemir.av.tr/...`.
+3. **Internal links to redirects (top volume):**
+   - Menu items 35 / 2673 / 2678 (`Press`) converted to custom links → `https://cindemir.av.tr/en/we-are-in-news/`
+   - mu-plugin **v1.4.0** rewrites remaining `/press/`, `/link9/`, `/author/admin/` hrefs in HTML output + `author_link` filter
+   - `/link9/` and `/press/` still 301 one-hop to the same final URL (safe for bookmarks)
+4. **External 403:** `barobirlik.org.tr` left as-is (bot-blocked; not a site bug)
+
+### Live verification (nocache)
+| Check | Result |
+|-------|--------|
+| `/press/` hrefs on sample pages | **0** (rewritten to av.tr news) |
+| `/author/admin/` hrefs | **0** (rewritten to `/`) |
+| `/family-heritage/` H1 | present (`cindemir-seo-h1`) |
+| divorce 404 / mixed `http://` | gone |
+| `/how-to-lift-entry-ban-to-turkey/` | **200** EN |
+| `/link9/`, `/press/` | **301** → av.tr news |
+
+### Remaining (lower Ahrefs impact)
+- ~400 links still point at RU hash/`fde…` or Cyrillic slugs that 301 to `?lang=ru` (WPML canonicalization). Prefer linking canonical RU URLs with `?lang=ru` in menus/widgets when editing content.
+- Homepage / long CISG articles: keep one H1 (plugin demotes extras in `the_content`; Enfold builder home already one H1).
+- Title/meta length polish in Yoast (109 long titles).
+- Optional: disable author archives in Yoast so `/author/admin/` 301 can be removed entirely.
 
 ### Note on cindemir.av.tr
-15 outbound links from cindemirlaw.com; 1 broken (`howtodivorce.html`), 2 mixed-content image URLs. No deploy was made to av.tr in this session.
+Outbound only. No deploy was made to av.tr. Broken `howtodivorce.html` fixed on the **linking** side (cindemirlaw.com).
