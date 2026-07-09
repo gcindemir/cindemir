@@ -149,3 +149,36 @@ Still outside this site's control:
 - External 403s (barobirlik) / social robots blocks
 
 Also v1.5.1: generic `fde…` / Cyrillic path → `?lang=ru` href+redirect resolver.
+
+
+## Google Search Console findings (2026-07-09)
+
+Property: `sc-domain:cindemirlaw.com`
+
+### Indexing
+| Status | Count |
+|--------|------:|
+| Indexed | 95 |
+| Not indexed | 410 |
+
+**Why not indexed**
+| Reason | Pages |
+|--------|------:|
+| Crawled – currently not indexed | 194 |
+| Discovered – currently not indexed | 186 |
+| Not found (404) | 13 |
+| Page with redirect | 9 |
+| Excluded by noindex | 6 |
+| Redirect error | 2 |
+
+### Other GSC
+- HTTPS: OK (0 issues)
+- Manual actions / Security: OK
+- Core Web Vitals: insufficient data (desktop + mobile)
+- Sitemaps: apex OK (~303 URLs); **failed** entry `http://www.cindemirlaw.com/sitemap_index.xml` (remove in GSC)
+- Performance (3 mo): 142 clicks · 32.1K impressions · 0.4% CTR · avg pos 15.5
+
+### Live bugs found while probing GSC candidates
+- `/russian/` and `/chinese/` → **HTTP 500** (old physical dirs / broken WP). Fixed in mu-plugin **v1.5.2** → `/?lang=ru` and `/?lang=zh-hans`
+- `/zh/`, `/zh-hans/` → 404 → same ZH home redirect in v1.5.2
+- Sitemap still lists `/press/?lang=ru|zh-hans` (those 301 to av.tr news)
