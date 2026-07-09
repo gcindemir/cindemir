@@ -84,3 +84,13 @@ Homepage has **4 H1s** (`About Our Law Office`, `Welcome`, `Our Articles`, `Our 
 3. Trim `/articles/` archive weight
 4. Add alt text on logo/banner images
 5. Then decide: redesign, `.co` redirect, or WP cleanup
+
+## Fixes prepared (2026-07-09)
+
+Deployable package in [`fixes/`](../../fixes/INSTALL.md):
+
+- `fixes/mu-plugins/cindemir-seo-fixes.php` — H1, orphans, alts, redirect guards
+- `fixes/redirection/` — rules to delete/import in Redirection plugin
+- `fixes/htaccess/` — www→apex + press/link9 one-hop rules
+
+**Not yet live:** WP/FTP credentials were not available in this environment. Upload per `fixes/INSTALL.md`.
