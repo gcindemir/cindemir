@@ -179,6 +179,10 @@ Property: `sc-domain:cindemirlaw.com`
 - Performance (3 mo): 142 clicks · 32.1K impressions · 0.4% CTR · avg pos 15.5
 
 ### Live bugs found while probing GSC candidates
-- `/russian/` and `/chinese/` → **HTTP 500** (old physical dirs / broken WP). Fixed in mu-plugin **v1.5.2** → `/?lang=ru` and `/?lang=zh-hans`
-- `/zh/`, `/zh-hans/` → 404 → same ZH home redirect in v1.5.2
+- `/russian/` and `/chinese/` → **HTTP 500** (old physical dirs / broken WP). Fixed in mu-plugin **v1.5.3** → `/?lang=ru` and `/?lang=zh-hans`
+- `/zh/`, `/zh-hans/` → 404 → same ZH home redirect in v1.5.3
 - Sitemap still lists `/press/?lang=ru|zh-hans` (those 301 to av.tr news)
+
+### Follow-up applied
+- mu-plugin **v1.5.3**: exclude `/press/` (and other redirect paths) from Yoast XML sitemap entries.
+- GSC actions: remove failed `http://www…` sitemap if UI allows; request indexing for key URLs; start validation on 404/redirect-error groups.

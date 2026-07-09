@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.2
+ * Version: 1.5.3
  * Author: Cindemir Law Office
  */
 
@@ -152,6 +152,32 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
+		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_press_from_sitemap' ) );
+		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
+	}
+
+	/** Keep redirecting Press page out of Yoast XML sitemaps. */
+	public static function exclude_press_from_sitemap( $ids ) {
+		if ( ! is_array( $ids ) ) {
+			$ids = array();
+		}
+		$press = get_page_by_path( 'press' );
+		if ( $press ) {
+			$ids[] = (int) $press->ID;
+		}
+		return array_values( array_unique( array_map( 'intval', $ids ) ) );
+	}
+
+	public static function filter_sitemap_entry( $url, $type, $object ) {
+		if ( ! is_array( $url ) || empty( $url['loc'] ) ) {
+			return $url;
+		}
+		$path = self::normalize_path( $url['loc'] );
+		$skip = array( '/press', '/link9', '/link2', '/link3', '/link4', '/author/admin', '/russian', '/chinese', '/zh', '/zh-hans' );
+		if ( in_array( $path, $skip, true ) ) {
+			return false;
+		}
+		return $url;
 	}
 
 	public static function kill_author_rewrites( $rules ) {
