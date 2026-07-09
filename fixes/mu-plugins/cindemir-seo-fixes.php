@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: Cindemir Law Office
  */
 
@@ -166,8 +166,11 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( $path, self::$broken, true ) ) {
 			return false;
 		}
-		if ( isset( self::$redirects[ $path ] ) ) {
-			return self::$redirects[ $path ];
+		$parts = wp_parse_url( $url );
+		$q = isset( $parts['query'] ) ? $parts['query'] : '';
+		$dest = self::resolve_path_dest( $path, $q );
+		if ( $dest ) {
+			return $dest;
 		}
 		return $target;
 	}
@@ -180,13 +183,13 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( $path, self::$broken, true ) ) {
 			return;
 		}
-		if ( ! isset( self::$redirects[ $path ] ) ) {
-			return;
-		}
-		$dest = self::$redirects[ $path ];
 		$req  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		$req_parts = wp_parse_url( $req );
 		$req_q = isset( $req_parts['query'] ) ? $req_parts['query'] : '';
+		$dest = self::resolve_path_dest( $path, $req_q );
+		if ( ! $dest ) {
+			return;
+		}
 		$dest_parts = wp_parse_url( $dest );
 		$dest_path = isset( $dest_parts['path'] ) ? untrailingslashit( rawurldecode( $dest_parts['path'] ) ) : '';
 		$dest_path = '' === $dest_path ? '/' : $dest_path;
@@ -315,11 +318,10 @@ final class Cindemir_SEO_Fixes {
 				$parts = wp_parse_url( 'https://cindemirlaw.com' . $pathq );
 				$path  = isset( $parts['path'] ) ? untrailingslashit( rawurldecode( $parts['path'] ) ) : '';
 				$path  = '' === $path ? '/' : $path;
-				if ( isset( self::$redirects[ $path ] ) ) {
-					return ' href=' . $quote . esc_url( self::$redirects[ $path ] ) . $quote;
-				}
-				if ( '/author/admin' === $path ) {
-					return ' href=' . $quote . esc_url( home_url( '/' ) ) . $quote;
+				$q     = isset( $parts['query'] ) ? $parts['query'] : '';
+				$dest  = self::resolve_path_dest( $path, $q );
+				if ( $dest ) {
+					return ' href=' . $quote . esc_url( $dest ) . $quote;
 				}
 				return $m[0];
 			},
@@ -330,11 +332,11 @@ final class Cindemir_SEO_Fixes {
 
 	private static function map_href( $href ) {
 		$path = self::normalize_path( $href );
-		if ( isset( self::$redirects[ $path ] ) ) {
-			return self::$redirects[ $path ];
-		}
-		if ( '/author/admin' === $path ) {
-			return home_url( '/' );
+		$parts = wp_parse_url( $href );
+		$q = isset( $parts['query'] ) ? $parts['query'] : '';
+		$dest = self::resolve_path_dest( $path, $q );
+		if ( $dest ) {
+			return $dest;
 		}
 		foreach ( self::$url_replace as $from => $to ) {
 			if ( 0 === strpos( $href, $from ) ) {
@@ -342,6 +344,32 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 		return $href;
+	}
+
+	/**
+	 * Resolve a path to its final URL when it would otherwise 301.
+	 *
+	 * @param string $path Normalized path without trailing slash.
+	 * @param string $query Existing query string (may already include lang=).
+	 * @return string|false
+	 */
+	private static function resolve_path_dest( $path, $query = '' ) {
+		if ( '/author/admin' === $path ) {
+			return home_url( '/' );
+		}
+		if ( isset( self::$redirects[ $path ] ) ) {
+			return self::$redirects[ $path ];
+		}
+		// WPML RU hash slugs and Cyrillic paths redirect to ?lang=ru when missing.
+		if ( $query && false !== strpos( $query, 'lang=' ) ) {
+			return false;
+		}
+		$is_fde = ( 0 === strpos( $path, '/fde' ) );
+		$is_cyr = (bool) preg_match( '/[А-Яа-яЁё]/u', $path );
+		if ( $is_fde || $is_cyr ) {
+			return home_url( user_trailingslashit( $path ) . '?lang=ru' );
+		}
+		return false;
 	}
 
 	private static function ensure_missing_h1_html( $html ) {
