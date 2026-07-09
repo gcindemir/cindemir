@@ -94,3 +94,28 @@ Deployable package in [`fixes/`](../../fixes/INSTALL.md):
 - `fixes/htaccess/` — www→apex + press/link9 one-hop rules
 
 **Not yet live:** WP/FTP credentials were not available in this environment. Upload per `fixes/INSTALL.md`.
+
+## Additional crawl exports (links / images) — analyzed 2026-07-09
+
+| Report | Count | Priority |
+|--------|------:|----------|
+| Links → 4xx | 5 | High (1 real 404 on cindemir.av.tr) |
+| Mixed content (http images) | 2 | High |
+| Links → redirect URLs | 999 (75 unique targets) | Medium |
+| Images without alt | 72 | Medium (partially fixed live) |
+| External links | 1412 | Low (mostly social / Google) |
+| Blocked by robots.txt | 233 | Info (LinkedIn etc.) |
+
+### Fix now
+1. **404:** `https://cindemir.av.tr/howtodivorce.html` linked from `/introduction-to-jurisdiction-of-divorce-in-turkey/` → point to a live divorce page (or restore file on av.tr).
+2. **Mixed content:** replace `http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg` with `https://…` on:
+   - `/definition-regarding-conflict-of-laws-in-turkey/`
+   - `/trade-law-of-turkey/`
+3. **Internal links to redirects (top):**
+   - 305 links → `/press/` (should go to final `cindemir.av.tr/en/we-are-in-news/` or a local News page)
+   - 271 links → `/author/admin/`
+   - many hash/`fde…` RU slugs still linked instead of canonical URLs
+4. **External 403:** `barobirlik.org.tr` (bot-blocked; optional link change, not a site bug)
+
+### Note on cindemir.av.tr
+15 outbound links from cindemirlaw.com; 1 broken (`howtodivorce.html`), 2 mixed-content image URLs. No deploy was made to av.tr in this session.
