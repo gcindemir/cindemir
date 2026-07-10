@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.3
+ * Version: 1.5.4
  * Author: Cindemir Law Office
  */
 
@@ -147,6 +147,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'noindex_utility' ), 1 );
+		add_filter( 'wp_robots', array( __CLASS__, 'filter_wp_robots' ), 99 );
+		add_filter( 'wpseo_robots', array( __CLASS__, 'filter_yoast_robots' ), 99 );
 		add_filter( 'wp_get_attachment_image_attributes', array( __CLASS__, 'fix_alt_attr' ), 10, 2 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_empty_alts' ), 20 );
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
@@ -308,13 +310,44 @@ final class Cindemir_SEO_Fixes {
 		echo "</nav>\n";
 	}
 
-	public static function noindex_utility() {
+	/** True when utility/tag URLs must stay out of the index. */
+	private static function should_noindex() {
 		if ( function_exists( 'is_page' ) && is_page( array( 'antimanual-assistant', 'embed-list' ) ) ) {
-			echo "<meta name=\"robots\" content=\"noindex,follow\" />\n";
+			return true;
 		}
-		if ( is_tag() ) {
-			echo "<meta name=\"robots\" content=\"noindex,follow\" />\n";
+		return is_tag();
+	}
+
+	public static function noindex_utility() {
+		// Prefer wp_robots / Yoast filters; keep a late meta only as fallback
+		// when those APIs are unavailable (should not duplicate index+noindex).
+		if ( ! self::should_noindex() ) {
+			return;
 		}
+		if ( has_filter( 'wp_robots' ) || has_filter( 'wpseo_robots' ) ) {
+			return;
+		}
+		echo "<meta name=\"robots\" content=\"noindex,follow\" />\n";
+	}
+
+	public static function filter_wp_robots( $robots ) {
+		if ( ! self::should_noindex() ) {
+			return $robots;
+		}
+		if ( ! is_array( $robots ) ) {
+			$robots = array();
+		}
+		$robots['noindex'] = true;
+		$robots['follow']  = true;
+		unset( $robots['index'] );
+		return $robots;
+	}
+
+	public static function filter_yoast_robots( $robots ) {
+		if ( ! self::should_noindex() ) {
+			return $robots;
+		}
+		return 'noindex, follow';
 	}
 
 	public static function fix_alt_attr( $attr, $attachment ) {

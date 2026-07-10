@@ -186,3 +186,22 @@ Property: `sc-domain:cindemirlaw.com`
 ### Follow-up applied
 - mu-plugin **v1.5.3**: exclude `/press/` (and other redirect paths) from Yoast XML sitemap entries.
 - GSC actions: remove failed `http://www…` sitemap if UI allows; request indexing for key URLs; start validation on 404/redirect-error groups.
+
+## Live re-check (2026-07-10)
+
+Verified against production after mu-plugin deploy:
+
+| Ahrefs CSV issue | Live status |
+|------------------|-------------|
+| Missing H1 (13 indexable) | Fixed — pages now emit H1 |
+| Long titles (108) | Mitigated — output titles trimmed ≤60 |
+| Orphans our-videos / appointment | Linked from footer nav |
+| Orphan antimanual-assistant | Intentionally unlinked + noindex (v1.5.4 clears Yoast index conflict) |
+| 4xx howtodivorce.html | Fixed — points to `cindemir.av.tr/en/how-to-divorce-in-turkey/` |
+| External 403 (barobirlik, tmgrup) | Not site bugs |
+| Redirect chains link9/press/EN→RU | Flattened / cancelled |
+| www http→https→apex (2 hops) | Still needs `.htaccess` one-hop (snippet in `fixes/htaccess/`) |
+| Empty alts (sample pages) | 0 empty on home/articles/cindemir |
+
+Fresh Ahrefs Site Audit crawl still needed after domain verification / login.
+

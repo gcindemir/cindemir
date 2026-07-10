@@ -13,7 +13,7 @@ WordPress admin / FTP access is required. This repo has no live server credentia
 | Missing H1 (heritage, RU pages, etc.) | Inject H1 (content + full-page buffer) |
 | Multiple H1 (home, long articles) | Keep first H1, demote rest to H2 |
 | Orphan `/our-videos/`, `/appointment/` | Footer internal links |
-| `/antimanual-assistant/`, `/embed-list/` | `noindex` |
+| `/antimanual-assistant/`, `/embed-list/` | `noindex` via `wp_robots` + Yoast filter (v1.5.4; avoids index+noindex conflict) |
 | Empty image `alt=""` | Fill from filename map (content + buffer) |
 
 ## Steps (≈ 10 minutes)
