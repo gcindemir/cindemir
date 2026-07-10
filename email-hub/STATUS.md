@@ -1,31 +1,40 @@
 # Live cutover status
 
-Updated: 2026-07-10 (continue pass)
+Updated: 2026-07-10 08:05 UTC
 
-## Done in repo
+## Critical discovery
 
-- [x] Architecture: Workspace hub + forwarding (no POP)
-- [x] DNS record sheet + **APPLY-DNS-ON-YOUR-PC.md** (Doruk unreachable from VM)
-- [x] Migration checklist, client setup, forwarding guides
+**`cindemir.av.tr` is NOT on Google Workspace.**
 
-## Live progress this session
+Google message:
 
-| Step | Status |
-|------|--------|
-| Consumer Gmail settings open | `gokhancindemir44@gmail.com` → Forwarding/POP/IMAP page reachable |
-| Disable POP / enable forward | **Not finished** — settings UI flaky with DevTools; needs clean click + confirm code to `gokhan@cindemir.av.tr` |
-| Google Admin | **Blocked** — Admin requires **Workspace admin**, not consumer Gmail. Password prompt for `gokhancindemir44@gmail.com` failed (wrong password / not admin). Need login as `gokhan@cindemir.av.tr` (or create Workspace if none). |
-| Doruk DNS | **Blocked from VM** — all Doruk panels connection reset. Use [APPLY-DNS-ON-YOUR-PC.md](./APPLY-DNS-ON-YOUR-PC.md) |
-| MX still Doruk | Confirmed — do not forward-only plan as final until Google MX live |
+> … login page for a domain that isn't using Google Workspace.
 
-## What you must do on Desktop now
+Current mail = **Doruk** only. Hub cannot go live until Workspace is created for this domain.
 
-1. **Workspace admin login**  
-   - Open Desktop view  
-   - Sign in to https://admin.google.com as **`gokhan@cindemir.av.tr`** (not @gmail.com)  
-   - If that account does not exist → start https://workspace.google.com signup for `cindemir.av.tr`
+## Done
 
-2. **Doruk DNS on your PC**  
-   - Apply records from APPLY-DNS-ON-YOUR-PC.md **after** Workspace users exist
+- [x] Architecture + migration pack in `email-hub/`
+- [x] DNS sheet + [APPLY-DNS-ON-YOUR-PC.md](./APPLY-DNS-ON-YOUR-PC.md) (Doruk blocked from cloud VM)
+- [x] Confirmed domain not on Workspace
+- [x] Opened Workspace signup / pricing flow on Desktop
 
-3. Tell the agent when Admin is open / MX switched — forwarding + Outlook steps resume immediately
+## Blocked / needs you (Desktop)
+
+1. **Create Google Workspace** for `cindemir.av.tr`  
+   - Desktop is on Workspace pricing/signup  
+   - Choose **Business Starter** (or higher) → start trial  
+   - Use domain **`cindemir.av.tr`**  
+   - Admin user: **`gokhan@cindemir.av.tr`**  
+   - Do **not** only “upgrade” consumer Gmail without attaching the domain
+
+2. After Admin opens: create alias `cindemir@` → `gokhan@`
+
+3. On **your PC**, apply Doruk DNS from APPLY-DNS-ON-YOUR-PC.md
+
+4. Then: forward Gmail / iCloud / Yahoo → hub; configure Outlook/phones
+
+## Do not do yet
+
+- Do not switch MX before Workspace users exist  
+- Do not enable personal “Send as” for yahoo/me/gmail on the hub

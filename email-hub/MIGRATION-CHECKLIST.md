@@ -4,9 +4,10 @@ Do **in order**. Do not change MX before users exist and domain is verified in W
 
 ## Phase 0 — Access
 
-- [ ] Google Admin login works (`admin.google.com`) with an admin for `cindemir.av.tr`
-- [ ] Doruk DNS login works for `cindemir.av.tr`
-- [ ] Confirm Workspace subscription / seats for `gokhan@` and optionally `cindemir@`
+- [ ] **Create Google Workspace** for `cindemir.av.tr` (domain is NOT on Workspace today)
+- [ ] Google Admin login works as `gokhan@cindemir.av.tr`
+- [ ] Doruk DNS login works on your PC (cloud VM cannot reach Doruk panels)
+- [ ] Confirm Workspace subscription / seats
 
 ## Phase 1 — Workspace prep (before MX change)
 
