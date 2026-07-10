@@ -196,7 +196,7 @@ Verified against production after mu-plugin deploy:
 | Missing H1 (13 indexable) | Fixed — pages now emit H1 |
 | Long titles (108) | Mitigated — output titles trimmed ≤60 |
 | Orphans our-videos / appointment | Linked from footer nav |
-| Orphan antimanual-assistant | Intentionally unlinked + noindex (v1.5.4 clears Yoast index conflict) |
+| Orphan antimanual-assistant | Intentionally unlinked + noindex (v1.5.5 clears Yoast index conflict via robots filters + HTML normalize) |
 | 4xx howtodivorce.html | Fixed — points to `cindemir.av.tr/en/how-to-divorce-in-turkey/` |
 | External 403 (barobirlik, tmgrup) | Not site bugs |
 | Redirect chains link9/press/EN→RU | Flattened / cancelled |

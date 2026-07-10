@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.4
+ * Version: 1.5.5
  * Author: Cindemir Law Office
  */
 
@@ -251,7 +251,33 @@ final class Cindemir_SEO_Fixes {
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::shorten_title_tag( $html );
+		$html = self::normalize_robots_meta( $html );
 		return $html;
+	}
+
+	/**
+	 * Ensure utility/tag pages expose a single noindex robots directive
+	 * even when Yoast/cache still emit index,follow.
+	 */
+	private static function normalize_robots_meta( $html ) {
+		if ( ! self::should_noindex() ) {
+			return $html;
+		}
+		$html = preg_replace(
+			'/<meta\b[^>]*\bname=(["\'])robots\1[^>]*>\s*/i',
+			'',
+			$html
+		);
+		$html = preg_replace(
+			'/<meta\b[^>]*\bcontent=(["\'])[^"\']*\1[^>]*\bname=(["\'])robots\2[^>]*>\s*/i',
+			'',
+			$html
+		);
+		$tag = '<meta name="robots" content="noindex, follow" />' . "\n";
+		if ( preg_match( '/<head\b[^>]*>/i', $html ) ) {
+			return preg_replace( '/<head\b[^>]*>/i', '$0' . "\n" . $tag, $html, 1 );
+		}
+		return $tag . $html;
 	}
 
 	public static function rewrite_content_hrefs( $content ) {
@@ -312,10 +338,14 @@ final class Cindemir_SEO_Fixes {
 
 	/** True when utility/tag URLs must stay out of the index. */
 	private static function should_noindex() {
+		if ( is_tag() ) {
+			return true;
+		}
 		if ( function_exists( 'is_page' ) && is_page( array( 'antimanual-assistant', 'embed-list' ) ) ) {
 			return true;
 		}
-		return is_tag();
+		$path = self::path();
+		return in_array( $path, array( '/antimanual-assistant', '/embed-list' ), true );
 	}
 
 	public static function noindex_utility() {
