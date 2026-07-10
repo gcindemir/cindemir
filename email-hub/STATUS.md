@@ -1,24 +1,31 @@
 # Live cutover status
 
-Updated: 2026-07-10
+Updated: 2026-07-10 (continue pass)
 
 ## Done in repo
 
-- [x] Architecture chosen: Workspace hub + forwarding (no POP)
-- [x] DNS record sheet for Doruk → Google
+- [x] Architecture: Workspace hub + forwarding (no POP)
+- [x] DNS record sheet + **APPLY-DNS-ON-YOUR-PC.md** (Doruk unreachable from VM)
 - [x] Migration checklist, client setup, forwarding guides
 
-## Waiting on you (credentials / 2FA)
+## Live progress this session
 
 | Step | Status |
 |------|--------|
-| Google Admin password / 2FA | **Blocked** — Chrome at password prompt for `gokhancindemir44@gmail.com` → admin.google.com |
-| Confirm Workspace owns `cindemir.av.tr` | Pending Admin access |
-| Create/verify `gokhan@` + `cindemir@` alias | Pending |
-| Doruk DNS login | **Blocked from this VM** — `dns.doruk.net.tr` → `ERR_CONNECTION_RESET` |
-| Publish MX/SPF/DKIM/DMARC | Pending reachable Doruk panel (or you paste records in Doruk UI using DNS-RECORDS.md) |
-| Enable Gmail/iCloud/Yahoo forwarding | Pending each mailbox login after hub receives mail |
+| Consumer Gmail settings open | `gokhancindemir44@gmail.com` → Forwarding/POP/IMAP page reachable |
+| Disable POP / enable forward | **Not finished** — settings UI flaky with DevTools; needs clean click + confirm code to `gokhan@cindemir.av.tr` |
+| Google Admin | **Blocked** — Admin requires **Workspace admin**, not consumer Gmail. Password prompt for `gokhancindemir44@gmail.com` failed (wrong password / not admin). Need login as `gokhan@cindemir.av.tr` (or create Workspace if none). |
+| Doruk DNS | **Blocked from VM** — all Doruk panels connection reset. Use [APPLY-DNS-ON-YOUR-PC.md](./APPLY-DNS-ON-YOUR-PC.md) |
+| MX still Doruk | Confirmed — do not forward-only plan as final until Google MX live |
 
-## After you unlock Admin + Doruk
+## What you must do on Desktop now
 
-Agent can continue: create users/aliases, copy DKIM, apply DNS, turn on forwarding, verify with test messages.
+1. **Workspace admin login**  
+   - Open Desktop view  
+   - Sign in to https://admin.google.com as **`gokhan@cindemir.av.tr`** (not @gmail.com)  
+   - If that account does not exist → start https://workspace.google.com signup for `cindemir.av.tr`
+
+2. **Doruk DNS on your PC**  
+   - Apply records from APPLY-DNS-ON-YOUR-PC.md **after** Workspace users exist
+
+3. Tell the agent when Admin is open / MX switched — forwarding + Outlook steps resume immediately
