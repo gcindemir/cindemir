@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.6
+ * Version: 1.5.7
  * Author: Cindemir Law Office
  */
 
@@ -149,7 +149,28 @@ final class Cindemir_SEO_Fixes {
 
 	private static $h1_done = false;
 
+	/** Reklamsız meta descriptions (Görev 1 — 14 sayfa). */
+	private static $meta_descriptions = array(
+		43   => "Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa.",
+		2    => 'Cindemir Law Office — независимая юридическая фирма в Стамбуле, работающая с 2004 года в сфере турецкого и международного права.',
+		105  => 'Статьи о турецком праве: гражданское, коммерческое, миграционное и уголовное право Турции для иностранных граждан и компаний.',
+		3884 => "Hafız Hüseyin Hüsnü Efendi'nin biyografisi: 1847'de Batum'da doğan bu ismin hayatı, ilmî kişiliği ve tarihsel arka planı ele alınır.",
+		16   => "Cindemir Law Office, 2004'ten bu yana İstanbul'da faaliyet gösteren, Türk ve uluslararası hukuk alanında çalışan bağımsız bir hukuk bürosudur.",
+		2427 => 'Команда Cindemir Law Office: адвокаты и консультанты, работающие в области турецкого и международного права в Стамбуле.',
+		392  => "Cindemir Law Office'in müvekkillerle iletişimi ve Türkiye'deki hukuki süreçlerde yabancılara sağladığı destek hakkında bilgi.",
+		51   => "Cindemir Law Office'ten haberler ve etkinlikler: yabancı birey ve şirketleri ilgilendiren Türk hukukundaki gelişmelere dair güncellemeler.",
+		19   => 'Cindemir Law Office ekibi: İstanbul\'da Türk ve uluslararası hukuk alanında çalışan avukatlar ve danışmanlar hakkında bilgi.',
+		103  => 'О порядке общения адвоката с подзащитным в Турции: обмен информацией, права и обязанности сторон в уголовном процессе.',
+		17   => 'Türk hukukuna dair makaleler: yabancı birey ve şirketleri ilgilendiren medeni, ticari, göç ve ceza hukuku konuları ele alınır.',
+		390  => "Cindemir Law Office'in gizlilik politikası: web sitesi ziyaretçilerine ait kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu açıklanır.",
+		56   => 'Юридические услуги в Турции: корпоративное, миграционное, семейное и уголовное право для иностранных клиентов в Стамбуле.',
+		3874 => "Cindemir Law Office'in tarihçesi: Osmanlı mahkemelerinden günümüze uzanan hukuki geçmişi İstanbul üzerinden anlatılır.",
+	);
+
 	public static function boot() {
+		add_action( 'init', array( __CLASS__, 'apply_meta_descriptions_once' ), 20 );
+		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_yoast_metadesc' ), 20 );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
@@ -262,7 +283,93 @@ final class Cindemir_SEO_Fixes {
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::shorten_title_tag( $html );
+		$html = self::fix_meta_description_html( $html );
 		$html = self::normalize_robots_meta( $html );
+		return $html;
+	}
+
+	/** One-time Yoast DB sync after deploy (first front-end or REST hit). */
+	public static function apply_meta_descriptions_once() {
+		if ( get_option( 'cindemir_seo_meta_v1_applied' ) ) {
+			return;
+		}
+		$updated = 0;
+		foreach ( self::$meta_descriptions as $id => $desc ) {
+			if ( ! get_post( $id ) ) {
+				continue;
+			}
+			update_post_meta( (int) $id, '_yoast_wpseo_metadesc', $desc );
+			$updated++;
+		}
+		update_option( 'cindemir_seo_meta_v1_applied', 1, false );
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+	}
+
+	public static function filter_yoast_metadesc( $desc ) {
+		$id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( $id && isset( self::$meta_descriptions[ $id ] ) ) {
+			return self::$meta_descriptions[ $id ];
+		}
+		return $desc;
+	}
+
+	public static function register_rest_routes() {
+		register_rest_route(
+			'cindemir/v1',
+			'/apply-seo-meta',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_apply_seo_meta' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_apply_seo_meta( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		delete_option( 'cindemir_seo_meta_v1_applied' );
+		self::apply_meta_descriptions_once();
+		$results = array();
+		foreach ( self::$meta_descriptions as $id => $expected ) {
+			$stored = get_post_meta( (int) $id, '_yoast_wpseo_metadesc', true );
+			$results[ $id ] = array(
+				'ok'    => ( $stored === $expected ),
+				'len'   => function_exists( 'mb_strlen' ) ? mb_strlen( (string) $stored ) : strlen( (string) $stored ),
+			);
+		}
+		return new WP_REST_Response(
+			array(
+				'ok'      => true,
+				'version' => '1.5.7',
+				'pages'   => $results,
+			),
+			200
+		);
+	}
+
+	private static function fix_meta_description_html( $html ) {
+		$id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( ! $id || ! isset( self::$meta_descriptions[ $id ] ) ) {
+			return $html;
+		}
+		$desc = esc_attr( self::$meta_descriptions[ $id ] );
+		$html = preg_replace(
+			'/<meta\s+name=(["\'])description\1[^>]*>/i',
+			'<meta name="description" content="' . $desc . '" />',
+			$html,
+			1
+		);
+		$html = preg_replace(
+			'/<meta\s+property=(["\'])og:description\1[^>]*>/i',
+			'<meta property="og:description" content="' . $desc . '" />',
+			$html,
+			1
+		);
 		return $html;
 	}
 

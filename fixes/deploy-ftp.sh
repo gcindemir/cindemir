@@ -28,6 +28,7 @@ mkdir -p ${REMOTE}
 cd ${REMOTE}
 put ${ROOT}/fixes/mu-plugins/cindemir-seo-fixes.php
 put ${ROOT}/fixes/mu-plugins/cindemir-expose-yoast-meta.php
+put ${ROOT}/fixes/mu-plugins/cindemir-contact-fixes.php
 bye
 EOF
 

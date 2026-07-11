@@ -23,12 +23,15 @@ Full task brief: [`docs/cindemirlaw-cursor-gorev.md`](../docs/cindemirlaw-cursor
 
 ## Quick deploy order (2026-07-11 görevleri)
 
-### 1. Upload mu-plugins (2 dosya)
+### 1. Upload mu-plugins (3 dosya)
 
 | File | Target |
 |------|--------|
-| `fixes/mu-plugins/cindemir-seo-fixes.php` | `wp-content/mu-plugins/` (v1.5.6) |
+| `fixes/mu-plugins/cindemir-seo-fixes.php` | `wp-content/mu-plugins/` (v1.5.7) |
 | `fixes/mu-plugins/cindemir-expose-yoast-meta.php` | `wp-content/mu-plugins/` (REST için) |
+| `fixes/mu-plugins/cindemir-contact-fixes.php` | `wp-content/mu-plugins/` (REST meta trigger) |
+
+**Otomatik (önerilen):** Cursor Cloud Environment secrets → `./fixes/scripts/auto-deploy.sh`
 
 ### 2. Meta descriptions — 14 sayfa (Görev 1)
 
