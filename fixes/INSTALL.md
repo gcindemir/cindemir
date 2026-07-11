@@ -20,6 +20,15 @@ WordPress admin / FTP access is required. This repo has no live server credentia
 ## Steps (≈ 10 minutes)
 
 ### 1. Upload mu-plugins
+
+**Option A — automated (if FTP creds are in env):**
+```bash
+export CINDEMIR_FTP_USER='your-bluehost-cpanel-user'
+export CINDEMIR_FTP_PASS='your-ftp-password'
+bash fixes/deploy-ftp.sh
+```
+
+**Option B — manual:**
 1. In hosting File Manager / FTP open `wp-content/`
 2. Create folder `mu-plugins` if missing
 3. Upload **both** into `wp-content/mu-plugins/`:
