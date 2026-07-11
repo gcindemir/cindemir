@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Cindemir Law Office
  */
 
@@ -19,6 +19,7 @@ final class Cindemir_Contact_Fixes {
 
 	const WHATSAPP_PHONE = '905325680647';
 	const MAIL_TO        = 'gokhan@cindemir.av.tr';
+	const MAIL_FROM      = 'wordpress@cindemirlaw.com';
 
 	public static function boot() {
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'debloat_exclusions' ) );
@@ -27,8 +28,95 @@ final class Cindemir_Contact_Fixes {
 
 		add_action( 'wp_footer', array( __CLASS__, 'render_fallback_assets' ), 5 );
 		add_action( 'wp_mail_failed', array( __CLASS__, 'log_mail_failure' ) );
+		add_action( 'phpmailer_init', array( __CLASS__, 'fix_phpmailer' ), 20 );
+
+		add_filter( 'wp_mail_from', array( __CLASS__, 'mail_from_address' ), 20 );
+		add_filter( 'wp_mail_from_name', array( __CLASS__, 'mail_from_name' ), 20 );
+		add_filter( 'avf_form_sendto', array( __CLASS__, 'force_form_recipients' ), 20, 3 );
+		add_filter( 'avf_form_from', array( __CLASS__, 'force_form_from' ), 20, 3 );
+		add_filter( 'avf_contact_form_incoming_mail', array( __CLASS__, 'fix_incoming_mail' ), 20, 6 );
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
+	}
+
+	/** Use a domain mailbox as envelope sender (visitor email as From gets dropped on Bluehost). */
+	public static function mail_from_address( $email ) {
+		if ( self::is_enfold_contact_submit() ) {
+			return self::MAIL_FROM;
+		}
+		return $email;
+	}
+
+	public static function mail_from_name( $name ) {
+		if ( self::is_enfold_contact_submit() ) {
+			return 'Cindemir Law Office';
+		}
+		return $name;
+	}
+
+	public static function fix_phpmailer( $phpmailer ) {
+		if ( ! self::is_enfold_contact_submit() ) {
+			return;
+		}
+		$phpmailer->setFrom( self::MAIL_FROM, 'Cindemir Law Office', false );
+		$phpmailer->Sender = self::MAIL_FROM;
+	}
+
+	public static function force_form_recipients( $to, $new_post, $form_params ) {
+		if ( ! self::is_enfold_contact_submit() ) {
+			return $to;
+		}
+		return self::recipient_list();
+	}
+
+	public static function force_form_from( $from, $new_post, $form_params ) {
+		if ( ! self::is_enfold_contact_submit() ) {
+			return $from;
+		}
+		return self::MAIL_FROM;
+	}
+
+	public static function fix_incoming_mail( $mail_array, $new_post, $form_params, $form, $from, $from_filtered ) {
+		if ( ! self::is_enfold_contact_submit() ) {
+			return $mail_array;
+		}
+
+		$mail_array['To'] = self::recipient_list();
+
+		$visitor = '';
+		if ( ! empty( $from ) && is_email( $from ) ) {
+			$visitor = $from;
+		} else {
+			foreach ( $new_post as $value ) {
+				if ( is_string( $value ) && is_email( $value ) ) {
+					$visitor = $value;
+					break;
+				}
+			}
+		}
+		if ( $visitor ) {
+			$mail_array['Reply-To'] = $visitor;
+		}
+
+		$mail_array['From'] = sprintf( '%s <%s>', 'Cindemir Law Office', self::MAIL_FROM );
+		return $mail_array;
+	}
+
+	private static function recipient_list() {
+		$list = array( self::MAIL_TO );
+		$admin = get_option( 'admin_email' );
+		if ( is_email( $admin ) && ! in_array( $admin, $list, true ) ) {
+			$list[] = $admin;
+		}
+		return $list;
+	}
+
+	private static function is_enfold_contact_submit() {
+		if ( empty( $_POST['ajax'] ) || empty( $_POST['avia_generated_form1'] ) ) {
+			return false;
+		}
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		return ( false !== strpos( $uri, '/contacts' ) );
 	}
 
 	/** Keep jQuery, Enfold bundle, and Joinchat from Debloat/Rocket delay. */
