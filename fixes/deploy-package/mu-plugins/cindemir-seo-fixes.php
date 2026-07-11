@@ -149,24 +149,6 @@ final class Cindemir_SEO_Fixes {
 
 	private static $h1_done = false;
 
-	/** Neutral Yoast meta descriptions (TBB-compliant, 110–160 chars). */
-	private static $page_metadesc = array(
-		43   => "Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa.",
-		2    => 'Cindemir Law Office — независимая юридическая фирма в Стамбуле, работающая с 2004 года в сфере турецкого и международного права.',
-		105  => 'Статьи о турецком праве: гражданское, коммерческое, миграционное и уголовное право Турции для иностранных граждан и компаний.',
-		3884 => "Hafız Hüseyin Hüsnü Efendi'nin biyografisi: 1847'de Batum'da doğan bu ismin hayatı, ilmî kişiliği ve tarihsel arka planı ele alınır.",
-		16   => "Cindemir Law Office, 2004'ten bu yana İstanbul'da faaliyet gösteren, Türk ve uluslararası hukuk alanında çalışan bağımsız bir hukuk bürosudur.",
-		2427 => 'Команда Cindemir Law Office: адвокаты и консультанты, работающие в области турецкого и международного права в Стамбуле.',
-		392  => "Cindemir Law Office'in müvekkillerle iletişimi ve Türkiye'deki hukuki süreçlerde yabancılara sağladığı destek hakkında bilgi.",
-		51   => "Cindemir Law Office'ten haberler ve etkinlikler: yabancı birey ve şirketleri ilgilendiren Türk hukukundaki gelişmelere dair güncellemeler.",
-		19   => 'Cindemir Law Office ekibi: İstanbul\'da Türk ve uluslararası hukuk alanında çalışan avukatlar ve danışmanlar hakkında bilgi.',
-		103  => 'О порядке общения адвоката с подзащитным в Турции: обмен информацией, права и обязанности сторон в уголовном процессе.',
-		17   => 'Türk hukukuna dair makaleler: yabancı birey ve şirketleri ilgilendiren medeni, ticari, göç ve ceza hukuku konuları ele alınır.',
-		390  => "Cindemir Law Office'in gizlilik politikası: web sitesi ziyaretçilerine ait kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu açıklanır.",
-		56   => 'Юридические услуги в Турции: корпоративное, миграционное, семейное и уголовное право для иностранных клиентов в Стамбуле.',
-		3874 => "Cindemir Law Office'in tarihçesi: Osmanlı mahkemelerinden günümüze uzanan hukuki geçmişi İstanbul üzerinden anlatılır.",
-	);
-
 	public static function boot() {
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
@@ -185,19 +167,6 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_press_from_sitemap' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
-		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
-	}
-
-	/** Override Yoast meta description for priority pages. */
-	public static function filter_page_metadesc( $desc ) {
-		if ( ! is_singular( 'page' ) ) {
-			return $desc;
-		}
-		$id = get_queried_object_id();
-		if ( isset( self::$page_metadesc[ $id ] ) ) {
-			return self::$page_metadesc[ $id ];
-		}
-		return $desc;
 	}
 
 	/** Keep redirecting Press page out of Yoast XML sitemaps. */
