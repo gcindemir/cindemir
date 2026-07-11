@@ -1,29 +1,43 @@
-# cindemirlaw.com backup
+# cindemirlaw.com backups
 
-**Created (UTC):** 2026-07-09 11:30:03  
-**Source:** https://cindemirlaw.com (162.241.252.122)  
-**Method:** `wget --mirror` static frontend snapshot (HTML/CSS/JS/images)
+Static **public frontend mirrors** via `wget --mirror`. Not full WordPress backups (no database, no `wp-admin`).
 
-## Important
+## Latest (2026-07-11)
 
-This is a **public frontend mirror**, not a full WordPress backup (no database, no `wp-admin`, no server-only files).
+| Field | Value |
+|-------|-------|
+| **Created (UTC)** | 2026-07-11 21:36:40 |
+| **Source** | https://cindemirlaw.com |
+| **Archive** | `cindemirlaw.com-20260711-213640.tar.gz.part00` … `part01` |
+| **Log** | `wget-cindemirlaw.com-20260711-213640.log` |
+| **Files** | 490 |
+| **HTML pages** | 308 |
+| **Uncompressed** | 276M (gitignored) |
 
-## Contents
+## Restore latest archive
+
+```bash
+cd backups
+cat cindemirlaw.com-20260711-213640.tar.gz.part* > cindemirlaw.com-20260711-213640.tar.gz
+tar -xzf cindemirlaw.com-20260711-213640.tar.gz
+# Open offline: backups/cindemirlaw.com-20260711-213640/cindemirlaw.com/index.html
+```
+
+## Create a new backup
+
+```bash
+./backups/create-backup.sh
+```
+
+## Previous backup (2026-07-09)
 
 | Item | Description |
 |------|-------------|
-| `cindemirlaw.com-20260709-113003.tar.gz.part00` … | Split archive parts (reassemble below) |
+| `cindemirlaw.com-20260709-113003.tar.gz.part00` … | Earlier mirror (808 files, ~149 MB archive) |
 | `wget-cindemirlaw.com.log` | Download log |
-| `cindemirlaw.com-20260709-113003/` | Uncompressed mirror (local only; gitignored) |
-
-**Stats:** 808 files · 308 HTML pages · ~470 MB uncompressed · ~149 MB archive
-
-## Restore archive
 
 ```bash
 cd backups
 cat cindemirlaw.com-20260709-113003.tar.gz.part* > cindemirlaw.com-20260709-113003.tar.gz
 tar -xzf cindemirlaw.com-20260709-113003.tar.gz
-# Open offline:
-# backups/cindemirlaw.com-20260709-113003/cindemirlaw.com/index.html
 ```

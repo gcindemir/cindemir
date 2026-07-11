@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.5
+ * Version: 1.5.6
  * Author: Cindemir Law Office
  */
 
@@ -106,6 +106,17 @@ final class Cindemir_SEO_Fixes {
 		'https://www.istanbulbarosu.org.tr/AttorneySearch.aspx' => 'https://istanbulbarosu.org.tr/AttorneySearch.aspx',
 		'https://www.cindemirlaw.com/' => 'https://cindemirlaw.com/',
 		'https://www.cindemirlaw.com' => 'https://cindemirlaw.com/',
+		// Legacy multisite image paths (404) → current media library.
+		'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-5-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-5-copy-300x300.jpg',
+		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'/russian/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'/russian/wp-content/uploads/2014/11/white-5-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-5-copy-300x300.jpg',
+		'/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
 	);
 
 	private static $missing_h1 = array(
