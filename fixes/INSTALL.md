@@ -2,6 +2,8 @@
 
 WordPress admin / FTP access is required. This repo has no live server credentials, so these files must be uploaded manually.
 
+Full task brief: [`docs/cindemirlaw-cursor-gorev.md`](../docs/cindemirlaw-cursor-gorev.md)
+
 ## What this fixes
 
 | Issue | Fix |
@@ -13,51 +15,77 @@ WordPress admin / FTP access is required. This repo has no live server credentia
 | Missing H1 (heritage, RU pages, etc.) | Inject H1 (content + full-page buffer) |
 | Multiple H1 (home, long articles) | Keep first H1, demote rest to H2 |
 | Orphan `/our-videos/`, `/appointment/` | Footer internal links |
-| `/antimanual-assistant/`, `/embed-list/` | `noindex` via `wp_robots` + Yoast filter (v1.5.4; avoids index+noindex conflict) |
+| `/antimanual-assistant/`, `/embed-list/` | `noindex` via `wp_robots` + Yoast filter (v1.5.4) |
 | Empty image `alt=""` | Fill from filename map (content + buffer) |
+| Broken `/russian/` `/chinese/` image paths (404) | v1.5.6 `$url_replace` in mu-plugin |
+| 14 pages meta description (reklamsız) | REST script or WP-CLI (see below) |
+| `?lang=` redirect / sitemap | wp-admin dil eklentisi ayarı — [`LANG-REDIRECT.md`](LANG-REDIRECT.md) |
 
-## Steps (≈ 10 minutes)
+## Quick deploy order (2026-07-11 görevleri)
 
-### 1. Upload mu-plugin
-1. In hosting File Manager / FTP open `wp-content/`
-2. Create folder `mu-plugins` if missing
-3. Upload `fixes/mu-plugins/cindemir-seo-fixes.php` into `wp-content/mu-plugins/`
-4. No “Activate” needed — must-use plugins load automatically
+### 1. Upload mu-plugins (2 dosya)
 
-### 2. Fix Redirection plugin rules
-1. WP Admin → **Tools → Redirection**
-2. Search and **delete** rules whose source is:
-   - `/how-to-lift-entry-ban-to-turkey/`
-   - `/exemptions-on-the-legislation-of-the-documents-in-turkey/`
-3. Import `fixes/redirection/import-flatten.csv` (or add those 3 rules manually)
-4. See `fixes/redirection/DELETE-AND-REPLACE.md`
+| File | Target |
+|------|--------|
+| `fixes/mu-plugins/cindemir-seo-fixes.php` | `wp-content/mu-plugins/` (v1.5.6) |
+| `fixes/mu-plugins/cindemir-expose-yoast-meta.php` | `wp-content/mu-plugins/` (REST için) |
 
-### 3. Optional: `.htaccess`
-Prepend `fixes/htaccess/cindemir-redirect-snippets.conf` above the `# BEGIN WordPress` block.
+### 2. Meta descriptions — 14 sayfa (Görev 1)
 
-### 4. Verify
+**Seçenek A — REST API (önerilen, mu-plugin yüklendikten sonra):**
+
 ```bash
-# Must stay on EN post (200), NOT jump to RU divorce/compensation
-curl -sI -A 'Mozilla/5.0' -L --max-redirs 0 \
-  https://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/ | head
-
-curl -sI -A 'Mozilla/5.0' -L --max-redirs 0 \
-  https://cindemirlaw.com/exemptions-on-the-legislation-of-the-documents-in-turkey/ | head
-
-# Single hop to av.tr
-curl -sI -A 'Mozilla/5.0' https://cindemirlaw.com/link9/ | grep -i location
-
-# H1 present
-curl -s -A 'Mozilla/5.0' https://cindemirlaw.com/family-heritage/ | grep -c '<h1'
+export WP_USER='your-username'
+export WP_APP_PASSWORD='xxxx xxxx xxxx xxxx'
+./fixes/scripts/update-page-meta-descriptions.sh --dry-run   # önizleme
+./fixes/scripts/update-page-meta-descriptions.sh             # uygula
 ```
 
-### 5. Clear caches
-Purge WP cache / Cloudflare / host cache after deploy.
+**Seçenek B — WP-CLI (SSH):**
 
-## Manual Enfold polish (optional, after mu-plugin)
+```bash
+wp eval-file fixes/scripts/update-page-meta-descriptions-wpcli.php
+```
 
-In Enfold page builder on **Home**:
-- Keep “About Our Law Office” as H1
-- Change Welcome / Our Articles / Our Services special headings to **H2**
+**Seçenek C — Manuel:** `fixes/meta-descriptions/pages-14.json` veya `docs/cindemirlaw-cursor-gorev.md` tablosundan wp-admin → Yoast → Meta açıklaması.
 
-That matches what the mu-plugin does in HTML output, but editing the builder keeps the backend clean.
+### 3. `?lang=` redirect (Görev 3 — kritik)
+
+[`fixes/LANG-REDIRECT.md`](LANG-REDIRECT.md) — Polylang/WPML ayarı + sitemap doğrulama.
+
+### 4. Bozuk görseller (Görev 4)
+
+[`fixes/BROKEN-IMAGES.md`](BROKEN-IMAGES.md) — mu-plugin v1.5.6 + Enfold'da kalıcı düzeltme.
+
+### 5. Redirection plugin (mevcut)
+
+1. WP Admin → **Tools → Redirection**
+2. Delete rules for `/how-to-lift-entry-ban-to-turkey/` and `/exemptions-on-the-legislation-of-the-documents-in-turkey/`
+3. Import `fixes/redirection/import-flatten.csv`
+
+### 6. Optional: `.htaccess`
+
+Prepend `fixes/htaccess/cindemir-redirect-snippets.conf` above `# BEGIN WordPress`.
+
+### 7. Verify
+
+```bash
+UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+
+# Meta description güncellendi mi (örnek)
+curl -s -A "$UA" https://cindemirlaw.com/about-us/ | grep -oP '(?<=meta name="description" content=")[^"]*'
+
+# EN post redirect olmamalı
+curl -sI -A "$UA" --max-redirs 0 https://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/ | head -3
+
+# Bozuk görsel rewrite (mu-plugin deploy sonrası kaynak HTML'de)
+curl -s -A "$UA" 'https://cindemirlaw.com/hakan/?lang=zh-hans' | grep -c 'chinese/wp-content'  # 0 olmalı
+```
+
+### 8. Clear caches
+
+Purge WP / Cloudflare / host cache. Ahrefs'te yeniden crawl tetikle.
+
+## Manual Enfold polish (optional)
+
+On **Home**: keep “About Our Law Office” as H1; change Welcome / Our Articles / Our Services to H2.

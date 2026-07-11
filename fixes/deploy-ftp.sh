@@ -27,8 +27,8 @@ set ssl:verify-certificate no
 mkdir -p ${REMOTE}
 cd ${REMOTE}
 put ${ROOT}/fixes/mu-plugins/cindemir-seo-fixes.php
-put ${ROOT}/fixes/mu-plugins/cindemir-contact-fixes.php
+put ${ROOT}/fixes/mu-plugins/cindemir-expose-yoast-meta.php
 bye
 EOF
 
-echo "Done. Purge Debloat + host cache, then test /contacts/"
+echo "Done. Purge cache, then run fixes/scripts/update-page-meta-descriptions.sh if WP_USER/WP_APP_PASSWORD are set."
