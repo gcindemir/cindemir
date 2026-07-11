@@ -4,7 +4,7 @@ Workspace for Cindemir Law Office web projects.
 
 ## Backups
 
-See [`backups/README.md`](backups/README.md) for the `cindemirlaw.com` static site snapshot (2026-07-09).
+See [`backups/README.md`](backups/README.md). **Latest:** 2026-07-11 static mirror (`cindemirlaw.com-20260711-214047`).
 
 ## Audits
 
@@ -12,4 +12,8 @@ See [`audits/cindemirlaw.com-2026-07-09/SUMMARY.md`](audits/cindemirlaw.com-2026
 
 ## Fixes
 
-See [`fixes/INSTALL.md`](fixes/INSTALL.md). **Live on cindemirlaw.com:** mu-plugin **v1.4.0** (href rewrite for `/press/`, `/link9/`, `/author/admin/`; H1/alt/orphan guards; redirect flatten). Menu Press items point at `cindemir.av.tr/en/we-are-in-news/`.
+See [`fixes/INSTALL.md`](fixes/INSTALL.md). Mu-plugin **v1.5.5** in repo (H1, redirects, alts, title trim).
+
+## SEO tasks
+
+See [`TASKS-STATUS.md`](TASKS-STATUS.md) — awaiting `cindemirlaw-cursor-gorev.md` attachment to apply meta / redirect / image tasks.

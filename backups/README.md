@@ -1,5 +1,34 @@
 # cindemirlaw.com backup
 
+## Latest (2026-07-11)
+
+**Created (UTC):** 2026-07-11 21:40:47  
+**Source:** https://cindemirlaw.com (162.241.252.122)  
+**Method:** `wget --mirror` static frontend snapshot (HTML/CSS/JS/images)
+
+| Item | Value |
+|------|------:|
+| Files | 491 |
+| HTML pages | 308 |
+| Uncompressed | ~276 MB |
+| Archive (split) | ~110 MB |
+
+| Part | File |
+|------|------|
+| 0 | `cindemirlaw.com-20260711-214047.tar.gz.part00` |
+| 1 | `cindemirlaw.com-20260711-214047.tar.gz.part01` |
+| Log | `wget-cindemirlaw-20260711-214051.log` |
+
+```bash
+cd backups
+cat cindemirlaw.com-20260711-214047.tar.gz.part* > cindemirlaw.com-20260711-214047.tar.gz
+tar -xzf cindemirlaw.com-20260711-214047.tar.gz
+```
+
+---
+
+## Previous (2026-07-09)
+
 **Created (UTC):** 2026-07-09 11:30:03  
 **Source:** https://cindemirlaw.com (162.241.252.122)  
 **Method:** `wget --mirror` static frontend snapshot (HTML/CSS/JS/images)
