@@ -213,11 +213,16 @@ final class Cindemir_Contact_Fixes {
 		);
 
 		if ( $existing ) {
+			self::fix_zh_contacts_slug( (int) $existing );
+			clean_post_cache( (int) $existing );
+			wp_cache_flush();
+
 			return new WP_REST_Response(
 				array(
 					'status'    => 'already_exists',
 					'post_id'   => (int) $existing,
 					'permalink' => get_permalink( (int) $existing ),
+					'zh_url'    => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 				),
 				200
 			);
@@ -280,6 +285,7 @@ final class Cindemir_Contact_Fixes {
 			$GLOBALS['sitepress']->set_element_language_details( $new_id, 'post_page', $trid, $lang, 'en' );
 		}
 
+		self::fix_zh_contacts_slug( $new_id );
 		clean_post_cache( $new_id );
 		wp_cache_flush();
 
@@ -291,6 +297,18 @@ final class Cindemir_Contact_Fixes {
 				'zh_url'    => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 			),
 			200
+		);
+	}
+
+	/** WPML translations share slug "contacts" per language; WP core may assign contacts-2. */
+	private static function fix_zh_contacts_slug( $post_id ) {
+		global $wpdb;
+		$wpdb->update(
+			$wpdb->posts,
+			array( 'post_name' => 'contacts' ),
+			array( 'ID' => (int) $post_id ),
+			array( '%s' ),
+			array( '%d' )
 		);
 	}
 
