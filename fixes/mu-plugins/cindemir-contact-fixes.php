@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Cindemir Law Office
  */
 
@@ -170,10 +170,148 @@ final class Cindemir_Contact_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/setup-zh-contacts',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'setup_zh_contacts' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 	}
 
 	public static function joinchat_track_stub( $request ) {
 		return new WP_REST_Response( array( 'ok' => true ), 200 );
+	}
+
+	/** One-time: create WPML Chinese translation for Contacts (EN post ID 20). */
+	public static function setup_zh_contacts( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'wpml-setup-zh-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+
+		$source_id = 20;
+		$trid      = 20;
+		$lang      = 'zh-hans';
+		$source    = get_post( $source_id );
+
+		if ( ! $source ) {
+			return new WP_REST_Response( array( 'error' => 'Source post not found' ), 500 );
+		}
+
+		global $wpdb;
+		$existing = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT p.ID FROM {$wpdb->posts} p
+				 INNER JOIN {$wpdb->prefix}icl_translations t ON t.element_id = p.ID AND t.element_type = 'post_page'
+				 WHERE t.trid = %d AND t.language_code = %s AND p.post_status = 'publish'",
+				$trid,
+				$lang
+			)
+		);
+
+		if ( $existing ) {
+			return new WP_REST_Response(
+				array(
+					'status'    => 'already_exists',
+					'post_id'   => (int) $existing,
+					'permalink' => get_permalink( (int) $existing ),
+				),
+				200
+			);
+		}
+
+		$content      = $source->post_content;
+		$replacements = self::zh_contacts_replacements();
+
+		foreach ( $replacements as $from => $to ) {
+			$content = str_replace( $from, $to, $content );
+		}
+
+		$new_id = wp_insert_post(
+			array(
+				'post_title'     => '联系我们',
+				'post_name'      => 'contacts',
+				'post_content'   => $content,
+				'post_status'    => 'publish',
+				'post_type'      => 'page',
+				'post_author'    => $source->post_author,
+				'menu_order'     => $source->menu_order,
+				'comment_status' => $source->comment_status,
+				'ping_status'    => $source->ping_status,
+			),
+			true
+		);
+
+		if ( is_wp_error( $new_id ) ) {
+			return new WP_REST_Response( array( 'error' => $new_id->get_error_message() ), 500 );
+		}
+
+		$meta = get_post_meta( $source_id );
+		foreach ( $meta as $meta_key => $values ) {
+			if ( 0 === strpos( $meta_key, '_edit_' ) || '_wp_old_slug' === $meta_key ) {
+				continue;
+			}
+			foreach ( $values as $value ) {
+				$val = maybe_unserialize( $value );
+				if ( is_string( $val ) ) {
+					foreach ( $replacements as $from => $to ) {
+						$val = str_replace( $from, $to, $val );
+					}
+				}
+				update_post_meta( $new_id, $meta_key, $val );
+			}
+		}
+
+		do_action(
+			'wpml_set_element_language_details',
+			array(
+				'element_id'           => $new_id,
+				'element_type'         => 'post_page',
+				'trid'                 => $trid,
+				'language_code'        => $lang,
+				'source_language_code' => 'en',
+			)
+		);
+
+		if ( isset( $GLOBALS['sitepress'] ) && $GLOBALS['sitepress'] ) {
+			$GLOBALS['sitepress']->set_element_language_details( $new_id, 'post_page', $trid, $lang, 'en' );
+		}
+
+		clean_post_cache( $new_id );
+		wp_cache_flush();
+
+		return new WP_REST_Response(
+			array(
+				'status'    => 'created',
+				'post_id'   => $new_id,
+				'permalink' => get_permalink( $new_id ),
+				'zh_url'    => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
+			),
+			200
+		);
+	}
+
+	private static function zh_contacts_replacements() {
+		return array(
+			"heading='Contact Us'"               => "heading='联系我们'",
+			"button='Submit'"                    => "button='立即发送'",
+			"sent='Your message has been sent!'" => "sent='您的消息已发送！'",
+			"label='Name'"                       => "label='姓名'",
+			"label='E-Mail'"                     => "label='电子邮箱'",
+			"label='Phone'"                      => "label='电话号码'",
+			"label='Message'"                    => "label='留言'",
+			'<h4>Cindemir Hukuk Bürosu / Cindemir Law Office</h4>' => '<h4>辛德米尔律师事务所 / Cindemir Law Office</h4>',
+			'<strong>Adress:</strong>'           => '<strong>地址：</strong>',
+			'<strong>Email:</strong>'            => '<strong>电子邮箱：</strong>',
+			'<h4>Registered Electronic Mail (REM)</h4>' => '<h4>注册电子信箱 (KEP)</h4>',
+			'<strong>Fax:</strong>'               => '<strong>传真：</strong>',
+			'<strong>Phone:</strong>'             => '<strong>电话：</strong>',
+			'<strong>Check İstanbul Ritim Residences in English </strong>' => '<strong>查看伊斯坦布尔 Ritim 住宅区（英文）</strong>',
+			'<strong>Whatsapp:</strong>'          => '<strong>WhatsApp：</strong>',
+		);
 	}
 
 	public static function log_mail_failure( $error ) {

@@ -80,6 +80,19 @@ curl -sI -A 'Mozilla/5.0' https://cindemirlaw.com/wp-content/cache/debloat/js/bc
 ### 6. Clear caches
 Purge WP cache / Cloudflare / host cache after deploy.
 
+### 7. Create Chinese Contacts page (WPML)
+After uploading `cindemir-contact-fixes.php` **v1.2.0+**, run once:
+
+```bash
+curl -s "https://cindemirlaw.com/wp-json/cindemir/v1/setup-zh-contacts?key=wpml-setup-zh-2026"
+```
+
+Expected: `"status":"created"` and `/contacts/?lang=zh-hans` returns 200.
+
+Alternative: upload and open `fixes/scripts/cindemir-create-zh-contacts.php` in site root, then visit:
+`https://cindemirlaw.com/cindemir-create-zh-contacts.php?key=wpml-setup-zh-2026`
+Delete the script after success.
+
 ## Manual Enfold polish (optional, after mu-plugin)
 
 In Enfold page builder on **Home**:
