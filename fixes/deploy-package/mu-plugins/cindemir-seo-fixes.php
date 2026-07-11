@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: Cindemir Law Office
  */
 
@@ -112,12 +112,20 @@ final class Cindemir_SEO_Fixes {
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-1-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/russian/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/russian/wp-content/uploads/2014/11/white-5-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-5-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'/russian/wp-content/uploads/2014/11/white-1-copy.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
+
+	const VERSION = '1.7.0';
 
 	private static $missing_h1 = array(
 		3874 => 'Family Heritage',
@@ -168,17 +176,24 @@ final class Cindemir_SEO_Fixes {
 	);
 
 	public static function boot() {
+		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
+		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
+		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 10, 2 );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'strip_default_lang_redirect' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 1 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
+		add_filter( 'the_content', array( __CLASS__, 'rewrite_legacy_media_in_content' ), 15 );
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
+		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'noindex_utility' ), 1 );
 		add_filter( 'wp_robots', array( __CLASS__, 'filter_wp_robots' ), 99 );
 		add_filter( 'wpseo_robots', array( __CLASS__, 'filter_yoast_robots' ), 99 );
 		add_filter( 'wp_get_attachment_image_attributes', array( __CLASS__, 'fix_alt_attr' ), 10, 2 );
+		add_filter( 'wp_get_attachment_image_attributes', array( __CLASS__, 'fix_attachment_src_attrs' ), 11, 2 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_empty_alts' ), 20 );
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
@@ -186,6 +201,102 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_press_from_sitemap' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
+		add_filter( 'wpseo_opengraph_image', array( __CLASS__, 'rewrite_media_url' ) );
+		add_filter( 'wpseo_twitter_image', array( __CLASS__, 'rewrite_media_url' ) );
+	}
+
+	/** One-time cache/sitemap flush after deploy. */
+	public static function maybe_purge_caches_on_upgrade() {
+		$key = 'cindemir_seo_fixes_version';
+		$prev = get_option( $key, '' );
+		if ( self::VERSION === $prev ) {
+			return;
+		}
+		update_option( $key, self::VERSION, false );
+		flush_rewrite_rules( false );
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		delete_transient( 'wpseo_sitemap_cache_validator_page' );
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( class_exists( 'LiteSpeed_Cache_API' ) ) {
+			LiteSpeed_Cache_API::purge_all();
+		}
+		if ( function_exists( 'w3tc_flush_all' ) ) {
+			w3tc_flush_all();
+		}
+		if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
+			sg_cachepress_purge_cache();
+		}
+	}
+
+	/** Polylang: hide language param for default language URLs. */
+	public static function filter_polylang_options( $options ) {
+		if ( ! is_array( $options ) ) {
+			return $options;
+		}
+		$options['hide_default'] = 1;
+		$options['default_lang'] = isset( $options['default_lang'] ) ? $options['default_lang'] : 'en';
+		return $options;
+	}
+
+	/** WPML: prefer directory format without forcing ?lang= on default pages. */
+	public static function filter_wpml_setting( $value, $key ) {
+		if ( 'language_negotiation_type' === $key && 3 === (int) $value ) {
+			return 1;
+		}
+		return $value;
+	}
+
+	/** Redirect ?lang=en away from canonical English URLs. */
+	public static function strip_default_lang_redirect() {
+		if ( is_admin() || empty( $_GET['lang'] ) ) {
+			return;
+		}
+		$lang = sanitize_text_field( wp_unslash( $_GET['lang'] ) );
+		if ( ! in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return;
+		}
+		$path = self::path();
+		$clean = home_url( user_trailingslashit( $path ) );
+		wp_redirect( $clean, 301 );
+		exit;
+	}
+
+	public static function version_marker() {
+		echo "\n<!-- cindemir-seo-fixes " . esc_html( self::VERSION ) . " -->\n";
+	}
+
+	public static function rewrite_media_url( $url ) {
+		return self::apply_url_replace( $url );
+	}
+
+	public static function rewrite_legacy_media_in_content( $content ) {
+		return self::apply_url_replace( $content );
+	}
+
+	public static function fix_attachment_src_attrs( $attr, $attachment ) {
+		foreach ( array( 'src', 'data-lazy-src', 'data-src' ) as $k ) {
+			if ( ! empty( $attr[ $k ] ) ) {
+				$attr[ $k ] = self::apply_url_replace( $attr[ $k ] );
+			}
+		}
+		return $attr;
+	}
+
+	private static function apply_url_replace( $text ) {
+		if ( ! is_string( $text ) || '' === $text ) {
+			return $text;
+		}
+		foreach ( self::$url_replace as $from => $to ) {
+			$text = str_replace( $from, $to, $text );
+		}
+		return $text;
 	}
 
 	/** Override Yoast meta description for priority pages. */
@@ -216,9 +327,14 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_array( $url ) || empty( $url['loc'] ) ) {
 			return $url;
 		}
-		$path = self::normalize_path( $url['loc'] );
+		$loc = $url['loc'];
+		$path = self::normalize_path( $loc );
 		$skip = array( '/press', '/link9', '/link2', '/link3', '/link4', '/author/admin', '/russian', '/chinese', '/zh', '/zh-hans' );
 		if ( in_array( $path, $skip, true ) ) {
+			return false;
+		}
+		$parts = wp_parse_url( $loc );
+		if ( ! empty( $parts['query'] ) && false !== strpos( $parts['query'], 'lang=en' ) ) {
 			return false;
 		}
 		return $url;
@@ -442,9 +558,7 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	private static function rewrite_hrefs_in_html( $html ) {
-		foreach ( self::$url_replace as $from => $to ) {
-			$html = str_replace( $from, $to, $html );
-		}
+		$html = self::apply_url_replace( $html );
 		$html = preg_replace_callback(
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)?(/[^"\']*)(\2)#i',
 			function ( $m ) {
