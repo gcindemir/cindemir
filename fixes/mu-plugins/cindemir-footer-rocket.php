@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.0.0
+ * Version: 1.0.2
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,9 +43,11 @@ function cindemir_rocket_inject_extras( $html ) {
 		return $html;
 	}
 	$block = cindemir_rocket_footer_markup();
-	$with_div = preg_replace(
+	$with_div = preg_replace_callback(
 		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
-		'$1' . $block . '$4',
+		function ( $m ) use ( $block ) {
+			return $m[1] . $block . $m[4];
+		},
 		$html,
 		1,
 		$c
@@ -53,9 +55,11 @@ function cindemir_rocket_inject_extras( $html ) {
 	if ( $c ) {
 		return $with_div;
 	}
-	$with_span = preg_replace(
+	$with_span = preg_replace_callback(
 		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
-		'$1' . $block,
+		function ( $m ) use ( $block ) {
+			return $m[0] . $block;
+		},
 		$html,
 		1,
 		$c2
@@ -71,7 +75,7 @@ function cindemir_rocket_footer_markup() {
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v1' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v102' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -80,7 +84,17 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v1', 1, false );
+		if ( defined( 'WP_CONTENT_DIR' ) && is_dir( WP_CONTENT_DIR . '/cache/wp-rocket' ) ) {
+			$dir = WP_CONTENT_DIR . '/cache/wp-rocket';
+			foreach ( scandir( $dir ) ?: array() as $item ) {
+				if ( '.' === $item || '..' === $item ) {
+					continue;
+				}
+				$path = $dir . '/' . $item;
+				is_dir( $path ) ? @rmdir( $path ) : @unlink( $path );
+			}
+		}
+		update_option( 'cindemir_footer_rocket_v102', 1, false );
 	},
 	1
 );

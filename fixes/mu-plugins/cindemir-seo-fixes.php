@@ -344,9 +344,11 @@ final class Cindemir_SEO_Fixes {
 			return $html;
 		}
 		$block = self::socket_footer_extras_markup();
-		$with_div = preg_replace(
+		$with_div = preg_replace_callback(
 			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
-			'$1' . $block . '$4',
+			function ( $m ) use ( $block ) {
+				return $m[1] . $block . $m[4];
+			},
 			$html,
 			1,
 			$count_div
@@ -354,9 +356,11 @@ final class Cindemir_SEO_Fixes {
 		if ( $count_div ) {
 			return $with_div;
 		}
-		$with_span = preg_replace(
+		$with_span = preg_replace_callback(
 			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
-			'$1' . $block,
+			function ( $m ) use ( $block ) {
+				return $m[0] . $block;
+			},
 			$html,
 			1,
 			$count_span

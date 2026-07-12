@@ -102,23 +102,27 @@ final class Cindemir_Contact_Fixes {
 			return $html;
 		}
 		$block = self::socket_footer_extras_markup();
-		$with_div = preg_replace(
-			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
-			'$1' . $block . '$4',
-			$html,
-			1,
-			$count_div
-		);
-		if ( $count_div ) {
-			return $with_div;
-		}
-		$with_span = preg_replace(
-			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
-			'$1' . $block,
-			$html,
-			1,
-			$count_span
-		);
+	$with_div = preg_replace_callback(
+		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
+		function ( $m ) use ( $block ) {
+			return $m[1] . $block . $m[4];
+		},
+		$html,
+		1,
+		$count_div
+	);
+	if ( $count_div ) {
+		return $with_div;
+	}
+	$with_span = preg_replace_callback(
+		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
+		function ( $m ) use ( $block ) {
+			return $m[0] . $block;
+		},
+		$html,
+		1,
+		$count_span
+	);
 		return $count_span ? $with_span : $html;
 	}
 
