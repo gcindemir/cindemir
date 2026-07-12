@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Footer Fixes
  * Description: Socket footer: clickable mail, social icons, bar verification, and bar association badges (aligned with cindemir.av.tr).
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Cindemir Law Office
  */
 
@@ -23,7 +23,24 @@ final class Cindemir_Footer_Fixes {
 	const BARO_VERIFY = 'https://baronet.istanbulbarosu.org.tr/avukat/belge_dogrulama?lang=EN&onayno=HBE4U7ES3DM6C52&tck=58612509084';
 
 	public static function boot() {
+		add_action( 'init', array( __CLASS__, 'purge_caches_once' ), 1 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 0 );
+	}
+
+	public static function purge_caches_once() {
+		if ( get_option( 'cindemir_footer_fixes_v1_purged' ) ) {
+			return;
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		update_option( 'cindemir_footer_fixes_v1_purged', 1, false );
 	}
 
 	public static function start_buffer() {
