@@ -423,7 +423,10 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	private static function inject_mobile_header_branding( $html ) {
-		if ( false !== strpos( $html, 'cindemir-mobile-brand' ) ) {
+		if (
+			false !== strpos( $html, '<span class="cindemir-mobile-brand"' )
+			|| false !== strpos( $html, "<span class='cindemir-mobile-brand'" )
+		) {
 			return $html;
 		}
 
@@ -435,17 +438,7 @@ final class Cindemir_SEO_Fixes {
 			'tr'      => 'Cindemir Hukuk Bürosu',
 		);
 
-		$lang = 'en';
-		if ( function_exists( 'pll_current_language' ) ) {
-			$pll = pll_current_language( 'slug' );
-			if ( is_string( $pll ) && '' !== $pll ) {
-				$lang = $pll;
-			}
-		} elseif ( defined( 'ICL_LANGUAGE_CODE' ) && is_string( ICL_LANGUAGE_CODE ) && '' !== ICL_LANGUAGE_CODE ) {
-			$lang = ICL_LANGUAGE_CODE;
-		} elseif ( ! empty( $_GET['lang'] ) ) {
-			$lang = sanitize_key( wp_unslash( $_GET['lang'] ) );
-		}
+		$lang = self::mobile_brand_lang();
 
 		$label  = isset( $labels[ $lang ] ) ? $labels[ $lang ] : $labels['en'];
 		$markup = '<span class="cindemir-mobile-brand" aria-hidden="false">' . esc_html( $label ) . '</span>';
@@ -464,6 +457,41 @@ final class Cindemir_SEO_Fixes {
 		}
 
 		return $html;
+	}
+
+	private static function mobile_brand_lang() {
+		if ( ! empty( $_GET['lang'] ) ) {
+			return self::normalize_mobile_brand_lang( sanitize_key( wp_unslash( $_GET['lang'] ) ) );
+		}
+		$wpml = apply_filters( 'wpml_current_language', null );
+		if ( is_string( $wpml ) && '' !== $wpml ) {
+			return self::normalize_mobile_brand_lang( $wpml );
+		}
+		if ( function_exists( 'pll_current_language' ) ) {
+			$pll = pll_current_language( 'slug' );
+			if ( is_string( $pll ) && '' !== $pll ) {
+				return self::normalize_mobile_brand_lang( $pll );
+			}
+		}
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && is_string( ICL_LANGUAGE_CODE ) && '' !== ICL_LANGUAGE_CODE ) {
+			return self::normalize_mobile_brand_lang( ICL_LANGUAGE_CODE );
+		}
+		return 'en';
+	}
+
+	private static function normalize_mobile_brand_lang( $lang ) {
+		$lang = strtolower( (string) $lang );
+		if ( 0 === strpos( $lang, 'tr' ) ) {
+			return 'tr';
+		}
+		if ( 0 === strpos( $lang, 'zh' ) ) {
+			return 'zh-hans';
+		}
+		if ( 0 === strpos( $lang, 'ru' ) ) {
+			return 'ru';
+		}
+		return $lang;
+	}
 
 	/**
 	 * Ensure utility/tag pages expose a single noindex robots directive

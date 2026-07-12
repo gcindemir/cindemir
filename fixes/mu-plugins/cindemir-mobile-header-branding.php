@@ -44,7 +44,10 @@ final class Cindemir_Mobile_Header_Branding {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		if ( false !== strpos( $html, 'cindemir-mobile-brand' ) ) {
+		if (
+			false !== strpos( $html, '<span class="cindemir-mobile-brand"' )
+			|| false !== strpos( $html, "<span class='cindemir-mobile-brand'" )
+		) {
 			return $html;
 		}
 
@@ -76,19 +79,37 @@ final class Cindemir_Mobile_Header_Branding {
 	}
 
 	private static function current_lang() {
+		if ( ! empty( $_GET['lang'] ) ) {
+			return self::normalize_lang( sanitize_key( wp_unslash( $_GET['lang'] ) ) );
+		}
+		$wpml = apply_filters( 'wpml_current_language', null );
+		if ( is_string( $wpml ) && '' !== $wpml ) {
+			return self::normalize_lang( $wpml );
+		}
 		if ( function_exists( 'pll_current_language' ) ) {
 			$lang = pll_current_language( 'slug' );
 			if ( is_string( $lang ) && '' !== $lang ) {
-				return $lang;
+				return self::normalize_lang( $lang );
 			}
 		}
 		if ( defined( 'ICL_LANGUAGE_CODE' ) && is_string( ICL_LANGUAGE_CODE ) && '' !== ICL_LANGUAGE_CODE ) {
-			return ICL_LANGUAGE_CODE;
-		}
-		if ( ! empty( $_GET['lang'] ) ) {
-			return sanitize_key( wp_unslash( $_GET['lang'] ) );
+			return self::normalize_lang( ICL_LANGUAGE_CODE );
 		}
 		return 'en';
+	}
+
+	private static function normalize_lang( $lang ) {
+		$lang = strtolower( (string) $lang );
+		if ( 0 === strpos( $lang, 'tr' ) ) {
+			return 'tr';
+		}
+		if ( 0 === strpos( $lang, 'zh' ) ) {
+			return 'zh-hans';
+		}
+		if ( 0 === strpos( $lang, 'ru' ) ) {
+			return 'ru';
+		}
+		return $lang;
 	}
 
 	public static function print_styles() {

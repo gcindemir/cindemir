@@ -45,15 +45,23 @@ final class Cindemir_Contact_Fixes {
 			return;
 		}
 		$lang = 'en';
-		if ( function_exists( 'pll_current_language' ) ) {
-			$pll = pll_current_language( 'slug' );
-			if ( is_string( $pll ) && '' !== $pll ) {
-				$lang = $pll;
-			}
-		} elseif ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
-			$lang = ICL_LANGUAGE_CODE;
-		} elseif ( ! empty( $_GET['lang'] ) ) {
+		if ( ! empty( $_GET['lang'] ) ) {
 			$lang = sanitize_key( wp_unslash( $_GET['lang'] ) );
+		} else {
+			$wpml = apply_filters( 'wpml_current_language', null );
+			if ( is_string( $wpml ) && '' !== $wpml ) {
+				$lang = $wpml;
+			} elseif ( function_exists( 'pll_current_language' ) ) {
+				$pll = pll_current_language( 'slug' );
+				if ( is_string( $pll ) && '' !== $pll ) {
+					$lang = $pll;
+				}
+			} elseif ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
+				$lang = ICL_LANGUAGE_CODE;
+			}
+		}
+		if ( 0 === strpos( strtolower( (string) $lang ), 'tr' ) ) {
+			$lang = 'tr';
 		}
 		$label = ( 'tr' === $lang ) ? 'Cindemir Hukuk Bürosu' : 'Cindemir Law Office';
 		echo '<style id="cindemir-mobile-brand">@media(max-width:989px){#header .logo a{display:inline-flex!important;align-items:center;gap:8px;max-width:calc(100vw - 110px)}#header .logo img{max-height:38px!important;max-width:38px!important}#header .logo.bg-logo img[src*="themes/enfold/images/layout/logo.png"]{display:none!important}#header .logo a::after{content:"' . esc_attr( $label ) . '";font-size:13px;font-weight:600;line-height:1.2;color:#336666;max-width:170px}}</style>';
