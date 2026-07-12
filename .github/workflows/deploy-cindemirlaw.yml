@@ -1,0 +1,45 @@
+name: Deploy cindemirlaw SEO
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/cindemirlaw-seo-tasks-be51
+      - cursor/footer-email-social-baro-917b
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload mu-plugins via FTP
+        env:
+          FTP_USER: ${{ secrets.CINDEMIR_FTP_USER }}
+          FTP_PASS: ${{ secrets.CINDEMIR_FTP_PASS }}
+          FTP_HOST: ${{ secrets.CINDEMIR_FTP_HOST }}
+        run: |
+          set -euo pipefail
+          HOST="${FTP_HOST:-162.241.252.122}"
+          REMOTE="wp-content/mu-plugins"
+          for f in cindemir-seo-fixes.php cindemir-expose-yoast-meta.php cindemir-contact-fixes.php cindemir-footer-fixes.php; do
+            echo "Uploading $f …"
+            curl --ftp-create-dirs -sS --ftp-pasv \
+              -T "fixes/mu-plugins/$f" \
+              -u "${FTP_USER}:${FTP_PASS}" \
+              "ftp://${HOST}/${REMOTE}/${f}"
+          done
+
+      - name: Apply 14 meta descriptions via REST
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          sleep 3
+          curl -sS -A "$UA" "https://cindemirlaw.com/wp-json/cindemir/v1/apply-seo-meta?key=seo-pack-2026" | tee /tmp/seo-result.json
+          python3 -c "import json; d=json.load(open('/tmp/seo-result.json')); assert d.get('ok'), d"
+
+      - name: Verify about-us meta
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          META=$(curl -sS -A "$UA" 'https://cindemirlaw.com/about-us/' | grep -oP '(?<=meta name="description" content=")[^"]*' | head -1)
+          echo "Meta: $META"
+          echo "$META" | grep -q "2004'ten bu yana İstanbul'da"
