@@ -33,6 +33,7 @@ deploy_ftp() {
   ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-seo-fixes.php" "cindemir-seo-fixes.php"
   ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-expose-yoast-meta.php" "cindemir-expose-yoast-meta.php"
   ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-contact-fixes.php" "cindemir-contact-fixes.php"
+  ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-footer-fixes.php" "cindemir-footer-fixes.php"
   echo "FTP upload OK."
 }
 
