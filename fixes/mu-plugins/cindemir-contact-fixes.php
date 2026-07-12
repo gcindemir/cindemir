@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.2
+ * Version: 1.3.3
  * Author: Cindemir Law Office
  */
 
@@ -23,7 +23,6 @@ final class Cindemir_Contact_Fixes {
 
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_purge_after_upgrade' ), 1 );
-		add_action( 'template_redirect', array( __CLASS__, 'start_footer_buffer' ), 0 );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'debloat_exclusions' ) );
 		add_filter( 'rocket_delay_js_exclusions', array( __CLASS__, 'debloat_exclusions' ) );
 		add_filter( 'script_loader_tag', array( __CLASS__, 'exclude_critical_scripts' ), 20, 3 );
@@ -42,81 +41,61 @@ final class Cindemir_Contact_Fixes {
 	}
 
 	public static function maybe_purge_after_upgrade() {
-		$version = '1.3.2';
+		$version = '1.3.3';
 		if ( get_option( 'cindemir_contact_fixes_version' ) === $version ) {
 			return;
 		}
+		self::purge_all_caches();
+		update_option( 'cindemir_contact_fixes_version', $version, false );
+	}
+
+	/** Aggressively clear WP Rocket and other page caches (fixes empty cached pages). */
+	public static function purge_all_caches() {
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
+		}
+		if ( function_exists( 'rocket_clean_minify' ) ) {
+			rocket_clean_minify();
+		}
+		if ( function_exists( 'rocket_clean_cache' ) ) {
+			rocket_clean_cache();
 		}
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_contact_fixes_version', $version, false );
+		if ( defined( 'WP_CONTENT_DIR' ) ) {
+			$dirs = array(
+				WP_CONTENT_DIR . '/cache/wp-rocket',
+				WP_CONTENT_DIR . '/cache/min',
+				WP_CONTENT_DIR . '/cache/busting',
+				WP_CONTENT_DIR . '/wp-cloudflare-super-page-cache',
+			);
+			foreach ( $dirs as $dir ) {
+				self::delete_dir_contents( $dir );
+			}
+		}
 	}
 
-	public static function start_footer_buffer() {
-		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+	private static function delete_dir_contents( $dir ) {
+		if ( ! is_dir( $dir ) ) {
 			return;
 		}
-		ob_start( array( __CLASS__, 'enhance_footer_html' ) );
-	}
-
-	public static function enhance_footer_html( $html ) {
-		if ( ! is_string( $html ) || '' === $html ) {
-			return $html;
+		$items = @scandir( $dir );
+		if ( ! is_array( $items ) ) {
+			return;
 		}
-		if ( false === stripos( $html, "id='socket'" ) && false === stripos( $html, 'id="socket"' ) ) {
-			return $html;
+		foreach ( $items as $item ) {
+			if ( '.' === $item || '..' === $item ) {
+				continue;
+			}
+			$path = $dir . '/' . $item;
+			if ( is_dir( $path ) ) {
+				self::delete_dir_contents( $path );
+				@rmdir( $path );
+			} else {
+				@unlink( $path );
+			}
 		}
-		$html = preg_replace_callback(
-			'/(<span[^>]*class=(["\'])copyright\2[^>]*>)(.*?)(<\/span>)/is',
-			function ( $m ) {
-				$inner = $m[3];
-				if ( false === stripos( $inner, 'cindemir@cindemir.av.tr' ) ) {
-					return $m[0];
-				}
-				$email = 'cindemir@cindemir.av.tr';
-				$phone = '+90 216 550 67 75';
-				$inner = preg_replace(
-					'/' . preg_quote( $email, '/' ) . '/i',
-					'<a href="mailto:' . esc_attr( $email ) . '" class="cindemir-footer-email">' . esc_html( $email ) . '</a>',
-					$inner,
-					1
-				);
-				$inner = preg_replace(
-					'/' . preg_quote( $phone, '/' ) . '/',
-					'<a href="tel:+902165506775" class="cindemir-footer-phone">' . esc_html( $phone ) . '</a>',
-					$inner,
-					1
-				);
-				return $m[1] . $inner . $m[4];
-			},
-			$html,
-			1
-		);
-		if ( false !== strpos( $html, 'cindemir-socket-extras' ) ) {
-			return $html;
-		}
-		$block = self::socket_footer_extras_markup();
-		$with_div = preg_replace(
-			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
-			'$1' . $block . '$4',
-			$html,
-			1,
-			$count_div
-		);
-		if ( $count_div ) {
-			return $with_div;
-		}
-		$with_span = preg_replace(
-			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
-			'$1' . $block,
-			$html,
-			1,
-			$count_span
-		);
-		return $count_span ? $with_span : $html;
 	}
 
 	private static function socket_footer_extras_markup() {
@@ -309,6 +288,26 @@ final class Cindemir_Contact_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/purge-cache',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_purge_cache' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_purge_cache( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'footer-deploy-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		delete_option( 'cindemir_contact_fixes_version' );
+		self::purge_all_caches();
+		update_option( 'cindemir_contact_fixes_version', '1.3.3', false );
+		return new WP_REST_Response( array( 'ok' => true, 'purged' => true ), 200 );
 	}
 
 	/** Pull footer-enabled contact-fixes from GitHub and purge caches. */
@@ -337,7 +336,7 @@ final class Cindemir_Contact_Fixes {
 			}
 			$code = (int) wp_remote_retrieve_response_code( $response );
 			$tmp  = (string) wp_remote_retrieve_body( $response );
-			if ( 200 === $code && strlen( $tmp ) > 20000 && false !== strpos( $tmp, 'enhance_footer_html' ) ) {
+			if ( 200 === $code && strlen( $tmp ) > 20000 && false !== strpos( $tmp, 'purge_all_caches' ) ) {
 				$body = $tmp;
 				break;
 			}
@@ -356,12 +355,7 @@ final class Cindemir_Contact_Fixes {
 		delete_option( 'cindemir_contact_fixes_version' );
 		delete_option( 'cindemir_footer_deploy_done' );
 
-		if ( function_exists( 'rocket_clean_domain' ) ) {
-			rocket_clean_domain();
-		}
-		if ( function_exists( 'wp_cache_flush' ) ) {
-			wp_cache_flush();
-		}
+		self::purge_all_caches();
 
 		return new WP_REST_Response(
 			array(
