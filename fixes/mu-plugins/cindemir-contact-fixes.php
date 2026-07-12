@@ -371,6 +371,7 @@ final class Cindemir_Contact_Fixes {
 			),
 			200
 		);
+	}
 
 	public static function joinchat_track_stub( $request ) {
 		return new WP_REST_Response( array( 'ok' => true ), 200 );
