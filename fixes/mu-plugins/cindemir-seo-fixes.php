@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.8
+ * Version: 1.6.0
  * Author: Cindemir Law Office
  */
 
@@ -153,6 +153,29 @@ final class Cindemir_SEO_Fixes {
 
 	private static $h1_done = false;
 
+	/** Site logo used when WPML serves Enfold placeholder on translated homepages. */
+	private static $logo_url = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
+
+	/** Visible header branding per language (name + short neutral tagline). */
+	private static $header_brands = array(
+		'en'      => array(
+			'name'    => 'Cindemir Law Office',
+			'tagline' => 'Turkish & international law · Istanbul',
+		),
+		'tr'      => array(
+			'name'    => 'Cindemir Hukuk Bürosu',
+			'tagline' => 'Türk ve uluslararası hukuk · İstanbul',
+		),
+		'ru'      => array(
+			'name'    => 'Юридическая фирма Cindemir',
+			'tagline' => 'Турецкое и международное право · Стамбул',
+		),
+		'zh-hans' => array(
+			'name'    => '辛德米尔律师事务所',
+			'tagline' => '土耳其及国际法律服务 · 伊斯坦布尔',
+		),
+	);
+
 	/** Reklamsız meta descriptions (Görev 1 — 14 sayfa). */
 	private static $meta_descriptions = array(
 		43   => "Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa.",
@@ -179,6 +202,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 1 );
+		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
@@ -303,7 +327,130 @@ final class Cindemir_SEO_Fixes {
 		$html = self::shorten_title_tag( $html );
 		$html = self::fix_meta_description_html( $html );
 		$html = self::normalize_robots_meta( $html );
+		$html = self::fix_placeholder_logo_html( $html );
+		$html = self::inject_header_branding( $html );
 		return $html;
+	}
+
+	public static function header_brand_styles() {
+		if ( is_admin() ) {
+			return;
+		}
+		?>
+<style id="cindemir-header-branding">
+#header #header_main .av-logo-container .inner-container{display:flex;align-items:center;flex-wrap:nowrap;gap:12px}
+#header .logo{display:flex;align-items:center;flex-shrink:0;max-width:none}
+#header .logo a{display:inline-flex!important;align-items:center;gap:10px;text-decoration:none}
+#header .logo img{max-height:52px!important;width:auto!important;height:auto!important}
+#header .logo.bg-logo img[src*="themes/enfold/images/layout/logo.png"]{display:none!important}
+#header .cindemir-header-brand{display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;line-height:1.25;color:#1e3d3d}
+#header .cindemir-header-brand__name{font-size:15px;font-weight:700;letter-spacing:.01em;color:#1e3d3d}
+#header .cindemir-header-brand__tagline{font-size:12px;font-weight:500;color:#4a6666;white-space:normal;max-width:260px}
+#header.header_color .av-main-nav>li>a .avia-menu-text,
+#header.header_color .av-main-nav>li>a .avia-menu-subtext,
+#header.header_color.av_header_transparency .av-main-nav>li>a .avia-menu-text,
+#header.header_color.av_header_transparency .av-main-nav>li>a .avia-menu-subtext{color:#1e3d3d!important;font-weight:600}
+#header.header_color .av-main-nav>li.current-menu-item>a .avia-menu-text,
+#header.header_color .av-main-nav>li.current-menu-ancestor>a .avia-menu-text,
+#header.header_color .av-main-nav>li.current_page_item>a .avia-menu-text{color:#0d6b6b!important}
+#header.header_color .av-main-nav>li:hover>a .avia-menu-text,
+#header.header_color .av-main-nav>li:hover>a .avia-menu-subtext{color:#fff!important}
+#header .sub-menu a .avia-menu-text{color:#1e3d3d!important;font-weight:500}
+#header .sub-menu li:hover>a .avia-menu-text{color:#fff!important}
+#header .avia_wpml_language_switch a{color:#1e3d3d!important}
+#header .avia_wpml_language_switch .avia_current_lang>a{color:#0d6b6b!important;font-weight:700}
+@media only screen and (max-width:989px){
+#header #header_main .av-logo-container .inner-container{gap:8px}
+#header .logo{max-width:calc(100vw - 110px)}
+#header .logo img{max-height:38px!important;max-width:38px!important}
+#header .cindemir-header-brand__name{font-size:13px}
+#header .cindemir-header-brand__tagline{font-size:11px;max-width:170px}
+}
+@media only screen and (min-width:990px){
+#header .logo.av-logo-hidden-with-text .logo img{display:none!important}
+}
+</style>
+		<?php
+	}
+
+	private static function inject_header_branding( $html ) {
+		if (
+			false !== strpos( $html, 'cindemir-header-brand' )
+		) {
+			return $html;
+		}
+
+		$brand = self::header_brand_for_lang();
+		$markup = '<span class="cindemir-header-brand" aria-hidden="false">'
+			. '<span class="cindemir-header-brand__name">' . esc_html( $brand['name'] ) . '</span>'
+			. '<span class="cindemir-header-brand__tagline">' . esc_html( $brand['tagline'] ) . '</span>'
+			. '</span>';
+
+		$patterns = array(
+			"/(<span class='logo[^']*'[^>]*>.*?<\/a><\/span>)(<nav class='main_menu')/s",
+			'/(<span class="logo[^"]*"[^>]*>.*?<\/a><\/span>)(<nav class="main_menu")/s',
+		);
+
+		foreach ( $patterns as $pattern ) {
+			$count = 0;
+			$new   = preg_replace( $pattern, '$1' . $markup . '$2', $html, 1, $count );
+			if ( $count > 0 ) {
+				return $new;
+			}
+		}
+
+		return $html;
+	}
+
+	private static function fix_placeholder_logo_html( $html ) {
+		$logo = esc_url( self::$logo_url );
+		return preg_replace(
+			"#src=(['\"])[^'\"]*themes/enfold/images/layout/logo\\.png\\1#i",
+			'src=$1' . $logo . '$1',
+			$html
+		);
+	}
+
+	private static function header_brand_for_lang() {
+		$lang = self::current_site_lang();
+		if ( isset( self::$header_brands[ $lang ] ) ) {
+			return self::$header_brands[ $lang ];
+		}
+		return self::$header_brands['en'];
+	}
+
+	private static function current_site_lang() {
+		if ( ! empty( $_GET['lang'] ) ) {
+			return self::normalize_site_lang( sanitize_key( wp_unslash( $_GET['lang'] ) ) );
+		}
+		$wpml = apply_filters( 'wpml_current_language', null );
+		if ( is_string( $wpml ) && '' !== $wpml ) {
+			return self::normalize_site_lang( $wpml );
+		}
+		if ( function_exists( 'pll_current_language' ) ) {
+			$pll = pll_current_language( 'slug' );
+			if ( is_string( $pll ) && '' !== $pll ) {
+				return self::normalize_site_lang( $pll );
+			}
+		}
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && is_string( ICL_LANGUAGE_CODE ) && '' !== ICL_LANGUAGE_CODE ) {
+			return self::normalize_site_lang( ICL_LANGUAGE_CODE );
+		}
+		return 'en';
+	}
+
+	private static function normalize_site_lang( $lang ) {
+		$lang = strtolower( (string) $lang );
+		if ( 0 === strpos( $lang, 'tr' ) ) {
+			return 'tr';
+		}
+		if ( 0 === strpos( $lang, 'zh' ) ) {
+			return 'zh-hans';
+		}
+		if ( 0 === strpos( $lang, 'ru' ) ) {
+			return 'ru';
+		}
+		return $lang;
 	}
 
 	/** One-time Yoast DB sync after deploy (first front-end or REST hit). */
@@ -363,7 +510,7 @@ final class Cindemir_SEO_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => '1.5.8',
+				'version' => '1.6.0',
 				'pages'   => $results,
 			),
 			200
