@@ -2,3 +2,6 @@
 backups/cindemirlaw.com-*/
 backups/cindemirlaw.com-*.tar.gz
 backups/wget-cindemirlaw.com-*.log
+
+# SSH deploy key (never commit)
+fixes/.ssh/
