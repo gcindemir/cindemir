@@ -1,0 +1,3 @@
+"Link type"	"Is nofollow"	"Source URL"	"Source HTTP status code"	"Target URL"	"Target HTTP status code"	"Target no-crawl reason"	"Anchor"	"Alt attribute"	"Hreflang attribute"	"Is source canonical"	"Is source noindex"	"Is target canonical"	"Is target noindex"
+"Image"	"false"	"https://cindemirlaw.com/definition-regarding-conflict-of-laws-in-turkey/"	"200"	"http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg"	"301"	""	""	"conflict of laws in Turkey"	""	"true"	"false"	"true"	"false"
+"Image"	"false"	"https://cindemirlaw.com/trade-law-of-turkey/"	"200"	"http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg"	"301"	""	""	"turkish commercial code"	""	"true"	"false"	"true"	"false"

@@ -1,0 +1,52 @@
+name: Deploy cindemirlaw SEO
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/cindemirlaw-seo-tasks-be51
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH key
+        env:
+          SSH_KEY: ${{ secrets.CINDEMIR_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SSH_KEY:-}" ]]; then
+            echo "CINDEMIR_SSH_KEY secret not set; skipping SSH upload." >&2
+            exit 0
+          fi
+          mkdir -p fixes/.ssh
+          printf '%s\n' "$SSH_KEY" > fixes/.ssh/cindemirlaw_deploy
+          chmod 600 fixes/.ssh/cindemirlaw_deploy
+          ssh-keyscan -H 162.241.252.122 >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload mu-plugins via SSH
+        env:
+          CINDEMIR_SSH_KEY: ${{ github.workspace }}/fixes/.ssh/cindemirlaw_deploy
+        run: |
+          if [[ -f fixes/.ssh/cindemirlaw_deploy ]]; then
+            chmod +x fixes/deploy-ssh.sh
+            ./fixes/deploy-ssh.sh
+          else
+            echo "No SSH key; upload skipped."
+          fi
+
+      - name: Apply 14 meta descriptions via REST
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          sleep 3
+          curl -sS -A "$UA" "https://cindemirlaw.com/wp-json/cindemir/v1/apply-seo-meta?key=seo-pack-2026" | tee /tmp/seo-result.json
+          python3 -c "import json; d=json.load(open('/tmp/seo-result.json')); assert d.get('ok'), d"
+
+      - name: Verify about-us meta
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          META=$(curl -sS -A "$UA" 'https://cindemirlaw.com/about-us/' | grep -oP '(?<=meta name="description" content=")[^"]*' | head -1)
+          echo "Meta: $META"
+          echo "$META" | grep -q "2004'ten bu yana İstanbul'da"
