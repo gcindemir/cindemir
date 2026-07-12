@@ -2,3 +2,4 @@
 backups/cindemirlaw.com-*/
 backups/cindemirlaw.com-*.tar.gz
 backups/wget-cindemirlaw.com-*.log
+fixes/.ssh/

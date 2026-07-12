@@ -1,6 +1,6 @@
 # Deploy: cindemirlaw.com SEO fixes
 
-WordPress admin / FTP access is required. This repo has no live server credentials, so these files must be uploaded manually.
+WordPress admin or **SSH** access is required. Preferred deploy path: [`fixes/SSH.md`](SSH.md) + `./fixes/deploy-ssh.sh`.
 
 Full task brief: [`docs/cindemirlaw-cursor-gorev.md`](../docs/cindemirlaw-cursor-gorev.md)
 
@@ -31,7 +31,8 @@ Full task brief: [`docs/cindemirlaw-cursor-gorev.md`](../docs/cindemirlaw-cursor
 | `fixes/mu-plugins/cindemir-expose-yoast-meta.php` | `wp-content/mu-plugins/` (REST için) |
 | `fixes/mu-plugins/cindemir-contact-fixes.php` | `wp-content/mu-plugins/` (REST meta trigger) |
 
-**Otomatik (önerilen):** Cursor Cloud Environment secrets → `./fixes/scripts/auto-deploy.sh`
+**Otomatik (önerilen):** SSH → `./fixes/deploy-ssh.sh` veya `./fixes/scripts/auto-deploy.sh`  
+Detay: [`fixes/SSH.md`](SSH.md)
 
 ### 2. Meta descriptions — 14 sayfa (Görev 1)
 

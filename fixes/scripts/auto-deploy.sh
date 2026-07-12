@@ -2,20 +2,21 @@
 # Full automatic deploy for cindemirlaw.com SEO pack.
 #
 # Required (one of):
-#   CINDEMIR_FTP_USER + CINDEMIR_FTP_PASS  → upload mu-plugins via FTP
-#   WP_USER + WP_APP_PASSWORD              → meta via REST (needs expose-yoast mu-plugin)
+#   CINDEMIR_SSH_KEY or CINDEMIR_SSH_PASS    → upload mu-plugins via SSH (önerilen)
+#   CINDEMIR_FTP_USER + CINDEMIR_FTP_PASS    → FTP fallback (timeout riski)
+#   WP_USER + WP_APP_PASSWORD                → meta via REST (needs expose-yoast mu-plugin)
 #
 # Usage:
 #   ./fixes/scripts/auto-deploy.sh
-#   ./fixes/scripts/auto-deploy.sh --skip-ftp    # only REST/meta trigger
+#   ./fixes/scripts/auto-deploy.sh --skip-upload   # only REST/meta trigger
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 HOST="${CINDEMIR_FTP_HOST:-162.241.252.122}"
 REMOTE="${CINDEMIR_FTP_PATH:-public_html/wp-content/mu-plugins}"
 UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-SKIP_FTP=false
-[[ "${1:-}" == "--skip-ftp" ]] && SKIP_FTP=true
+SKIP_UPLOAD=false
+[[ "${1:-}" == "--skip-upload" || "${1:-}" == "--skip-ftp" ]] && SKIP_UPLOAD=true
 
 ftp_upload() {
   local local_file="$1"
@@ -23,6 +24,15 @@ ftp_upload() {
   local url="ftp://${HOST}/${REMOTE}/${remote_name}"
   echo "FTP upload: ${remote_name} → ${url}"
   curl --ftp-create-dirs -sS --ftp-pasv -T "${local_file}" -u "${CINDEMIR_FTP_USER}:${CINDEMIR_FTP_PASS}" "${url}"
+}
+
+deploy_ssh() {
+  if [[ -n "${CINDEMIR_SSH_KEY:-}" || -n "${CINDEMIR_SSH_PASS:-}" || -f "${ROOT}/fixes/.ssh/cindemirlaw_deploy" ]]; then
+    "${ROOT}/fixes/deploy-ssh.sh"
+    return $?
+  fi
+  echo "SKIP SSH: CINDEMIR_SSH_KEY / CINDEMIR_SSH_PASS not set." >&2
+  return 1
 }
 
 deploy_ftp() {
@@ -34,6 +44,14 @@ deploy_ftp() {
   ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-expose-yoast-meta.php" "cindemir-expose-yoast-meta.php"
   ftp_upload "${ROOT}/fixes/mu-plugins/cindemir-contact-fixes.php" "cindemir-contact-fixes.php"
   echo "FTP upload OK."
+}
+
+deploy_mu_plugins() {
+  if deploy_ssh; then
+    echo "SSH upload OK."
+    return 0
+  fi
+  deploy_ftp
 }
 
 trigger_rest_meta() {
@@ -70,13 +88,13 @@ verify_live() {
 
 main() {
   local ok=false
-  if ! $SKIP_FTP; then
-    if deploy_ftp; then ok=true; fi
+  if ! $SKIP_UPLOAD; then
+    if deploy_mu_plugins; then ok=true; fi
   fi
   if trigger_rest_meta; then ok=true; fi
   if apply_meta_rest; then ok=true; fi
   if ! $ok; then
-    echo "ERROR: No deploy method succeeded. Set FTP or WP credentials in Cursor Cloud Environment secrets." >&2
+    echo "ERROR: No deploy method succeeded. Set SSH, FTP, or WP credentials (see fixes/SSH.md)." >&2
     exit 1
   fi
   sleep 2
