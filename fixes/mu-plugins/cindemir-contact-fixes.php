@@ -300,7 +300,77 @@ final class Cindemir_Contact_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/deploy-footer',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'deploy_footer_fixes' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 	}
+
+	/** Pull footer-enabled contact-fixes from GitHub and purge caches. */
+	public static function deploy_footer_fixes( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'footer-deploy-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+
+		$sources = array(
+			'https://raw.githubusercontent.com/gcindemir/cindemir/cursor/footer-email-social-baro-917b/fixes/mu-plugins/cindemir-contact-fixes.php',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/master/fixes/mu-plugins/cindemir-contact-fixes.php',
+		);
+
+		$body = '';
+		foreach ( $sources as $url ) {
+			$response = wp_remote_get(
+				$url,
+				array(
+					'timeout' => 45,
+					'headers' => array( 'User-Agent' => 'CindemirFooterDeploy/1.3' ),
+				)
+			);
+			if ( is_wp_error( $response ) ) {
+				continue;
+			}
+			$code = (int) wp_remote_retrieve_response_code( $response );
+			$tmp  = (string) wp_remote_retrieve_body( $response );
+			if ( 200 === $code && strlen( $tmp ) > 20000 && false !== strpos( $tmp, 'enhance_footer_html' ) ) {
+				$body = $tmp;
+				break;
+			}
+		}
+
+		if ( '' === $body || ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return new WP_REST_Response( array( 'error' => 'download_failed' ), 500 );
+		}
+
+		$dest = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-contact-fixes.php';
+		$ok   = file_put_contents( $dest, $body );
+		if ( false === $ok ) {
+			return new WP_REST_Response( array( 'error' => 'write_failed' ), 500 );
+		}
+
+		delete_option( 'cindemir_contact_fixes_version' );
+		delete_option( 'cindemir_footer_deploy_done' );
+
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+
+		return new WP_REST_Response(
+			array(
+				'ok'      => true,
+				'version' => 'contact-footer-v1.3.0',
+				'bytes'   => strlen( $body ),
+			),
+			200
+		);
 
 	public static function joinchat_track_stub( $request ) {
 		return new WP_REST_Response( array( 'ok' => true ), 200 );
