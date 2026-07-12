@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.8
+ * Version: 1.5.9
  * Author: Cindemir Law Office
  */
 
@@ -176,6 +176,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 1 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'rewrite_html' ), 16 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
@@ -291,7 +292,7 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	public static function maybe_purge_after_upgrade() {
-		$version = '1.5.8';
+		$version = '1.5.9';
 		if ( get_option( 'cindemir_seo_fixes_version' ) === $version ) {
 			return;
 		}
