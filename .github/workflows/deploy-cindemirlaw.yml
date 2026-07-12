@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           HOST="${FTP_HOST:-162.241.252.122}"
-          REMOTE="public_html/wp-content/mu-plugins"
+          REMOTE="wp-content/mu-plugins"
           for f in cindemir-seo-fixes.php cindemir-expose-yoast-meta.php cindemir-contact-fixes.php cindemir-footer-fixes.php; do
             echo "Uploading $f …"
             curl --ftp-create-dirs -sS --ftp-pasv \

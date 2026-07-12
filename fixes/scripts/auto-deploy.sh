@@ -12,7 +12,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 HOST="${CINDEMIR_FTP_HOST:-162.241.252.122}"
-REMOTE="${CINDEMIR_FTP_PATH:-public_html/wp-content/mu-plugins}"
+REMOTE="${CINDEMIR_FTP_PATH:-wp-content/mu-plugins}"
 UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 SKIP_FTP=false
 [[ "${1:-}" == "--skip-ftp" ]] && SKIP_FTP=true

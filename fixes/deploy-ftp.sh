@@ -13,7 +13,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HOST="${CINDEMIR_FTP_HOST:-162.241.252.122}"
 USER="${CINDEMIR_FTP_USER:?Set CINDEMIR_FTP_USER}"
 PASS="${CINDEMIR_FTP_PASS:?Set CINDEMIR_FTP_PASS}"
-REMOTE="${CINDEMIR_FTP_PATH:-public_html/wp-content/mu-plugins}"
+REMOTE="${CINDEMIR_FTP_PATH:-wp-content/mu-plugins}"
 
 if ! command -v lftp >/dev/null 2>&1; then
   echo "lftp is required. Install with: apt-get install -y lftp" >&2
