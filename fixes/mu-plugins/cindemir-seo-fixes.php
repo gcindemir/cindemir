@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.7
+ * Version: 1.5.8
  * Author: Cindemir Law Office
  */
 
@@ -112,11 +112,15 @@ final class Cindemir_SEO_Fixes {
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/russian/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/russian/wp-content/uploads/2014/11/white-5-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-5-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-1-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-2-copy-150x150.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 		'/chinese/wp-content/uploads/2014/11/white-1-copy.jpg' => '/wp-content/uploads/2020/10/white-1-copy-300x300.jpg',
+		'/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
 	private static $missing_h1 = array(
@@ -206,6 +210,10 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_array( $url ) || empty( $url['loc'] ) ) {
 			return $url;
 		}
+		$parts = wp_parse_url( $url['loc'] );
+		if ( ! empty( $parts['query'] ) && preg_match( '/(?:^|&)lang=/', $parts['query'] ) ) {
+			return false;
+		}
 		$path = self::normalize_path( $url['loc'] );
 		$skip = array( '/press', '/link9', '/link2', '/link3', '/link4', '/author/admin', '/russian', '/chinese', '/zh', '/zh-hans' );
 		if ( in_array( $path, $skip, true ) ) {
@@ -279,6 +287,16 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
+		$html = preg_replace(
+			'#(https?://(?:www\.)?cindemirlaw\.com)/(?:russian|chinese)/wp-content/#i',
+			'$1/wp-content/',
+			$html
+		);
+		$html = preg_replace(
+			'#((?:href|src)=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/(?:russian|chinese)/wp-content/#i',
+			'$1$2/wp-content/',
+			$html
+		);
 		$html = self::rewrite_hrefs_in_html( $html );
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
@@ -345,7 +363,7 @@ final class Cindemir_SEO_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => '1.5.7',
+				'version' => '1.5.8',
 				'pages'   => $results,
 			),
 			200
@@ -521,6 +539,17 @@ final class Cindemir_SEO_Fixes {
 		foreach ( self::$url_replace as $from => $to ) {
 			$html = str_replace( $from, $to, $html );
 		}
+		$html = preg_replace_callback(
+			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)(/[^"\']*?)(\?[^"\']*lang=[^"\']*)(\2)#i',
+			function ( $m ) {
+				$path = isset( $m[4] ) ? rawurldecode( $m[4] ) : '';
+				if ( $path && ! preg_match( '/[А-Яа-яЁё]/u', $path ) && ! preg_match( '#^/fde#i', $path ) ) {
+					return $m[1] . $m[3] . user_trailingslashit( $path ) . $m[6];
+				}
+				return $m[0];
+			},
+			$html
+		);
 		$html = preg_replace_callback(
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)?(/[^"\']*)(\2)#i',
 			function ( $m ) {

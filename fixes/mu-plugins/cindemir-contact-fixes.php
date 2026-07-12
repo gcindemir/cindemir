@@ -37,6 +37,8 @@ final class Cindemir_Contact_Fixes {
 		add_filter( 'avf_contact_form_incoming_mail', array( __CLASS__, 'fix_incoming_mail' ), 20, 6 );
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'start_html_buffer' ), 1 );
+		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 	}
 
 	/** Use a domain mailbox as envelope sender (visitor email as From gets dropped on Bluehost). */
@@ -158,6 +160,60 @@ final class Cindemir_Contact_Fixes {
 			$tag = str_replace( '<script ', '<script data-cfasync="false" ', $tag );
 		}
 		return $tag;
+	}
+
+	public static function start_html_buffer() {
+		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
+		ob_start( array( __CLASS__, 'rewrite_legacy_assets' ) );
+	}
+
+	public static function rewrite_legacy_assets( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$map = array(
+			'https://cindemirlaw.com/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+			'https://cindemirlaw.com/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+			'/chinese/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+			'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
+		);
+		foreach ( $map as $from => $to ) {
+			$html = str_replace( $from, $to, $html );
+		}
+		$html = preg_replace(
+			'#(https?://(?:www\.)?cindemirlaw\.com)/(?:russian|chinese)/wp-content/#i',
+			'$1/wp-content/',
+			$html
+		);
+		$html = preg_replace(
+			'#((?:href|src)=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/(?:russian|chinese)/wp-content/#i',
+			'$1$2/wp-content/',
+			$html
+		);
+		return preg_replace_callback(
+			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)(/[^"\']*?)(\?[^"\']*lang=[^"\']*)(\2)#i',
+			function ( $m ) {
+				$path = isset( $m[4] ) ? rawurldecode( $m[4] ) : '';
+				if ( $path && ! preg_match( '/[А-Яа-яЁё]/u', $path ) && ! preg_match( '#^/fde#i', $path ) ) {
+					return $m[1] . $m[3] . user_trailingslashit( $path ) . $m[6];
+				}
+				return $m[0];
+			},
+			$html
+		);
+	}
+
+	public static function filter_sitemap_entry( $url, $type, $object ) {
+		if ( ! is_array( $url ) || empty( $url['loc'] ) ) {
+			return $url;
+		}
+		$parts = wp_parse_url( $url['loc'] );
+		if ( ! empty( $parts['query'] ) && preg_match( '/(?:^|&)lang=/', $parts['query'] ) ) {
+			return false;
+		}
+		return $url;
 	}
 
 	public static function register_rest_routes() {
@@ -353,7 +409,7 @@ final class Cindemir_Contact_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => 'contact-seo-v1',
+				'version' => '1.5.8',
 				'pages'   => $results,
 			),
 			200
