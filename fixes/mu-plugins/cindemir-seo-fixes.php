@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: Cindemir Law Office
  */
 
@@ -125,7 +125,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.7.0';
+	const VERSION = '1.7.1';
 
 	private static $missing_h1 = array(
 		3874 => 'Family Heritage',
