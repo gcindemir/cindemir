@@ -67,9 +67,9 @@ final class Cindemir_Contact_Fixes {
 
 	private static function linkify_copyright_html( $html ) {
 		return preg_replace_callback(
-			'/(<span[^>]*class=(["\'])copyright\2[^>]*>)(.*?)(<\/span>)/is',
+			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>)(.*?)(<\/span>)/is',
 			function ( $m ) {
-				$inner = $m[3];
+				$inner = $m[4];
 				if ( false !== stripos( $inner, 'cindemir-footer-email' ) ) {
 					return $m[0];
 				}
@@ -90,7 +90,7 @@ final class Cindemir_Contact_Fixes {
 					$inner,
 					1
 				);
-				return $m[1] . $inner . $m[4];
+				return $m[1] . $inner . $m[5];
 			},
 			$html,
 			1
