@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.6
+ * Version: 1.8.7
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.6';
+	const VERSION = '1.8.7';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -768,34 +768,10 @@ final class Cindemir_SEO_Fixes {
 
 	/**
 	 * Put a readable firm name next to the header logo so visitors know which site they are on.
+	 * Brand text is painted via CSS ::after (reliable with page cache / picture logos).
 	 */
 	private static function inject_header_brand_html( $html ) {
-		if ( false !== strpos( $html, 'cindemir-header-brand' ) ) {
-			return $html;
-		}
-		$label  = esc_html( self::header_brand_label() );
-		$markup = '<span class="cindemir-header-brand">' . $label . '</span>';
-		$patterns = array(
-			"/(<(?:span|div)[^>]*class=['\"]logo[^'\"]*['\"][^>]*>.*?<\/a>\s*<\/(?:span|div)>)(\s*<(?:nav|div)[^>]*class=['\"][^'\"]*main_menu)/is",
-			"/(<a[^>]*class=['\"]logo['\"][^>]*>.*?<\/a>)(\s*<(?:nav|div)[^>]*class=['\"][^'\"]*main_menu)/is",
-		);
-		foreach ( $patterns as $pattern ) {
-			$count = 0;
-			$new   = preg_replace( $pattern, '$1' . $markup . '$2', $html, 1, $count );
-			if ( null !== $new && $count > 0 ) {
-				return $new;
-			}
-		}
-		// Fallback: append after first logo image inside #header / .logo.
-		$count = 0;
-		$new   = preg_replace(
-			'/(id=["\']logo["\'][^>]*>[\s\S]*?<img[^>]*>)/i',
-			'$1' . $markup,
-			$html,
-			1,
-			$count
-		);
-		return ( null !== $new && $count > 0 ) ? $new : $html;
+		return $html;
 	}
 
 	private static function header_brand_label() {
@@ -816,25 +792,35 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		$label = esc_attr( self::header_brand_label() );
+		// Enfold is configured logo_right; force brand+logo to the left so the site is identifiable.
 		echo '<style id="cindemir-header-brand">'
-			. '#header .logo,#header .av-logo-container .inner-container{display:flex!important;align-items:center;gap:10px}'
-			. '#header .logo a{display:inline-flex!important;align-items:center;gap:10px;text-decoration:none;max-width:100%}'
-			. '#header .cindemir-header-brand{display:inline-block;font-size:15px;font-weight:600;line-height:1.2;color:#336666;letter-spacing:.01em;white-space:nowrap}'
+			. '#top #header #header_main .av-logo-container .inner-container,'
+			. '#top #header #header_main .container .inner-container{'
+			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;position:relative!important;min-height:70px}'
+			. '#top #header .logo{'
+			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
+			. 'transform:none!important;-webkit-transform:none!important;margin:0 24px 0 0!important;'
+			. 'max-width:none!important;z-index:30;order:1;flex:0 0 auto}'
+			. '#top #header .logo a{'
+			. 'display:inline-flex!important;align-items:center!important;gap:12px!important;'
+			. 'text-decoration:none!important;max-width:none!important}'
+			. '#top #header .logo img,#top #header .logo picture{'
+			. 'max-height:48px!important;width:auto!important;height:auto!important;flex-shrink:0}'
+			. '#top #header .logo a::after{'
+			. 'content:"' . $label . '"!important;display:inline-block!important;'
+			. 'font-family:Georgia,"Times New Roman",serif!important;'
+			. 'font-size:22px!important;font-weight:700!important;line-height:1.1!important;'
+			. 'color:#244f4f!important;letter-spacing:.01em;white-space:nowrap}'
+			. '#top #header .main_menu{'
+			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
+			. 'transform:none!important;margin-left:auto!important;order:2;flex:1 1 auto;text-align:right!important}'
+			. '#top #header .main_menu .av-main-nav-wrap{float:none!important;display:inline-block}'
 			. '@media only screen and (max-width:989px){'
-			. '#header .logo{max-width:calc(100vw - 110px)}'
-			. '#header .logo img{max-height:38px!important;max-width:38px!important;width:auto!important;height:auto!important;flex-shrink:0}'
-			. '#header .cindemir-header-brand{font-size:13px;white-space:normal;max-width:170px}'
-			. '#header .logo a::after{content:"";}'
+			. '#top #header .logo{max-width:calc(100vw - 100px)!important;margin-right:8px!important}'
+			. '#top #header .logo img{max-height:36px!important;max-width:36px!important}'
+			. '#top #header .logo a::after{font-size:16px!important;white-space:normal!important;max-width:min(240px,58vw);text-align:left}'
+			. '#top #header .main_menu{display:none!important}'
 			. '}'
-			. '@media only screen and (min-width:990px){'
-			. '#header .logo img{max-height:52px!important;width:auto!important}'
-			. '}'
-			. '</style>';
-		// CSS fallback if HTML inject missed (uses ::after on logo link).
-		echo '<style id="cindemir-header-brand-fallback">'
-			. 'body:not(:has(.cindemir-header-brand)) #header .logo a::after{'
-			. 'content:"' . $label . '";display:inline-block;font-size:15px;font-weight:600;line-height:1.2;color:#336666;margin-left:8px}'
-			. '@media only screen and (max-width:989px){body:not(:has(.cindemir-header-brand)) #header .logo a::after{font-size:13px;max-width:170px;white-space:normal}}'
 			. '</style>';
 	}
 
