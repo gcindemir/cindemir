@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: Cindemir Law Office
  */
 
@@ -17,7 +17,7 @@ define( 'CINDEMIR_CONTACT_FIXES_LOADED', true );
 
 final class Cindemir_Contact_Fixes {
 
-	const WHATSAPP_PHONE = '905325680647';
+	const WHATSAPP_PHONE = '902165506775';
 	const MAIL_TO        = 'gokhan@cindemir.av.tr';
 	const MAIL_FROM      = 'wordpress@cindemirlaw.com';
 
@@ -38,6 +38,42 @@ final class Cindemir_Contact_Fixes {
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
 		add_action( 'wp_head', array( __CLASS__, 'mobile_header_brand' ), 50 );
+
+		add_filter( 'joinchat_get_settings', array( __CLASS__, 'force_joinchat_phone' ), 99 );
+		add_filter( 'joinchat_get_settings_site', array( __CLASS__, 'force_joinchat_phone' ), 99 );
+		add_action( 'template_redirect', array( __CLASS__, 'start_whatsapp_buffer' ), 0 );
+	}
+
+	public static function force_joinchat_phone( $settings ) {
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['telephone'] = apply_filters( 'cindemir_whatsapp_phone', self::WHATSAPP_PHONE );
+		return $settings;
+	}
+
+	public static function start_whatsapp_buffer() {
+		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
+		ob_start( array( __CLASS__, 'normalize_whatsapp_html' ) );
+	}
+
+	public static function normalize_whatsapp_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$phone = preg_replace( '/\D+/', '', apply_filters( 'cindemir_whatsapp_phone', self::WHATSAPP_PHONE ) );
+		if ( '' === $phone ) {
+			return $html;
+		}
+		$wa = 'https://wa.me/' . $phone;
+
+		$html = preg_replace( '#https?://wa\.me/[0-9]+#i', $wa, $html );
+		$html = preg_replace( '#"telephone"\s*:\s*"[0-9]+"#', '"telephone":"' . $phone . '"', $html );
+		$html = preg_replace( '#data-phone="[0-9]+"#', 'data-phone="' . $phone . '"', $html );
+
+		return $html;
 	}
 
 	public static function mobile_header_brand() {
