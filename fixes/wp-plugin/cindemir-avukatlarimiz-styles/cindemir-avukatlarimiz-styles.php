@@ -1,0 +1,144 @@
+<?php
+/**
+ * Plugin Name: Cindemir Avukatlarımız Team Styles
+ * Description: Unifies lawyer card colors on the Turkish Avukatlarımız page.
+ * Version: 1.0.0
+ * Author: Cindemir Law Office
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( defined( 'CINDEMIR_AVUKATLARIMIZ_STYLES_LOADED' ) ) {
+	return;
+}
+define( 'CINDEMIR_AVUKATLARIMIZ_STYLES_LOADED', true );
+
+final class Cindemir_Avukatlarimiz_Styles {
+
+	const PAGE_ID = 440;
+
+	public static function boot() {
+		add_action( 'wp_head', array( __CLASS__, 'print_styles' ), 60 );
+		add_action( 'template_redirect', array( __CLASS__, 'maybe_start_buffer' ), 0 );
+	}
+
+	public static function is_team_page() {
+		return function_exists( 'is_page' ) && is_page( self::PAGE_ID );
+	}
+
+	public static function print_styles() {
+		if ( ! self::is_team_page() ) {
+			return;
+		}
+		?>
+<style id="cindemir-avukatlarimiz-team-fix">
+body.elementor-page-440 .elementor-element-6e99e18 {
+	--gap: 32px !important;
+	--row-gap: 32px !important;
+	--column-gap: 32px !important;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px 40px;
+	box-sizing: border-box;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="background-color: #f2f2f2"],
+body.elementor-page-440 .elementor-widget-text-editor div[style*="background-color:#f2f2f2"] {
+	background: #fff !important;
+	border: 1px solid #e2e2e2 !important;
+	border-radius: 14px !important;
+	padding: 28px 24px !important;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+	max-width: none !important;
+	margin: 0 !important;
+	text-align: center !important;
+	height: 100%;
+	box-sizing: border-box;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="background-color: #f2f2f2"]:hover,
+body.elementor-page-440 .elementor-widget-text-editor div[style*="background-color:#f2f2f2"]:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07) !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] h2 {
+	margin: 0 0 18px !important;
+	font-size: 20px !important;
+	line-height: 1.3 !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.3px !important;
+	color: #222 !important;
+	text-transform: uppercase !important;
+	text-align: center !important;
+}
+body.elementor-page-440 .elementor-element-a89e60e h2.elementor-heading-title:first-of-type {
+	display: none !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] p,
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] span,
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] li {
+	font-size: 15px !important;
+	line-height: 1.7 !important;
+	color: #444 !important;
+	text-align: justify !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] a {
+	color: #8a1f1f !important;
+	font-weight: 600 !important;
+	text-decoration: none !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] a:hover {
+	text-decoration: underline !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] img {
+	border-radius: 50% !important;
+	width: 180px !important;
+	height: 180px !important;
+	max-width: 180px !important;
+	object-fit: cover !important;
+	border: 4px solid #f1f1f1 !important;
+	margin: 0 auto 18px !important;
+	display: block !important;
+}
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] picture,
+body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] .wp-block-image {
+	text-align: center !important;
+	margin-bottom: 0 !important;
+}
+@media (max-width: 600px) {
+	body.elementor-page-440 .elementor-element-6e99e18 {
+		padding: 0 14px 28px;
+	}
+	body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] {
+		padding: 24px 18px !important;
+	}
+	body.elementor-page-440 .elementor-widget-text-editor div[style*="f2f2f2"] h2 {
+		font-size: 18px !important;
+	}
+}
+</style>
+		<?php
+	}
+
+	public static function maybe_start_buffer() {
+		if ( ! self::is_team_page() || is_admin() ) {
+			return;
+		}
+		ob_start( array( __CLASS__, 'cleanup_html' ) );
+	}
+
+	public static function cleanup_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$html = preg_replace(
+			'#<h2 class="elementor-heading-title elementor-size-default" style="text-align: justify;">\s*</h2>#',
+			'',
+			$html
+		);
+		return $html;
+	}
+}
+
+Cindemir_Avukatlarimiz_Styles::boot();
