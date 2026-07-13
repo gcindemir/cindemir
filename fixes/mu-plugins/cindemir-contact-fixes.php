@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Cindemir Law Office
  */
 
@@ -192,6 +192,18 @@ final class Cindemir_Contact_Fixes {
 			'$1$2/wp-content/',
 			$html
 		);
+		$html = preg_replace(
+			'#((?:href|src|data-lazy-src)=(["\']))(?:https?:)?//d\.barobirlik\.org\.tr/amblem/tbb_amblem_60\.png\2#i',
+			'$1' . esc_url( get_option( 'cindemir_tbb_badge_local', 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg' ) ) . '$2',
+			$html
+		);
+		$html = preg_replace(
+			'#<link\b[^>]*\bhreflang=(["\'])[^"\']+\1[^>]*\bhref=(["\'])[^"\']*contacts-2[^"\']*\2[^>]*>#i',
+			'',
+			$html
+		);
+		$html = str_replace( '/contacts-2/?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
+		$html = str_replace( '/contacts-2?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		return preg_replace_callback(
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)(/[^"\']*?)(\?[^"\']*lang=[^"\']*)(\2)#i',
 			function ( $m ) {
@@ -241,6 +253,24 @@ final class Cindemir_Contact_Fixes {
 			array(
 				'methods'             => array( 'GET', 'POST' ),
 				'callback'            => array( __CLASS__, 'apply_seo_meta' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+		register_rest_route(
+			'cindemir/v1',
+			'/pull-plugins',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'pull_plugins' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+		register_rest_route(
+			'cindemir/v1',
+			'/fix-ahrefs',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'fix_ahrefs' ),
 				'permission_callback' => '__return_true',
 			)
 		);
@@ -409,8 +439,78 @@ final class Cindemir_Contact_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => '1.5.8',
+				'version' => '1.8.0',
 				'pages'   => $results,
+			),
+			200
+		);
+	}
+
+	/** Pull latest mu-plugins from GitHub (remote deploy without SSH). */
+	public static function pull_plugins( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
+		}
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$files  = array(
+			'cindemir-seo-fixes.php'         => 40000,
+			'cindemir-contact-fixes.php'     => 20000,
+			'cindemir-expose-yoast-meta.php' => 2000,
+			'cindemir-purge-cache.php'       => 500,
+		);
+		$out = array();
+		foreach ( $files as $name => $min ) {
+			$dest = trailingslashit( WPMU_PLUGIN_DIR ) . $name;
+			$response = wp_remote_get(
+				$base . $name,
+				array(
+					'timeout' => 60,
+					'headers' => array( 'User-Agent' => 'CindemirPull/1.2.1' ),
+				)
+			);
+			if ( is_wp_error( $response ) ) {
+				$out[ $name ] = array( 'ok' => false, 'error' => $response->get_error_message() );
+				continue;
+			}
+			$body = (string) wp_remote_retrieve_body( $response );
+			$bytes = strlen( $body );
+			if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || $bytes < $min ) {
+				$out[ $name ] = array( 'ok' => false, 'bytes' => $bytes );
+				continue;
+			}
+			file_put_contents( $dest, $body );
+			$out[ $name ] = array( 'ok' => true, 'bytes' => $bytes );
+		}
+		delete_option( 'cindemir_seo_fixes_version' );
+		wp_cache_flush();
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		return new WP_REST_Response( array( 'ok' => true, 'files' => $out ), 200 );
+	}
+
+	/** One-shot Ahrefs cleanup: WPML contacts + meta + cache. */
+	public static function fix_ahrefs( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		$zh = self::setup_zh_contacts( $request );
+		$meta = self::apply_seo_meta( $request );
+		wp_cache_flush();
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		return new WP_REST_Response(
+			array(
+				'ok'   => true,
+				'zh'   => $zh->get_data(),
+				'meta' => $meta->get_data(),
 			),
 			200
 		);

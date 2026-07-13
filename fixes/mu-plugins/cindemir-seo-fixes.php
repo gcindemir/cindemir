@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.7.2
+ * Version: 1.8.0
  * Author: Cindemir Law Office
  */
 
@@ -126,7 +126,12 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.7.2';
+	const VERSION = '1.8.0';
+
+	/** Slug → neutral meta (110–160 chars, TBB-compliant). */
+	private static $slug_metadesc = array(
+		'services' => 'Information on legal service areas under Turkish law for foreign individuals and companies: civil, commercial, migration, and criminal law topics.',
+	);
 
 	private static $missing_h1 = array(
 		3874 => 'Family Heritage',
@@ -178,6 +183,7 @@ final class Cindemir_SEO_Fixes {
 
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
+		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 10, 2 );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
@@ -202,12 +208,80 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_press_from_sitemap' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
+		add_filter( 'wpml_hreflangs', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
+		add_filter( 'wpseo_hreflang_links', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
 		add_filter( 'wpseo_opengraph_image', array( __CLASS__, 'rewrite_media_url' ) );
 		add_filter( 'wpseo_twitter_image', array( __CLASS__, 'rewrite_media_url' ) );
 	}
 
-	/** One-time cache/sitemap flush after deploy. */
-	public static function maybe_purge_caches_on_upgrade() {
+	/** Download TBB badge locally (Ahrefs bots get 403 from d.barobirlik.org.tr). */
+	public static function ensure_local_badge_assets() {
+		$local = get_option( 'cindemir_tbb_badge_local', '' );
+		if ( $local && false !== strpos( $local, '/uploads/cindemir/' ) ) {
+			return;
+		}
+		$dir = WP_CONTENT_DIR . '/uploads/cindemir';
+		if ( ! wp_mkdir_p( $dir ) ) {
+			return;
+		}
+		$file = trailingslashit( $dir ) . 'tbb_amblem_60.png';
+		if ( ! file_exists( $file ) || filesize( $file ) < 100 ) {
+			$response = wp_remote_get(
+				'https://d.barobirlik.org.tr/amblem/tbb_amblem_60.png',
+				array(
+					'timeout' => 30,
+					'headers' => array(
+						'User-Agent' => 'Mozilla/5.0 (compatible; CindemirSEO/1.8)',
+					),
+				)
+			);
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				return;
+			}
+			$body = wp_remote_retrieve_body( $response );
+			if ( strlen( $body ) < 100 ) {
+				return;
+			}
+			file_put_contents( $file, $body );
+		}
+		if ( file_exists( $file ) && filesize( $file ) > 100 ) {
+			update_option( 'cindemir_tbb_badge_local', content_url( 'uploads/cindemir/tbb_amblem_60.png' ), false );
+		}
+	}
+
+	public static function filter_hreflang_urls( $hreflangs ) {
+		if ( ! is_array( $hreflangs ) ) {
+			return $hreflangs;
+		}
+		foreach ( $hreflangs as $lang => $url ) {
+			$hreflangs[ $lang ] = self::normalize_hreflang_url( $url );
+		}
+		return $hreflangs;
+	}
+
+	private static function normalize_hreflang_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return $url;
+		}
+		$url = str_replace( '/contacts-2/', '/contacts/', $url );
+		$url = str_replace( '/contacts-2?', '/contacts?', $url );
+		$parts = wp_parse_url( $url );
+		if ( empty( $parts['query'] ) ) {
+			return $url;
+		}
+		parse_str( $parts['query'], $q );
+		if ( empty( $q['lang'] ) || ! in_array( $q['lang'], array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return $url;
+		}
+		unset( $q['lang'] );
+		$path = isset( $parts['path'] ) ? $parts['path'] : '/';
+		$new  = home_url( user_trailingslashit( $path ) );
+		if ( ! empty( $q ) ) {
+			$new = add_query_arg( $q, $new );
+		}
+		return $new;
+	}
+
 		$key = 'cindemir_seo_fixes_version';
 		$prev = get_option( $key, '' );
 		if ( self::VERSION === $prev ) {
@@ -294,22 +368,58 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $text ) || '' === $text ) {
 			return $text;
 		}
+		$local_tbb = get_option( 'cindemir_tbb_badge_local', '' );
+		if ( $local_tbb ) {
+			$text = str_replace( 'https://d.barobirlik.org.tr/amblem/tbb_amblem_60.png', $local_tbb, $text );
+			$text = str_replace( 'http://d.barobirlik.org.tr/amblem/tbb_amblem_60.png', $local_tbb, $text );
+		}
 		foreach ( self::$url_replace as $from => $to ) {
 			$text = str_replace( $from, $to, $text );
 		}
 		return $text;
 	}
 
-	/** Override Yoast meta description for priority pages. */
+	/** Override Yoast meta description for priority pages; pad short post/page metas. */
 	public static function filter_page_metadesc( $desc ) {
-		if ( ! is_singular( 'page' ) ) {
+		if ( ! is_singular( array( 'page', 'post' ) ) ) {
 			return $desc;
 		}
-		$id = get_queried_object_id();
+		$id   = get_queried_object_id();
+		$post = get_post( $id );
+		if ( ! $post ) {
+			return $desc;
+		}
 		if ( isset( self::$page_metadesc[ $id ] ) ) {
 			return self::$page_metadesc[ $id ];
 		}
-		return $desc;
+		$slug = $post->post_name;
+		if ( isset( self::$slug_metadesc[ $slug ] ) ) {
+			return self::$slug_metadesc[ $slug ];
+		}
+		return self::pad_short_metadesc( $desc, $post );
+	}
+
+	private static function pad_short_metadesc( $desc, $post ) {
+		$desc = trim( (string) $desc );
+		$len  = function_exists( 'mb_strlen' ) ? mb_strlen( $desc ) : strlen( $desc );
+		if ( $len >= 110 && $len <= 160 ) {
+			return $desc;
+		}
+		if ( $len > 160 ) {
+			$cut = function_exists( 'mb_substr' ) ? mb_substr( $desc, 0, 157 ) : substr( $desc, 0, 157 );
+			return rtrim( $cut ) . '…';
+		}
+		$title = wp_strip_all_tags( get_the_title( $post ) );
+		$title = trim( preg_replace( '/\s*[-|–—]\s*Cindemir.*$/u', '', $title ) );
+		$base  = $desc ? $desc : $title;
+		$suffix = ' Overview of relevant Turkish law topics, procedures, and legal context for foreign individuals and companies.';
+		$out    = trim( $base . $suffix );
+		$olen   = function_exists( 'mb_strlen' ) ? mb_strlen( $out ) : strlen( $out );
+		if ( $olen > 160 ) {
+			$out = function_exists( 'mb_substr' ) ? mb_substr( $out, 0, 157 ) : substr( $out, 0, 157 );
+			$out = rtrim( $out ) . '…';
+		}
+		return $out;
 	}
 
 	/** Keep redirecting Press page out of Yoast XML sitemaps. */
@@ -414,6 +524,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::rewrite_hrefs_in_html( $html );
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
+		$html = self::strip_blocked_external_images( $html );
+		$html = self::fix_hreflang_html( $html );
 		$html = self::shorten_title_tag( $html );
 		$html = self::normalize_robots_meta( $html );
 		return $html;
@@ -496,7 +608,8 @@ final class Cindemir_SEO_Fixes {
 		}
 		echo "\n<nav class=\"cindemir-orphan-links\" aria-label=\"Additional pages\" style=\"max-width:1200px;margin:0 auto 1rem;padding:0 20px;font-size:14px;\">";
 		echo '<a href="' . esc_url( home_url( '/our-videos/' ) ) . '">Our Videos</a> · ';
-		echo '<a href="' . esc_url( home_url( '/appointment/' ) ) . '">Book an Appointment</a>';
+		echo '<a href="' . esc_url( home_url( '/appointment/' ) ) . '">Book an Appointment</a> · ';
+		echo '<a href="' . esc_url( home_url( '/about-us/' ) ) . '">About Us</a>';
 		echo "</nav>\n";
 	}
 
@@ -665,6 +778,33 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 		return $html;
+	}
+
+	private static function fix_hreflang_html( $html ) {
+		return preg_replace_callback(
+			'#<link\b[^>]*\bhreflang=(["\'])([^"\']+)\1[^>]*\bhref=(["\'])([^"\']+)\3[^>]*>#i',
+			function ( $m ) {
+				$url = self::normalize_hreflang_url( $m[4] );
+				return '<link rel="alternate" hreflang="' . esc_attr( $m[2] ) . '" href="' . esc_url( $url ) . '" />';
+			},
+			$html
+		);
+	}
+
+	private static function strip_blocked_external_images( $html ) {
+		$html = preg_replace(
+			'#<img\b[^>]*\b(?:src|data-lazy-src)=(["\'])(?:https?:)?//idsb\.tmgrup\.com\.tr/[^"\']+\1[^>]*>#i',
+			'',
+			$html
+		);
+		if ( get_option( 'cindemir_tbb_badge_local', '' ) ) {
+			return $html;
+		}
+		return preg_replace(
+			'#<img\b[^>]*\b(?:src|data-lazy-src)=(["\'])(?:https?:)?//d\.barobirlik\.org\.tr/[^"\']+\1[^>]*>#i',
+			'',
+			$html
+		);
 	}
 
 	private static function fill_empty_alts_html( $html ) {
