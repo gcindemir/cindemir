@@ -777,15 +777,79 @@ final class Cindemir_Contact_Fixes {
 	private static function remove_press_redirection_rules() {
 		global $wpdb;
 		$table = $wpdb->prefix . 'redirection_items';
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
-			return;
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
+			$wpdb->query(
+				"DELETE FROM {$table}
+				 WHERE url LIKE '%/press%' OR url LIKE '%link9%'
+				    OR action_data LIKE '%we-are-in-news%'
+				    OR action_data LIKE '%cindemir.av.tr/en/we-are-in-news%'"
+			);
 		}
-		$wpdb->query(
-			"DELETE FROM {$table}
-			 WHERE url LIKE '%/press%' OR url LIKE '%link9%'
-			    OR action_data LIKE '%we-are-in-news%'
-			    OR action_data LIKE '%cindemir.av.tr/en/we-are-in-news%'"
+
+		// Yoast SEO Premium redirects (/press/ currently 301s with x-redirect-by: Yoast SEO Premium).
+		self::remove_yoast_press_redirects();
+	}
+
+	private static function remove_yoast_press_redirects() {
+		$needles = array(
+			'/press',
+			'/press/',
+			'press',
+			'/link9',
+			'/link9/',
+			'we-are-in-news',
+			'cindemir.av.tr/en/we-are-in-news',
 		);
+		$option_names = array(
+			'wpseo-premium-redirects-base',
+			'wpseo-premium-redirects-export-plain',
+			'wpseo-premium-redirects-export-regex',
+			'wpseo-premium-redirects-regex',
+		);
+		foreach ( $option_names as $opt ) {
+			$redirects = get_option( $opt );
+			if ( ! is_array( $redirects ) || ! $redirects ) {
+				continue;
+			}
+			$changed = false;
+			foreach ( $redirects as $key => $row ) {
+				$origin = '';
+				$target = '';
+				if ( is_array( $row ) ) {
+					$origin = isset( $row['origin'] ) ? (string) $row['origin'] : (string) $key;
+					$target = isset( $row['url'] ) ? (string) $row['url'] : ( isset( $row['target'] ) ? (string) $row['target'] : '' );
+				} elseif ( is_string( $row ) ) {
+					$origin = (string) $key;
+					$target = $row;
+				}
+				$blob = strtolower( $origin . ' ' . $target . ' ' . (string) $key );
+				foreach ( $needles as $n ) {
+					if ( false !== strpos( $blob, strtolower( $n ) ) ) {
+						unset( $redirects[ $key ] );
+						$changed = true;
+						break;
+					}
+				}
+			}
+			if ( $changed ) {
+				update_option( $opt, $redirects, false );
+			}
+		}
+
+		// Per-page Yoast “Redirect” meta on press translations.
+		$ids = get_posts(
+			array(
+				'name'           => 'press',
+				'post_type'      => 'page',
+				'post_status'    => 'any',
+				'posts_per_page' => 20,
+				'fields'         => 'ids',
+			)
+		);
+		foreach ( (array) $ids as $pid ) {
+			delete_post_meta( (int) $pid, '_yoast_wpseo_redirect' );
+			delete_post_meta( (int) $pid, 'wpseo-premium-redirects-base' );
+		}
 	}
 
 	/** WPML translations share slug "contacts" per language; WP core may assign contacts-2. */

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.4
+ * Version: 1.8.5
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.4';
+	const VERSION = '1.8.5';
 
 	/** Slug → neutral meta (110–160 chars, TBB-compliant). */
 	private static $slug_metadesc = array(
@@ -194,6 +194,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_deploy_routes' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
+		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 10, 2 );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
@@ -267,6 +268,7 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		update_option( $key, self::VERSION, false );
+		self::strip_yoast_press_redirects();
 		flush_rewrite_rules( false );
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
@@ -638,6 +640,56 @@ final class Cindemir_SEO_Fixes {
 			return $dest;
 		}
 		return $target;
+	}
+
+	/**
+	 * Yoast Premium was 301'ing /press/ → cindemir.av.tr (x-redirect-by: Yoast SEO Premium).
+	 * Keep press local on law.com.
+	 */
+	public static function strip_yoast_press_redirects() {
+		static $done = false;
+		if ( $done ) {
+			return;
+		}
+		$done = true;
+		$needles = array( '/press', 'we-are-in-news', '/link9', 'cindemir.av.tr/en/we-are-in-news' );
+		$option_names = array(
+			'wpseo-premium-redirects-base',
+			'wpseo-premium-redirects-export-plain',
+			'wpseo-premium-redirects-export-regex',
+			'wpseo-premium-redirects-regex',
+		);
+		foreach ( $option_names as $opt ) {
+			$redirects = get_option( $opt );
+			if ( ! is_array( $redirects ) || ! $redirects ) {
+				continue;
+			}
+			$changed = false;
+			foreach ( $redirects as $key => $row ) {
+				$origin = '';
+				$target = '';
+				if ( is_array( $row ) ) {
+					$origin = isset( $row['origin'] ) ? (string) $row['origin'] : (string) $key;
+					$target = isset( $row['url'] ) ? (string) $row['url'] : ( isset( $row['target'] ) ? (string) $row['target'] : '' );
+				} elseif ( is_string( $row ) ) {
+					$origin = (string) $key;
+					$target = $row;
+				} else {
+					$origin = (string) $key;
+				}
+				$blob = strtolower( $origin . ' ' . $target . ' ' . (string) $key );
+				foreach ( $needles as $n ) {
+					if ( false !== strpos( $blob, strtolower( $n ) ) ) {
+						unset( $redirects[ $key ] );
+						$changed = true;
+						break;
+					}
+				}
+			}
+			if ( $changed ) {
+				update_option( $opt, $redirects, false );
+			}
+		}
 	}
 
 	public static function flatten_redirects() {
