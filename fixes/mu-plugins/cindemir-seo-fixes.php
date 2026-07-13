@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.7
+ * Version: 1.8.8
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.7';
+	const VERSION = '1.8.8';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -767,10 +767,31 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Put a readable firm name next to the header logo so visitors know which site they are on.
-	 * Brand text is painted via CSS ::after (reliable with page cache / picture logos).
+	 * Inject a left-side site brand that does not depend on Enfold’s logo_right positioning.
 	 */
 	private static function inject_header_brand_html( $html ) {
+		if ( false !== strpos( $html, 'cindemir-site-brand' ) ) {
+			return $html;
+		}
+		$label = esc_html( self::header_brand_label() );
+		$logo  = esc_url( self::HEADER_LOGO );
+		$home  = esc_url( home_url( '/' ) );
+		$brand = '<a class="cindemir-site-brand" href="' . $home . '" aria-label="' . esc_attr( $label ) . '">'
+			. '<img src="' . $logo . '" width="48" height="48" alt="' . esc_attr( $label ) . '" decoding="async" />'
+			. '<span class="cindemir-site-brand__text">' . $label . '</span>'
+			. '</a>';
+
+		$patterns = array(
+			'/(<div[^>]*class=["\'][^"\']*inner-container[^"\']*["\'][^>]*>)/i',
+			'/(<(?:div|span)[^>]*class=["\'][^"\']*av-logo-container[^"\']*["\'][^>]*>)/i',
+		);
+		foreach ( $patterns as $pattern ) {
+			$count = 0;
+			$new   = preg_replace( $pattern, '$1' . $brand, $html, 1, $count );
+			if ( null !== $new && $count > 0 ) {
+				return $new;
+			}
+		}
 		return $html;
 	}
 
@@ -792,34 +813,38 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		$label = esc_attr( self::header_brand_label() );
-		// Enfold is configured logo_right; force brand+logo to the left so the site is identifiable.
 		echo '<style id="cindemir-header-brand">'
-			. '#top #header #header_main .av-logo-container .inner-container,'
-			. '#top #header #header_main .container .inner-container{'
-			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;position:relative!important;min-height:70px}'
-			. '#top #header .logo{'
-			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
-			. 'transform:none!important;-webkit-transform:none!important;margin:0 24px 0 0!important;'
-			. 'max-width:none!important;z-index:30;order:1;flex:0 0 auto}'
-			. '#top #header .logo a{'
+			. '#top #header #header_main .inner-container{position:relative!important;display:flex!important;align-items:center!important;min-height:70px}'
+			. '#top #header .cindemir-site-brand{'
 			. 'display:inline-flex!important;align-items:center!important;gap:12px!important;'
-			. 'text-decoration:none!important;max-width:none!important}'
-			. '#top #header .logo img,#top #header .logo picture{'
-			. 'max-height:48px!important;width:auto!important;height:auto!important;flex-shrink:0}'
-			. '#top #header .logo a::after{'
-			. 'content:"' . $label . '"!important;display:inline-block!important;'
-			. 'font-family:Georgia,"Times New Roman",serif!important;'
-			. 'font-size:22px!important;font-weight:700!important;line-height:1.1!important;'
+			. 'text-decoration:none!important;z-index:40;order:0;flex:0 0 auto;margin-right:20px;'
+			. 'max-width:min(360px,55vw)}'
+			. '#top #header .cindemir-site-brand img{width:48px!important;height:48px!important;object-fit:contain;flex-shrink:0}'
+			. '#top #header .cindemir-site-brand__text{'
+			. 'display:inline-block!important;font-family:Georgia,"Times New Roman",serif!important;'
+			. 'font-size:22px!important;font-weight:700!important;line-height:1.15!important;'
 			. 'color:#244f4f!important;letter-spacing:.01em;white-space:nowrap}'
-			. '#top #header .main_menu{'
-			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
-			. 'transform:none!important;margin-left:auto!important;order:2;flex:1 1 auto;text-align:right!important}'
-			. '#top #header .main_menu .av-main-nav-wrap{float:none!important;display:inline-block}'
+			/* Only hide Enfold logo when our left brand node is present. */
+			. '#top #header:has(.cindemir-site-brand) .logo{display:none!important}'
+			. '#top #header:has(.cindemir-site-brand) .main_menu{margin-left:auto!important;order:2;text-align:right!important}'
+			/* Cache / buffer miss fallback: show Enfold logo on the left with title. */
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo{'
+			. 'display:block!important;position:relative!important;left:0!important;right:auto!important;'
+			. 'float:none!important;transform:none!important;margin:0 20px 0 0!important;z-index:30}'
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo a{'
+			. 'display:inline-flex!important;align-items:center!important;gap:12px!important;text-decoration:none!important}'
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo img{max-height:48px!important;width:auto!important}'
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo a::after{'
+			. 'content:"' . $label . '"!important;display:inline-block!important;'
+			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:22px!important;font-weight:700!important;'
+			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .logo{max-width:calc(100vw - 100px)!important;margin-right:8px!important}'
-			. '#top #header .logo img{max-height:36px!important;max-width:36px!important}'
-			. '#top #header .logo a::after{font-size:16px!important;white-space:normal!important;max-width:min(240px,58vw);text-align:left}'
-			. '#top #header .main_menu{display:none!important}'
+			. '#top #header .cindemir-site-brand{margin-right:8px;max-width:calc(100vw - 100px)}'
+			. '#top #header .cindemir-site-brand img{width:36px!important;height:36px!important}'
+			. '#top #header .cindemir-site-brand__text,'
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo a::after{'
+			. 'font-size:16px!important;white-space:normal!important;max-width:min(220px,58vw)}'
+			. '#top #header:not(:has(.cindemir-site-brand)) .logo img{max-height:36px!important;max-width:36px!important}'
 			. '}'
 			. '</style>';
 	}
