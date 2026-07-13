@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.2
+ * Version: 1.8.3
  * Author: Cindemir Law Office
  */
 
@@ -126,7 +126,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.2';
+	const VERSION = '1.8.3';
 
 	/** Slug → neutral meta (110–160 chars, TBB-compliant). */
 	private static $slug_metadesc = array(
@@ -468,34 +468,6 @@ final class Cindemir_SEO_Fixes {
 			$new = add_query_arg( $q, $new );
 		}
 		return $new;
-	}
-
-		$key = 'cindemir_seo_fixes_version';
-		$prev = get_option( $key, '' );
-		if ( self::VERSION === $prev ) {
-			return;
-		}
-		update_option( $key, self::VERSION, false );
-		flush_rewrite_rules( false );
-		if ( function_exists( 'wp_cache_flush' ) ) {
-			wp_cache_flush();
-		}
-		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
-			WPSEO_Sitemaps_Cache::clear();
-		}
-		delete_transient( 'wpseo_sitemap_cache_validator_page' );
-		if ( function_exists( 'rocket_clean_domain' ) ) {
-			rocket_clean_domain();
-		}
-		if ( class_exists( 'LiteSpeed_Cache_API' ) ) {
-			LiteSpeed_Cache_API::purge_all();
-		}
-		if ( function_exists( 'w3tc_flush_all' ) ) {
-			w3tc_flush_all();
-		}
-		if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
-			sg_cachepress_purge_cache();
-		}
 	}
 
 	/** Polylang: hide language param for default language URLs. */
