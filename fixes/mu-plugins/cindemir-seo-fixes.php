@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.3
+ * Version: 1.8.4
  * Author: Cindemir Law Office
  */
 
@@ -89,8 +89,7 @@ final class Cindemir_SEO_Fixes {
 		'/link13' => 'https://cindemirlaw.com/link13/?lang=zh-hans',
 		'/link15' => 'https://cindemirlaw.com/link15/?lang=zh-hans',
 		'/link25' => 'https://cindemirlaw.com/link25/?lang=zh-hans',
-		'/link9' => 'https://cindemir.av.tr/en/we-are-in-news/',
-		'/press' => 'https://cindemir.av.tr/en/we-are-in-news/',
+		'/link9' => 'https://cindemirlaw.com/press/',
 		'/link2' => 'https://cindemirlaw.com/about-us/',
 		'/link3' => 'https://cindemirlaw.com/support/',
 		'/link4' => 'https://cindemirlaw.com/services/',
@@ -101,6 +100,14 @@ final class Cindemir_SEO_Fixes {
 
 	private static $url_replace = array(
 		'http://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg' => 'https://cindemir.av.tr/wp-content/uploads/2020/01/health-image-300x200.jpg',
+		'https://cindemir.av.tr/en/we-are-in-news/' => 'https://cindemirlaw.com/press/',
+		'https://cindemir.av.tr/en/we-are-in-news' => 'https://cindemirlaw.com/press/',
+		'https://cindemir.av.tr/ru/support-ru/' => 'https://cindemirlaw.com/press/?lang=ru',
+		'https://cindemir.av.tr/ru/support-ru' => 'https://cindemirlaw.com/press/?lang=ru',
+		'https://cindemir.av.tr/zh/support-zn/' => 'https://cindemirlaw.com/press/?lang=zh-hans',
+		'https://cindemir.av.tr/zh/support-zn' => 'https://cindemirlaw.com/press/?lang=zh-hans',
+		'https://cindemir.av.tr/basinda-biz/' => 'https://cindemirlaw.com/press/',
+		'https://cindemir.av.tr/basinda-biz' => 'https://cindemirlaw.com/press/',
 		'https://mersis.gtb.gov.tr/' => 'https://mersis.ticaret.gov.tr/',
 		'https://mersis.gtb.gov.tr' => 'https://mersis.ticaret.gov.tr/',
 		'https://turkodeme.com.tr/Tahsilat/Default.aspx?k=697795e3-b10e-4cbb-8251-e0c7a1b8ce76' => 'https://pos.param.com.tr/Tahsilat/Default.aspx?k=697795e3-b10e-4cbb-8251-e0c7a1b8ce76',
@@ -126,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.3';
+	const VERSION = '1.8.4';
 
 	/** Slug → neutral meta (110–160 chars, TBB-compliant). */
 	private static $slug_metadesc = array(
@@ -208,7 +215,6 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
-		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_press_from_sitemap' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
@@ -582,25 +588,13 @@ final class Cindemir_SEO_Fixes {
 		return $out;
 	}
 
-	/** Keep redirecting Press page out of Yoast XML sitemaps. */
-	public static function exclude_press_from_sitemap( $ids ) {
-		if ( ! is_array( $ids ) ) {
-			$ids = array();
-		}
-		$press = get_page_by_path( 'press' );
-		if ( $press ) {
-			$ids[] = (int) $press->ID;
-		}
-		return array_values( array_unique( array_map( 'intval', $ids ) ) );
-	}
-
 	public static function filter_sitemap_entry( $url, $type, $object ) {
 		if ( ! is_array( $url ) || empty( $url['loc'] ) ) {
 			return $url;
 		}
 		$loc = $url['loc'];
 		$path = self::normalize_path( $loc );
-		$skip = array( '/press', '/link9', '/link2', '/link3', '/link4', '/author/admin', '/russian', '/chinese', '/zh', '/zh-hans' );
+		$skip = array( '/link9', '/link2', '/link3', '/link4', '/author/admin', '/russian', '/chinese', '/zh', '/zh-hans' );
 		if ( in_array( $path, $skip, true ) ) {
 			return false;
 		}

@@ -267,6 +267,15 @@ final class Cindemir_Contact_Fixes {
 		);
 		register_rest_route(
 			'cindemir/v1',
+			'/setup-press',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'setup_press' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+		register_rest_route(
+			'cindemir/v1',
 			'/fix-ahrefs',
 			array(
 				'methods'             => array( 'GET', 'POST' ),
@@ -283,7 +292,7 @@ final class Cindemir_Contact_Fixes {
 	/** One-time: create WPML Chinese translation for Contacts (EN post ID 20). */
 	public static function setup_zh_contacts( $request ) {
 		$key = $request->get_param( 'key' );
-		if ( 'wpml-setup-zh-2026' !== $key ) {
+		if ( ! in_array( $key, array( 'wpml-setup-zh-2026', 'seo-pack-2026' ), true ) ) {
 			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
 		}
 
@@ -497,25 +506,285 @@ final class Cindemir_Contact_Fixes {
 		return new WP_REST_Response( array( 'ok' => true, 'files' => $out ), 200 );
 	}
 
-	/** One-shot Ahrefs cleanup: WPML contacts + meta + cache. */
+	/** One-shot Ahrefs cleanup: WPML contacts + press + meta + cache. */
 	public static function fix_ahrefs( $request ) {
 		$key = $request->get_param( 'key' );
 		if ( 'seo-pack-2026' !== $key ) {
 			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
 		}
-		$zh = self::setup_zh_contacts( $request );
-		$meta = self::apply_seo_meta( $request );
+		$zh    = self::setup_zh_contacts( $request );
+		$press = self::setup_press( $request );
+		$meta  = self::apply_seo_meta( $request );
 		wp_cache_flush();
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
 		}
 		return new WP_REST_Response(
 			array(
-				'ok'   => true,
-				'zh'   => $zh->get_data(),
-				'meta' => $meta->get_data(),
+				'ok'    => true,
+				'zh'    => $zh->get_data(),
+				'press' => $press->get_data(),
+				'meta'  => $meta->get_data(),
 			),
 			200
+		);
+	}
+
+	/**
+	 * Import press pages from cindemir.av.tr (EN kept locally; RU/ZH translated).
+	 * Stops outsourcing /press/ to av.tr.
+	 */
+	public static function setup_press( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( ! in_array( $key, array( 'seo-pack-2026', 'wpml-setup-zh-2026' ), true ) ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+
+		$en = get_page_by_path( 'press' );
+		if ( ! $en ) {
+			$en_id = wp_insert_post(
+				array(
+					'post_title'   => 'Press',
+					'post_name'    => 'press',
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+					'post_content' => self::build_press_html_from_remote( 'we-are-in-news', 'en' ),
+				),
+				true
+			);
+			if ( is_wp_error( $en_id ) ) {
+				return new WP_REST_Response( array( 'error' => $en_id->get_error_message() ), 500 );
+			}
+			$en = get_post( $en_id );
+		}
+
+		$en_id = (int) $en->ID;
+		update_post_meta( $en_id, '_yoast_wpseo_canonical', 'https://cindemirlaw.com/press/' );
+		update_post_meta( $en_id, '_yoast_wpseo_title', 'Press & Media Appearances | Cindemir Law Office' );
+		update_post_meta(
+			$en_id,
+			'_yoast_wpseo_metadesc',
+			'Press coverage and media appearances of Cindemir Law Office: television, newspapers, and agency reports related to legal matters in Turkey.'
+		);
+
+		$trid = $en_id;
+		if ( isset( $GLOBALS['sitepress'] ) && $GLOBALS['sitepress'] ) {
+			$trid = $GLOBALS['sitepress']->get_element_trid( $en_id, 'post_page' );
+			if ( ! $trid ) {
+				$GLOBALS['sitepress']->set_element_language_details( $en_id, 'post_page', null, 'en' );
+				$trid = $GLOBALS['sitepress']->get_element_trid( $en_id, 'post_page' );
+			}
+		}
+
+		$langs = array(
+			'ru'      => array(
+				'slug'    => 'support-ru',
+				'title'   => 'О нас в прессе',
+				'meta'    => 'Публикации и выступления Cindemir Law Office в СМИ и на телевидении: комментарии по значимым делам в Турции.',
+				'canonic' => 'https://cindemirlaw.com/press/?lang=ru',
+			),
+			'zh-hans' => array(
+				'slug'    => 'support-zn',
+				'title'   => '媒体报道',
+				'meta'    => '辛德米尔律师事务所媒体与电视报道：就土耳其重大法律案件发表的专业评论与新闻稿。',
+				'canonic' => 'https://cindemirlaw.com/press/?lang=zh-hans',
+			),
+		);
+
+		$created = array( 'en' => $en_id );
+		foreach ( $langs as $lang => $cfg ) {
+			$existing = 0;
+			global $wpdb;
+			if ( $trid ) {
+				$existing = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT p.ID FROM {$wpdb->posts} p
+						 INNER JOIN {$wpdb->prefix}icl_translations t ON t.element_id = p.ID AND t.element_type = 'post_page'
+						 WHERE t.trid = %d AND t.language_code = %s AND p.post_status IN ('publish','draft')",
+						$trid,
+						$lang
+					)
+				);
+			}
+			$body = self::build_press_html_from_remote( $cfg['slug'], $lang );
+			if ( '' === $body ) {
+				$created[ $lang ] = array( 'ok' => false, 'error' => 'empty remote content' );
+				continue;
+			}
+			if ( $existing ) {
+				wp_update_post(
+					array(
+						'ID'           => $existing,
+						'post_title'   => $cfg['title'],
+						'post_name'    => 'press',
+						'post_content' => $body,
+						'post_status'  => 'publish',
+					)
+				);
+				$pid = $existing;
+			} else {
+				$pid = wp_insert_post(
+					array(
+						'post_title'   => $cfg['title'],
+						'post_name'    => 'press',
+						'post_content' => $body,
+						'post_status'  => 'publish',
+						'post_type'    => 'page',
+					),
+					true
+				);
+				if ( is_wp_error( $pid ) ) {
+					$created[ $lang ] = array( 'ok' => false, 'error' => $pid->get_error_message() );
+					continue;
+				}
+				if ( isset( $GLOBALS['sitepress'] ) && $GLOBALS['sitepress'] && $trid ) {
+					$GLOBALS['sitepress']->set_element_language_details( (int) $pid, 'post_page', $trid, $lang, 'en' );
+				}
+			}
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'press' ), array( 'ID' => (int) $pid ), array( '%s' ), array( '%d' ) );
+			update_post_meta( (int) $pid, '_yoast_wpseo_canonical', $cfg['canonic'] );
+			update_post_meta( (int) $pid, '_yoast_wpseo_title', $cfg['title'] . ' | Cindemir Law Office' );
+			update_post_meta( (int) $pid, '_yoast_wpseo_metadesc', $cfg['meta'] );
+			delete_post_meta( (int) $pid, '_wp_old_slug' );
+			clean_post_cache( (int) $pid );
+			$created[ $lang ] = array( 'ok' => true, 'post_id' => (int) $pid );
+		}
+
+		// Drop Redirection plugin rules that still send /press to av.tr when possible.
+		self::remove_press_redirection_rules();
+
+		flush_rewrite_rules( false );
+		wp_cache_flush();
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+
+		return new WP_REST_Response(
+			array(
+				'ok'    => true,
+				'pages' => $created,
+				'urls'  => array(
+					'en' => 'https://cindemirlaw.com/press/',
+					'ru' => 'https://cindemirlaw.com/press/?lang=ru',
+					'zh' => 'https://cindemirlaw.com/press/?lang=zh-hans',
+				),
+			),
+			200
+		);
+	}
+
+	private static function build_press_html_from_remote( $slug, $lang ) {
+		$url = 'https://cindemir.av.tr/wp-json/wp/v2/pages?slug=' . rawurlencode( $slug );
+		$res = wp_remote_get(
+			$url,
+			array(
+				'timeout' => 45,
+				'headers' => array( 'User-Agent' => 'CindemirPressMigrate/1.0' ),
+			)
+		);
+		if ( is_wp_error( $res ) ) {
+			return '';
+		}
+		$data = json_decode( (string) wp_remote_retrieve_body( $res ), true );
+		if ( empty( $data[0]['content']['rendered'] ) ) {
+			return '';
+		}
+		return self::simplify_press_html( (string) $data[0]['content']['rendered'], $lang );
+	}
+
+	private static function simplify_press_html( $content, $lang ) {
+		$parts = array();
+		if ( preg_match( '/<h1[^>]*>(.*?)<\/h1>/is', $content, $m ) ) {
+			$parts[] = '<h2>' . esc_html( wp_strip_all_tags( $m[1] ) ) . '</h2>';
+		}
+		if ( 'en' === $lang ) {
+			if ( preg_match_all( '/<h5[^>]*>(.*?)<\/h5>/is', $content, $mm ) ) {
+				foreach ( $mm[1] as $chunk ) {
+					$t = trim( wp_strip_all_tags( $chunk ) );
+					if ( $t ) {
+						$parts[] = '<p><strong>' . esc_html( $t ) . '</strong></p>';
+					}
+				}
+			}
+			if ( preg_match_all( '/<h2[^>]*>(.*?)<\/h2>/is', $content, $mm ) ) {
+				foreach ( $mm[1] as $chunk ) {
+					$t = trim( wp_strip_all_tags( $chunk ) );
+					if ( $t ) {
+						$parts[] = '<h3>' . esc_html( $t ) . '</h3>';
+					}
+				}
+			}
+			if ( preg_match_all( '/<li[^>]*>([\s\S]*?)<\/li>/i', $content, $mm ) ) {
+				foreach ( $mm[1] as $inner ) {
+					if ( ! preg_match( '/<strong>(.*?)<\/strong>/is', $inner, $tm ) ) {
+						continue;
+					}
+					$tit  = trim( wp_strip_all_tags( $tm[1] ) );
+					$rest = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( preg_replace( '/<strong>.*?<\/strong>/is', '', $inner ) ) ) );
+					$rest = trim( $rest, " \t\n\r\0\x0B–-" );
+					$block = '<p><strong>' . esc_html( $tit ) . '</strong>';
+					if ( $rest ) {
+						$block .= ' — ' . esc_html( mb_substr( $rest, 0, 350 ) );
+					}
+					$block .= '</p>';
+					if ( preg_match_all( '/href="(https?:\/\/[^"]+)"/i', $inner, $hm ) ) {
+						foreach ( $hm[1] as $href ) {
+							$block .= '<p><a href="' . esc_url( $href ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $href ) . '</a></p>';
+						}
+					}
+					$parts[] = $block;
+				}
+			}
+		} else {
+			$tokens = preg_split( '/(<h3[^>]*>.*?<\/h3>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE );
+			for ( $i = 0; $i < count( $tokens ); $i++ ) {
+				if ( preg_match( '/<h3[^>]*>(.*?)<\/h3>/is', $tokens[ $i ], $hm ) ) {
+					$parts[] = '<h3>' . esc_html( wp_strip_all_tags( $hm[1] ) ) . '</h3>';
+					if ( isset( $tokens[ $i + 1 ] ) ) {
+						$nxt = $tokens[ $i + 1 ];
+						if ( preg_match_all( '/<p[^>]*>(.*?)<\/p>/is', $nxt, $pm ) ) {
+							foreach ( $pm[1] as $phtml ) {
+								$t = trim( wp_strip_all_tags( $phtml ) );
+								if ( strlen( $t ) > 20 ) {
+									$parts[] = '<p>' . esc_html( $t ) . '</p>';
+								}
+							}
+						}
+						if ( preg_match_all( '/<a[^>]+href="(https?:\/\/[^"]+)"[^>]*>(.*?)<\/a>/is', $nxt, $am ) ) {
+							foreach ( $am[1] as $idx => $href ) {
+								$label = trim( wp_strip_all_tags( $am[2][ $idx ] ) );
+								$parts[] = '<p><a href="' . esc_url( $href ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $label ? $label : $href ) . '</a></p>';
+							}
+						}
+					}
+				}
+			}
+		}
+		$out  = array();
+		$prev = null;
+		foreach ( $parts as $p ) {
+			if ( $p !== $prev ) {
+				$out[] = $p;
+				$prev  = $p;
+			}
+		}
+		return implode( "\n", $out );
+	}
+
+	private static function remove_press_redirection_rules() {
+		global $wpdb;
+		$table = $wpdb->prefix . 'redirection_items';
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+			return;
+		}
+		$wpdb->query(
+			"DELETE FROM {$table}
+			 WHERE url LIKE '%/press%' OR url LIKE '%link9%'
+			    OR action_data LIKE '%we-are-in-news%'
+			    OR action_data LIKE '%cindemir.av.tr/en/we-are-in-news%'"
 		);
 	}
 
