@@ -12,10 +12,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Cindemir_Avukatlarimiz_Styles {
 
-	const VERSION = '1.0.3';
+	const VERSION = '1.0.4';
 
 	public function __construct() {
 		add_action( 'wp_footer', array( $this, 'print_team_card_fix' ), 999 );
+		add_filter( 'rocket_delay_js_exclusions', array( $this, 'rocket_js_exclusions' ) );
+	}
+
+	public function rocket_js_exclusions( $exclusions ) {
+		if ( ! is_array( $exclusions ) ) {
+			$exclusions = array();
+		}
+		$exclusions[] = 'cindemir-avukatlarimiz-team-fix';
+		return $exclusions;
 	}
 
 	/**
@@ -27,7 +36,7 @@ class Cindemir_Avukatlarimiz_Styles {
 			return;
 		}
 		?>
-<script id="cindemir-avukatlarimiz-team-fix" data-no-optimize="1" data-cfasync="false" data-no-minify="1">
+<script id="cindemir-avukatlarimiz-team-fix" data-no-optimize="1" data-cfasync="false" data-no-defer="1" data-no-minify="1">
 (function () {
 	'use strict';
 	function normalizeCards() {
