@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.8
+ * Version: 1.8.9
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.8';
+	const VERSION = '1.8.9';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -208,6 +208,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_legacy_media_in_content' ), 15 );
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
+		add_action( 'wp_footer', array( __CLASS__, 'header_brand_script' ), 5 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
 		add_action( 'wp_head', array( __CLASS__, 'noindex_utility' ), 1 );
@@ -814,23 +815,28 @@ final class Cindemir_SEO_Fixes {
 		}
 		$label = esc_attr( self::header_brand_label() );
 		echo '<style id="cindemir-header-brand">'
-			. '#top #header #header_main .inner-container{position:relative!important;display:flex!important;align-items:center!important;min-height:70px}'
+			. '#top #header #header_main .inner-container{'
+			. 'position:relative!important;display:flex!important;align-items:center!important;'
+			. 'justify-content:flex-start!important;gap:16px;min-height:70px}'
 			. '#top #header .cindemir-site-brand{'
 			. 'display:inline-flex!important;align-items:center!important;gap:12px!important;'
-			. 'text-decoration:none!important;z-index:40;order:0;flex:0 0 auto;margin-right:20px;'
-			. 'max-width:min(360px,55vw)}'
+			. 'text-decoration:none!important;z-index:60;order:0;flex:0 0 auto;margin:0 12px 0 0;'
+			. 'max-width:min(340px,42vw);position:relative}'
 			. '#top #header .cindemir-site-brand img{width:48px!important;height:48px!important;object-fit:contain;flex-shrink:0}'
 			. '#top #header .cindemir-site-brand__text{'
 			. 'display:inline-block!important;font-family:Georgia,"Times New Roman",serif!important;'
 			. 'font-size:22px!important;font-weight:700!important;line-height:1.15!important;'
 			. 'color:#244f4f!important;letter-spacing:.01em;white-space:nowrap}'
-			/* Only hide Enfold logo when our left brand node is present. */
 			. '#top #header:has(.cindemir-site-brand) .logo{display:none!important}'
-			. '#top #header:has(.cindemir-site-brand) .main_menu{margin-left:auto!important;order:2;text-align:right!important}'
-			/* Cache / buffer miss fallback: show Enfold logo on the left with title. */
+			. '#top #header .main_menu{'
+			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
+			. 'width:auto!important;max-width:none!important;transform:none!important;'
+			. 'margin-left:auto!important;order:2;flex:1 1 auto;text-align:right!important;z-index:40}'
+			. '#top #header .main_menu .av-main-nav-wrap,#top #header .main_menu .av-main-nav{float:none!important}'
+			/* Fallback when JS/HTML brand not yet present. */
 			. '#top #header:not(:has(.cindemir-site-brand)) .logo{'
-			. 'display:block!important;position:relative!important;left:0!important;right:auto!important;'
-			. 'float:none!important;transform:none!important;margin:0 20px 0 0!important;z-index:30}'
+			. 'display:flex!important;position:relative!important;left:0!important;right:auto!important;'
+			. 'float:none!important;transform:none!important;margin:0 12px 0 0!important;z-index:60;flex:0 0 auto;order:0}'
 			. '#top #header:not(:has(.cindemir-site-brand)) .logo a{'
 			. 'display:inline-flex!important;align-items:center!important;gap:12px!important;text-decoration:none!important}'
 			. '#top #header:not(:has(.cindemir-site-brand)) .logo img{max-height:48px!important;width:auto!important}'
@@ -839,14 +845,38 @@ final class Cindemir_SEO_Fixes {
 			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:22px!important;font-weight:700!important;'
 			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .cindemir-site-brand{margin-right:8px;max-width:calc(100vw - 100px)}'
+			. '#top #header .cindemir-site-brand{max-width:calc(100vw - 100px)}'
 			. '#top #header .cindemir-site-brand img{width:36px!important;height:36px!important}'
 			. '#top #header .cindemir-site-brand__text,'
 			. '#top #header:not(:has(.cindemir-site-brand)) .logo a::after{'
 			. 'font-size:16px!important;white-space:normal!important;max-width:min(220px,58vw)}'
 			. '#top #header:not(:has(.cindemir-site-brand)) .logo img{max-height:36px!important;max-width:36px!important}'
+			. '#top #header .main_menu{display:none!important}'
 			. '}'
 			. '</style>';
+	}
+
+	/** Client-side inject if output buffering misses (WP Rocket / Enfold). */
+	public static function header_brand_script() {
+		if ( is_admin() ) {
+			return;
+		}
+		$label = esc_js( self::header_brand_label() );
+		$logo  = esc_js( self::HEADER_LOGO );
+		$home  = esc_js( home_url( '/' ) );
+		echo '<script id="cindemir-header-brand-js">(function(){'
+			. 'function run(){'
+			. 'if(document.querySelector(".cindemir-site-brand"))return;'
+			. 'var inner=document.querySelector("#header_main .inner-container");'
+			. 'if(!inner)return;'
+			. 'var a=document.createElement("a");'
+			. 'a.className="cindemir-site-brand";a.href="' . $home . '";a.setAttribute("aria-label","' . $label . '");'
+			. 'a.innerHTML=\'<img src="' . $logo . '" width="48" height="48" alt="' . $label . '" decoding="async" />'
+			. '<span class="cindemir-site-brand__text">' . $label . '</span>\';'
+			. 'inner.insertBefore(a,inner.firstChild);'
+			. '}'
+			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();'
+			. '})();</script>';
 	}
 
 	/**
