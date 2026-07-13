@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Avukatlarımız Styles
  * Description: Avukatlarımız sayfasında tüm avukat kartlarının renk ve stil tutarlılığını sağlar.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Cindemir
  */
 
@@ -12,74 +12,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Cindemir_Avukatlarimiz_Styles {
 
-	const VERSION = '1.0.2';
+	const VERSION = '1.0.3';
 
 	public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ), 999 );
-		add_action( 'template_redirect', array( $this, 'maybe_start_buffer' ), 0 );
-	}
-
-	public function enqueue_styles() {
-		if ( ! $this->is_avukatlarimiz_page() ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'cindemir-avukatlarimiz-team',
-			plugin_dir_url( __FILE__ ) . 'avukatlarimiz-team.css',
-			array(),
-			self::VERSION
-		);
-	}
-
-	public function maybe_start_buffer() {
-		if ( ! $this->is_avukatlarimiz_page() || is_admin() ) {
-			return;
-		}
-
-		ob_start( array( $this, 'normalize_team_cards' ) );
+		add_action( 'wp_footer', array( $this, 'print_team_card_fix' ), 999 );
 	}
 
 	/**
-	 * Alt avukat kartları gri inline kutularla geliyor; üstteki clo-team-card
-	 * sınıfıyla aynı görünümü ver. clo-team-card CSS zaten sayfada mevcut.
+	 * WP Rocket inline CSS'i siliyor; clo-team-card stilleri sayfada zaten var.
+	 * Gri inline kutuları JS ile aynı sınıflara dönüştürüyoruz.
 	 */
-	public function normalize_team_cards( $html ) {
-		if ( ! is_string( $html ) || '' === $html ) {
-			return $html;
+	public function print_team_card_fix() {
+		if ( ! $this->is_avukatlarimiz_page() ) {
+			return;
 		}
-
-		$html = preg_replace(
-			'#<div style="background-color:\s*#f2f2f2;[^"]*">(.*?)</div>#is',
-			'<article class="clo-team-card">$1</article>',
-			$html
-		);
-
-		$html = preg_replace(
-			'#<h2 style="margin:\s*0 0 15px 0;\s*text-align:\s*center;">#i',
-			'<h2 class="clo-team-name">',
-			$html
-		);
-
-		$html = preg_replace(
-			'#<p style="text-align:\s*justify;\s*font-size:\s*15px;\s*line-height:\s*1\.6;\s*color:\s*#333;">#i',
-			'<p class="clo-team-text">',
-			$html
-		);
-
-		$html = preg_replace(
-			'#<img([^>]*?)style="display:\s*block;\s*margin:\s*0 auto 15px auto;\s*border:\s*1px solid #ccc;"#i',
-			'<img$1class="clo-team-photo"',
-			$html
-		);
-
-		$html = preg_replace(
-			'#<h2 class="elementor-heading-title elementor-size-default" style="text-align: justify;">\s*</h2>#',
-			'',
-			$html
-		);
-
-		return $html;
+		?>
+<script id="cindemir-avukatlarimiz-team-fix" data-no-optimize="1" data-cfasync="false" data-no-minify="1">
+(function () {
+	'use strict';
+	function normalizeCards() {
+		document.querySelectorAll('.elementor-widget-text-editor div[style*="f2f2f2"]').forEach(function (card) {
+			card.classList.add('clo-team-card');
+			card.removeAttribute('style');
+			var heading = card.querySelector('h2');
+			if (heading) {
+				heading.classList.add('clo-team-name');
+				heading.removeAttribute('style');
+			}
+			card.querySelectorAll('p').forEach(function (p) {
+				p.classList.add('clo-team-text');
+				p.removeAttribute('style');
+			});
+			card.querySelectorAll('img').forEach(function (img) {
+				img.classList.add('clo-team-photo');
+				img.removeAttribute('style');
+			});
+		});
+		var emptyHeading = document.querySelector('.elementor-element-a89e60e h2.elementor-heading-title');
+		if (emptyHeading && !emptyHeading.textContent.trim()) {
+			emptyHeading.style.display = 'none';
+		}
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', normalizeCards);
+	} else {
+		normalizeCards();
+	}
+})();
+</script>
+		<?php
 	}
 
 	private function is_avukatlarimiz_page() {
