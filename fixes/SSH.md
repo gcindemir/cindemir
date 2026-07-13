@@ -10,6 +10,19 @@ ssh cindemir@162.241.252.122
 
 Şifre: cPanel ana şifreniz (`cindemir` kullanıcısı).
 
+**Sunucu bilgileri (onaylı 2026-07-13):**
+
+| Alan | Değer |
+|------|-------|
+| Host | `162.241.252.122` |
+| User | `cindemir` |
+| Ana dizin | `/home4/cindemir` |
+| Site kökü | `~/public_html/` |
+| WP-CLI | `/usr/local/bin/wp` |
+| PHP | 8.3 |
+
+Bluehost paneline gerek yok — SSH yeterli.
+
 ## Kolay alias (önerilen)
 
 ```bash
@@ -55,6 +68,16 @@ cd ~/public_html && wp cache flush
 # Canlı kontrol (kendi bilgisayarınızdan)
 curl -sI https://cindemirlaw.com/ | head -3
 ```
+
+## Sunucuda tek komut deploy (0-byte düzeltme)
+
+SSH ile bağlandıktan sonra yapıştırın:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gcindemir/cindemir/cursor/cindemirlaw-seo-tasks-d204/fixes/scripts/server-deploy-from-github.sh | bash
+```
+
+Bu script GitHub'dan mu-plugins indirir, boş dosyaları siler, `php -l` doğrular, WP cache temizler.
 
 ## Otomatik deploy (mu-plugins)
 
