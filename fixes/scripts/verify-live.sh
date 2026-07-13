@@ -11,7 +11,7 @@ for f in cindemir-seo-fixes.php cindemir-expose-yoast-meta.php; do
 done
 
 echo
-echo "=== plugin version marker (expect 1.7.1 after deploy) ==="
+echo "=== plugin version marker (expect 1.7.2 after deploy) ==="
 curl -s -A "$UA" "$BASE/about-us/" | rg -o 'cindemir-seo-fixes [0-9.]+' || echo "marker not found (cache or old version)"
 
 echo

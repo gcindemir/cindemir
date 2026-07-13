@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.7.1
+ * Version: 1.7.2
  * Author: Cindemir Law Office
  */
 
@@ -95,6 +95,7 @@ final class Cindemir_SEO_Fixes {
 		'/link3' => 'https://cindemirlaw.com/support/',
 		'/link4' => 'https://cindemirlaw.com/services/',
 		'/hakan' => 'https://cindemirlaw.com/hakan/?lang=zh-hans',
+		'/contacts-2' => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 		'/fde1' => 'https://cindemirlaw.com/fde1/?lang=ru',
 	);
 
@@ -125,7 +126,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.7.1';
+	const VERSION = '1.7.2';
 
 	private static $missing_h1 = array(
 		3874 => 'Family Heritage',
@@ -334,8 +335,13 @@ final class Cindemir_SEO_Fixes {
 			return false;
 		}
 		$parts = wp_parse_url( $loc );
-		if ( ! empty( $parts['query'] ) && false !== strpos( $parts['query'], 'lang=en' ) ) {
+		$query = isset( $parts['query'] ) ? $parts['query'] : '';
+		if ( ! empty( $query ) && false !== strpos( $query, 'lang=en' ) ) {
 			return false;
+		}
+		$dest = self::resolve_path_dest( $path, $query );
+		if ( $dest ) {
+			$url['loc'] = $dest;
 		}
 		return $url;
 	}
@@ -559,6 +565,14 @@ final class Cindemir_SEO_Fixes {
 
 	private static function rewrite_hrefs_in_html( $html ) {
 		$html = self::apply_url_replace( $html );
+		// og:image / twitter:image meta content attributes.
+		$html = preg_replace_callback(
+			'#(<meta\b[^>]*\b(?:property|name)=(["\'])(?:og:image|twitter:image)\2[^>]*\bcontent=(["\']))([^"\']*)(\3)#i',
+			function ( $m ) {
+				return $m[1] . esc_attr( self::apply_url_replace( $m[4] ) ) . $m[5];
+			},
+			$html
+		);
 		$html = preg_replace_callback(
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)?(/[^"\']*)(\2)#i',
 			function ( $m ) {
