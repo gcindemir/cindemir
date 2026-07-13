@@ -529,6 +529,9 @@ final class Cindemir_Contact_Fixes {
 			array( '%s' ),
 			array( '%d' )
 		);
+		$canonical = 'https://cindemirlaw.com/contacts/?lang=zh-hans';
+		update_post_meta( (int) $post_id, '_yoast_wpseo_canonical', $canonical );
+		delete_post_meta( (int) $post_id, '_wp_old_slug' );
 	}
 
 	private static function zh_contacts_replacements() {

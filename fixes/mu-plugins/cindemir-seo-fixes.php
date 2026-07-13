@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.1
+ * Version: 1.8.2
  * Author: Cindemir Law Office
  */
 
@@ -126,7 +126,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.1';
+	const VERSION = '1.8.2';
 
 	/** Slug → neutral meta (110–160 chars, TBB-compliant). */
 	private static $slug_metadesc = array(
@@ -183,6 +183,8 @@ final class Cindemir_SEO_Fixes {
 
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_self_upgrade_from_github' ), 0 );
+		add_action( 'init', array( __CLASS__, 'maybe_upgrade_sibling_plugins' ), 0 );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_deploy_routes' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
@@ -319,6 +321,111 @@ final class Cindemir_SEO_Fixes {
 		}
 		delete_option( 'cindemir_seo_fixes_version' );
 		delete_transient( 'cindemir_seo_self_upgrade_lock' );
+	}
+
+	/** After seo-fixes updates, pull contact-fixes + helpers from GitHub. */
+	public static function maybe_upgrade_sibling_plugins() {
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) || get_transient( 'cindemir_sibling_upgrade_lock' ) ) {
+			return;
+		}
+		set_transient( 'cindemir_sibling_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
+
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$files  = array(
+			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.2.1' ),
+			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
+			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
+		);
+
+		foreach ( $files as $name => $spec ) {
+			$dest = trailingslashit( WPMU_PLUGIN_DIR ) . $name;
+			$local_ver = '';
+			if ( file_exists( $dest ) && filesize( $dest ) > $spec['min'] ) {
+				$local = file_get_contents( $dest );
+				if ( is_string( $local ) && preg_match( '/\bVersion:\s*([0-9.]+)/', $local, $m ) ) {
+					$local_ver = $m[1];
+				}
+				if ( $local_ver && version_compare( $local_ver, $spec['ver'], '>=' ) ) {
+					continue;
+				}
+			}
+			$response = wp_remote_get(
+				$base . $name,
+				array(
+					'timeout' => 45,
+					'headers' => array( 'User-Agent' => 'CindemirSiblingUpgrade/' . self::VERSION ),
+				)
+			);
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				continue;
+			}
+			$body = (string) wp_remote_retrieve_body( $response );
+			if ( strlen( $body ) < $spec['min'] ) {
+				continue;
+			}
+			file_put_contents( $dest, $body );
+		}
+		flush_rewrite_rules( false );
+	}
+
+	/** Fallback deploy routes when contact-fixes on server is outdated. */
+	public static function register_deploy_routes() {
+		register_rest_route(
+			'cindemir/v1',
+			'/pull-plugins',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_pull_plugins' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_pull_plugins( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
+		}
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$files  = array(
+			'cindemir-seo-fixes.php'         => 40000,
+			'cindemir-contact-fixes.php'     => 20000,
+			'cindemir-expose-yoast-meta.php' => 2000,
+			'cindemir-purge-cache.php'       => 500,
+		);
+		$out = array();
+		foreach ( $files as $name => $min ) {
+			$response = wp_remote_get(
+				$base . $name,
+				array(
+					'timeout' => 60,
+					'headers' => array( 'User-Agent' => 'CindemirPull/' . self::VERSION ),
+				)
+			);
+			if ( is_wp_error( $response ) ) {
+				$out[ $name ] = array( 'ok' => false, 'error' => $response->get_error_message() );
+				continue;
+			}
+			$body  = (string) wp_remote_retrieve_body( $response );
+			$bytes = strlen( $body );
+			if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || $bytes < $min ) {
+				$out[ $name ] = array( 'ok' => false, 'bytes' => $bytes );
+				continue;
+			}
+			file_put_contents( trailingslashit( WPMU_PLUGIN_DIR ) . $name, $body );
+			$out[ $name ] = array( 'ok' => true, 'bytes' => $bytes );
+		}
+		delete_option( 'cindemir_seo_fixes_version' );
+		wp_cache_flush();
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		return new WP_REST_Response( array( 'ok' => true, 'version' => self::VERSION, 'files' => $out ), 200 );
 	}
 
 	public static function filter_canonical_url( $url ) {

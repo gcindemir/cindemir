@@ -1,65 +1,74 @@
 <?php
 /**
  * Plugin Name: Cindemir Remote Deploy (one-shot)
- * Description: Downloads clean cindemir-seo-fixes.php v1.7.0 from GitHub and replaces corrupt local copy.
- * Version: 1.0
+ * Description: Downloads all mu-plugins from GitHub; removes itself after success.
+ * Version: 1.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'init', function () {
-	if ( get_option( 'cindemir_remote_deploy_done' ) ) {
-		return;
-	}
+add_action(
+	'init',
+	function () {
+		if ( get_option( 'cindemir_remote_deploy_v11_done' ) ) {
+			return;
+		}
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return;
+		}
 
-	$targets = array(
-		'https://raw.githubusercontent.com/gcindemir/cindemir/cursor/cindemirlaw-seo-tasks-d204/fixes/mu-plugins/cindemir-seo-fixes.php',
-		'https://raw.githubusercontent.com/gcindemir/cindemir/master/fixes/mu-plugins/cindemir-seo-fixes.php',
-	);
-
-	$body = '';
-	foreach ( $targets as $url ) {
-		$response = wp_remote_get(
-			$url,
-			array(
-				'timeout' => 30,
-				'headers' => array( 'User-Agent' => 'CindemirRemoteDeploy/1.0' ),
-			)
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$files  = array(
+			'cindemir-seo-fixes.php'         => 40000,
+			'cindemir-contact-fixes.php'     => 20000,
+			'cindemir-expose-yoast-meta.php' => 2000,
+			'cindemir-purge-cache.php'       => 500,
 		);
-		if ( is_wp_error( $response ) ) {
-			continue;
+
+		$ok = 0;
+		foreach ( $files as $name => $min ) {
+			$response = wp_remote_get(
+				$base . $name,
+				array(
+					'timeout' => 60,
+					'headers' => array( 'User-Agent' => 'CindemirRemoteDeploy/1.1' ),
+				)
+			);
+			if ( is_wp_error( $response ) ) {
+				continue;
+			}
+			$body = (string) wp_remote_retrieve_body( $response );
+			if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || strlen( $body ) < $min ) {
+				continue;
+			}
+			if ( false !== file_put_contents( trailingslashit( WPMU_PLUGIN_DIR ) . $name, $body ) ) {
+				$ok++;
+			}
 		}
-		$code = (int) wp_remote_retrieve_response_code( $response );
-		$tmp  = (string) wp_remote_retrieve_body( $response );
-		if ( 200 === $code && strlen( $tmp ) > 30000 && false === strpos( $tmp, 'collapsed' ) ) {
-			$body = $tmp;
-			break;
+
+		if ( $ok < count( $files ) ) {
+			return;
 		}
-	}
 
-	if ( '' === $body || ! defined( 'WPMU_PLUGIN_DIR' ) ) {
-		return;
-	}
+		update_option( 'cindemir_remote_deploy_v11_done', 1, false );
+		delete_option( 'cindemir_remote_deploy_done' );
+		delete_option( 'cindemir_seo_fixes_version' );
 
-	$dest = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-seo-fixes.php';
-	$ok   = file_put_contents( $dest, $body );
-	if ( false === $ok ) {
-		return;
-	}
+		$self = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-remote-deploy.php';
+		if ( file_exists( $self ) ) {
+			@unlink( $self );
+		}
 
-	update_option( 'cindemir_remote_deploy_done', 1, false );
-	delete_option( 'cindemir_seo_fixes_version' );
-
-	flush_rewrite_rules( false );
-	if ( function_exists( 'wp_cache_flush' ) ) {
-		wp_cache_flush();
-	}
-	if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
-		WPSEO_Sitemaps_Cache::clear();
-	}
-	if ( function_exists( 'rocket_clean_domain' ) ) {
-		rocket_clean_domain();
-	}
-}, 1 );
+		flush_rewrite_rules( false );
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+	},
+	0
+);
