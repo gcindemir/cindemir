@@ -401,6 +401,9 @@ final class Cindemir_Contact_Fixes {
 		if ( 'seo-pack-2026' !== $key ) {
 			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
 		}
+		if ( $request->get_param( 'pull' ) ) {
+			return self::pull_plugins( $request );
+		}
 
 		$pages = array(
 			43   => "Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa.",
@@ -439,7 +442,7 @@ final class Cindemir_Contact_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => '1.8.0',
+				'version' => '1.8.1',
 				'pages'   => $results,
 			),
 			200

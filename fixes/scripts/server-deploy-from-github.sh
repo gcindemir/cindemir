@@ -47,6 +47,10 @@ fetch cindemir-contact-fixes.php 20000
 fetch cindemir-purge-cache.php 500
 
 echo ""
+echo "=== optional: trigger Ahrefs fix endpoint ==="
+echo "curl -s \"https://cindemirlaw.com/wp-json/cindemir/v1/fix-ahrefs?key=seo-pack-2026\""
+
+echo ""
 echo "=== sizes ==="
 ls -la cindemir-*.php
 

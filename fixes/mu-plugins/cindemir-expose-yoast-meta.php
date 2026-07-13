@@ -3,7 +3,7 @@
  * Plugin Name: Cindemir – Expose Yoast Meta to REST (pages)
  * Description: Yoast REST expose + one-shot download of cindemir-seo-fixes.php v1.7.0 from GitHub when missing.
  * Author: Cindemir Law
- * Version: 1.1
+ * Version: 1.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,14 +32,21 @@ add_action( 'init', function () {
 }, 5 );
 
 add_action( 'init', function () {
-	if ( get_option( 'cindemir_remote_deploy_done' ) ) {
+	if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
 		return;
 	}
 
-	$dest = defined( 'WPMU_PLUGIN_DIR' ) ? trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-seo-fixes.php' : '';
-	if ( $dest && file_exists( $dest ) && filesize( $dest ) > 30000 ) {
-		update_option( 'cindemir_remote_deploy_done', 1, false );
+	$dest = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-seo-fixes.php';
+	if ( ! $dest ) {
 		return;
+	}
+
+	$local_version = '';
+	if ( file_exists( $dest ) && filesize( $dest ) > 30000 ) {
+		$local = file_get_contents( $dest );
+		if ( is_string( $local ) && preg_match( "/const\s+VERSION\s*=\s*'([^']+)'/", $local, $m ) ) {
+			$local_version = $m[1];
+		}
 	}
 
 	$targets = array(
@@ -48,12 +55,13 @@ add_action( 'init', function () {
 	);
 
 	$body = '';
+	$remote_version = '';
 	foreach ( $targets as $url ) {
 		$response = wp_remote_get(
 			$url,
 			array(
 				'timeout' => 30,
-				'headers' => array( 'User-Agent' => 'CindemirRemoteDeploy/1.1' ),
+				'headers' => array( 'User-Agent' => 'CindemirRemoteDeploy/1.2' ),
 			)
 		);
 		if ( is_wp_error( $response ) ) {
@@ -61,13 +69,22 @@ add_action( 'init', function () {
 		}
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$tmp  = (string) wp_remote_retrieve_body( $response );
-		if ( 200 === $code && strlen( $tmp ) > 30000 && false === strpos( $tmp, 'collapsed' ) ) {
-			$body = $tmp;
-			break;
+		if ( 200 !== $code || strlen( $tmp ) < 30000 || false !== strpos( $tmp, 'collapsed' ) ) {
+			continue;
 		}
+		if ( ! preg_match( "/const\s+VERSION\s*=\s*'([^']+)'/", $tmp, $m ) ) {
+			continue;
+		}
+		if ( '' !== $local_version && version_compare( $m[1], $local_version, '<=' ) ) {
+			update_option( 'cindemir_remote_deploy_done', 1, false );
+			return;
+		}
+		$body           = $tmp;
+		$remote_version = $m[1];
+		break;
 	}
 
-	if ( '' === $body || ! $dest ) {
+	if ( '' === $body ) {
 		return;
 	}
 
