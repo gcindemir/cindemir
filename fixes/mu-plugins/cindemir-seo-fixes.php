@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.1
+ * Version: 1.9.2
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.1';
+	const VERSION = '1.9.2';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -823,41 +823,52 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		$label = esc_attr( self::header_brand_label() );
-		// Keep Enfold mobile burger working: never force .main_menu { display:none }.
+		// Theme "Additional CSS" contains `.logo{display:none !important}` which collapses
+		// the mobile header (and hides the burger). Force logo/burger/header back.
 		echo '<style id="cindemir-header-brand">'
-			/* Brand text next to logo (all viewports). */
+			. '#top #header #header_main,'
+			. '#top #header #header_main .container,'
+			. '#top #header #header_main .inner-container{'
+			. 'min-height:64px!important;height:auto!important}'
+			. '#top #header .logo{'
+			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
+			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
+			. 'z-index:50;align-items:center}'
 			. '#top #header .logo a{'
-			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important}'
+			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
+			. 'text-decoration:none!important;max-height:none!important;height:auto!important}'
+			. '#top #header .logo img,#top #header .logo picture{'
+			. 'display:inline-block!important;max-height:44px!important;width:auto!important;'
+			. 'height:auto!important;opacity:1!important;visibility:visible!important}'
 			. '#top #header .logo a::after{'
 			. 'content:"' . $label . '"!important;display:inline-block!important;'
-			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:20px!important;font-weight:700!important;'
-			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap}'
+			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:18px!important;font-weight:700!important;'
+			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap;max-width:min(260px,58vw)}'
+			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
+			. '#top #header .av-burger-menu-main{'
+			. 'display:block!important;visibility:visible!important;opacity:1!important;'
+			. 'min-width:44px!important;min-height:44px!important;line-height:44px!important}'
+			. '#top #header .av-hamburger{display:inline-block!important;visibility:visible!important;'
+			. 'min-width:28px!important;min-height:22px!important}'
 			. '#top #header .cindemir-site-brand{'
 			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
 			. 'text-decoration:none!important;z-index:60;margin-right:12px}'
 			. '#top #header .cindemir-site-brand img{width:44px!important;height:44px!important;object-fit:contain}'
 			. '#top #header .cindemir-site-brand__text{'
-			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:20px!important;font-weight:700!important;'
-			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap}'
-			. '#top #header:has(.cindemir-site-brand) .logo{display:none!important}'
-			/* Desktop only: left brand / right menu layout. */
+			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:18px!important;font-weight:700!important;'
+			. 'color:#244f4f!important;white-space:nowrap}'
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
-			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:16px;min-height:70px}'
-			. '#top #header:not(:has(.cindemir-site-brand)) .logo{'
-			. 'display:flex!important;position:relative!important;left:0!important;right:auto!important;'
-			. 'float:none!important;transform:none!important;margin:0 12px 0 0!important;z-index:60;flex:0 0 auto}'
-			. '#top #header:not(:has(.cindemir-site-brand)) .logo img{max-height:48px!important;width:auto!important}'
+			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:16px}'
+			. '#top #header .logo a::after{font-size:20px!important;max-width:none}'
 			. '#top #header .main_menu{'
 			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
 			. 'margin-left:auto!important;flex:1 1 auto;text-align:right!important}'
 			. '}'
-			/* Mobile: keep burger/menu intact; only shrink brand text. */
 			. '@media only screen and (max-width:989px){'
 			. '#top #header .logo a::after,#top #header .cindemir-site-brand__text{'
-			. 'font-size:15px!important;white-space:normal!important;max-width:min(200px,52vw)}'
-			. '#top #header .logo img,#top #header .cindemir-site-brand img{max-height:36px!important;max-width:36px!important;width:36px!important;height:36px!important}'
-			. '#top #header .av-burger-menu-main{display:block!important;visibility:visible!important}'
+			. 'font-size:14px!important;white-space:normal!important;max-width:min(180px,48vw)}'
+			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
 			. '}'
 			. '</style>';
 	}
