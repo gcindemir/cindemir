@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.2
+ * Version: 1.9.3
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.2';
+	const VERSION = '1.9.3';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -198,7 +198,6 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
-		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 10, 2 );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'strip_default_lang_redirect' ), 0 );
@@ -454,28 +453,36 @@ final class Cindemir_SEO_Fixes {
 			return $hreflangs;
 		}
 		foreach ( $hreflangs as $lang => $url ) {
-			$hreflangs[ $lang ] = self::normalize_hreflang_url( $url );
+			$hreflangs[ $lang ] = self::normalize_hreflang_url( $url, is_string( $lang ) ? $lang : null );
 		}
 		return $hreflangs;
 	}
 
-	private static function normalize_hreflang_url( $url ) {
+	private static function normalize_hreflang_url( $url, $lang = null ) {
 		if ( ! is_string( $url ) || '' === $url ) {
 			return $url;
 		}
 		$url = str_replace( '/contacts-2/', '/contacts/', $url );
 		$url = str_replace( '/contacts-2?', '/contacts?', $url );
 		$parts = wp_parse_url( $url );
-		if ( empty( $parts['query'] ) ) {
-			return $url;
+		$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
+		$q     = array();
+		if ( ! empty( $parts['query'] ) ) {
+			parse_str( $parts['query'], $q );
 		}
-		parse_str( $parts['query'], $q );
-		if ( empty( $q['lang'] ) || ! in_array( $q['lang'], array( 'en', 'en-us', 'en_us' ), true ) ) {
-			return $url;
+		// Drop ?lang=en from default English URLs.
+		if ( ! empty( $q['lang'] ) && in_array( $q['lang'], array( 'en', 'en-us', 'en_us' ), true ) ) {
+			unset( $q['lang'] );
 		}
-		unset( $q['lang'] );
-		$path = isset( $parts['path'] ) ? $parts['path'] : '/';
-		$new  = home_url( user_trailingslashit( $path ) );
+		// Ensure non-English hreflang URLs keep a lang parameter (query-string WPML mode).
+		$code = is_string( $lang ) ? $lang : '';
+		if ( 'zh' === $code ) {
+			$code = 'zh-hans';
+		}
+		if ( $code && ! in_array( $code, array( 'en', 'x-default' ), true ) && empty( $q['lang'] ) ) {
+			$q['lang'] = $code;
+		}
+		$new = home_url( user_trailingslashit( $path ) );
 		if ( ! empty( $q ) ) {
 			$new = add_query_arg( $q, $new );
 		}
@@ -494,9 +501,9 @@ final class Cindemir_SEO_Fixes {
 
 	/** WPML: prefer directory format without forcing ?lang= on default pages. */
 	public static function filter_wpml_setting( $value, $key ) {
-		if ( 'language_negotiation_type' === $key && 3 === (int) $value ) {
-			return 1;
-		}
+		// Do not rewrite WPML language URL mode. The site uses query-string
+		// negotiation (?lang=ru / ?lang=zh-hans); forcing directories breaks menus
+		// and language switcher links.
 		return $value;
 	}
 
@@ -934,7 +941,42 @@ final class Cindemir_SEO_Fixes {
 			return $atts;
 		}
 		$atts['href'] = self::map_href( $atts['href'] );
+		$atts['href'] = self::with_front_lang( $atts['href'] );
 		return $atts;
+	}
+
+	/** Current front-end language slug (WPML / ?lang=). */
+	private static function front_lang() {
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
+			return (string) ICL_LANGUAGE_CODE;
+		}
+		if ( ! empty( $_GET['lang'] ) ) {
+			return sanitize_key( wp_unslash( $_GET['lang'] ) );
+		}
+		return 'en';
+	}
+
+	/**
+	 * Keep internal links on the active language when WPML uses ?lang=.
+	 */
+	private static function with_front_lang( $href ) {
+		if ( ! is_string( $href ) || '' === $href ) {
+			return $href;
+		}
+		$lang = self::front_lang();
+		if ( ! $lang || in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return $href;
+		}
+		if ( '#' === $href || 0 === strpos( $href, '#' ) || 0 === strpos( $href, 'mailto:' ) || 0 === strpos( $href, 'tel:' ) || 0 === strpos( $href, 'javascript:' ) ) {
+			return $href;
+		}
+		if ( preg_match( '#^(https?:)?//#i', $href ) && false === stripos( $href, 'cindemirlaw.com' ) ) {
+			return $href;
+		}
+		if ( false !== strpos( $href, 'lang=' ) ) {
+			return $href;
+		}
+		return add_query_arg( 'lang', $lang, $href );
 	}
 
 	public static function fix_headings( $content ) {
@@ -1062,7 +1104,16 @@ final class Cindemir_SEO_Fixes {
 				$q     = isset( $parts['query'] ) ? $parts['query'] : '';
 				$dest  = self::resolve_path_dest( $path, $q );
 				if ( $dest ) {
-					return ' href=' . $quote . esc_url( $dest ) . $quote;
+					return ' href=' . $quote . esc_url( self::with_front_lang( $dest ) ) . $quote;
+				}
+				$full = ( isset( $m[3] ) && $m[3] ? $m[3] : '' ) . $pathq;
+				if ( '' === $full ) {
+					return $m[0];
+				}
+				// Relative path on this site — keep/add active language.
+				if ( 0 === strpos( $pathq, '/' ) ) {
+					$kept = self::with_front_lang( 'https://cindemirlaw.com' . $pathq );
+					return ' href=' . $quote . esc_url( $kept ) . $quote;
 				}
 				return $m[0];
 			},
