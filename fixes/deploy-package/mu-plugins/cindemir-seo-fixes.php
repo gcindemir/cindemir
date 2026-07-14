@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.7
+ * Version: 1.9.8
  * Author: Cindemir Law Office
  */
 
@@ -165,7 +165,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.7';
+	const VERSION = '1.9.8';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -267,6 +267,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'month_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'day_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 1, 2 );
+		add_filter( 'wpml_active_languages', array( __CLASS__, 'fix_active_language_urls' ), 99 );
+		add_filter( 'icl_ls_languages', array( __CLASS__, 'fix_active_language_urls' ), 99 );
 		add_filter( 'rocket_exclude_defer_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_exclude_js', array( __CLASS__, 'exclude_brand_js' ) );
@@ -565,6 +567,101 @@ final class Cindemir_SEO_Fixes {
 			return '3';
 		}
 		return $value;
+	}
+
+	/**
+	 * Ensure WPML/Avia language switcher URLs use correct ?lang= targets.
+	 *
+	 * @param array $langs Active languages list from WPML.
+	 * @return array
+	 */
+	public static function fix_active_language_urls( $langs ) {
+		if ( ! is_array( $langs ) || ! $langs ) {
+			return $langs;
+		}
+		$path = self::path();
+		$path = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
+		$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
+		foreach ( $langs as $code => $info ) {
+			if ( ! is_array( $info ) ) {
+				continue;
+			}
+			$code = strtolower( (string) $code );
+			$url  = self::language_target_url( $code, $base );
+			$langs[ $code ]['url'] = $url;
+			if ( isset( $langs[ $code ]['url'] ) ) {
+				$langs[ $code ]['url'] = $url;
+			}
+		}
+		return $langs;
+	}
+
+	/**
+	 * Build absolute front URL for a language code on the current path.
+	 */
+	private static function language_target_url( $code, $base = null ) {
+		$code = strtolower( (string) $code );
+		if ( null === $base ) {
+			$path = self::path();
+			$path = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
+			$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
+		}
+		$base = preg_replace( '/([?&])lang=[^&]*/', '$1', $base );
+		$base = rtrim( $base, '?&' );
+		if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return $base;
+		}
+		$map = array(
+			'ru'      => 'ru',
+			'zh-hans' => 'zh-hans',
+			'zh'      => 'zh-hans',
+			'tr'      => 'tr',
+		);
+		if ( ! isset( $map[ $code ] ) ) {
+			return $base;
+		}
+		return self::raw_append_lang( $base, $map[ $code ] );
+	}
+
+	/**
+	 * Rewrite Avia/WPML language switcher <a href> to the correct ?lang= target.
+	 * Must run AFTER stamp_lang_on_internal_hrefs so the current language is not
+	 * incorrectly copied onto other-language flags.
+	 */
+	private static function fix_language_switcher_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		if ( false === strpos( $html, 'language_' ) && false === strpos( $html, 'wpml-ls-' ) ) {
+			return $html;
+		}
+		$path = self::path();
+		$path = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
+		$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
+
+		// Avia: <li class='language_ru ...'><a href='...'>
+		$out = preg_replace_callback(
+			'#(<li\b[^>]*\bclass=(["\'])([^"\']*\blanguage_([a-z0-9\-]+)[^"\']*)\2[^>]*>\s*<a\b[^>]*?\bhref=)(["\'])([^"\']*)\5#i',
+			function ( $m ) use ( $base ) {
+				$url = self::language_target_url( $m[4], $base );
+				return $m[1] . $m[5] . esc_attr( $url ) . $m[5];
+			},
+			$html
+		);
+		if ( null !== $out ) {
+			$html = $out;
+		}
+
+		// WPML Language Switcher blocks: wpml-ls-item-ru
+		$out = preg_replace_callback(
+			'#(<li\b[^>]*\bclass=(["\'])([^"\']*\bwpml-ls-item-([a-z0-9\-]+)[^"\']*)\2[^>]*>\s*<a\b[^>]*?\bhref=)(["\'])([^"\']*)\5#i',
+			function ( $m ) use ( $base ) {
+				$url = self::language_target_url( $m[4], $base );
+				return $m[1] . $m[5] . esc_attr( $url ) . $m[5];
+			},
+			$html
+		);
+		return ( null === $out ) ? $html : $out;
 	}
 
 	/** Persist WPML query-string mode in icl_sitepress_settings if drifted. */
@@ -943,6 +1040,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::normalize_robots_meta( $html );
 		// Final pass after other rewriters — keep menu/site links on active lang.
 		$html = self::stamp_lang_on_internal_hrefs( $html );
+		// Language switcher must point at TARGET language, not the current one.
+		$html = self::fix_language_switcher_html( $html );
 		return $html;
 	}
 
@@ -1089,6 +1188,7 @@ final class Cindemir_SEO_Fixes {
 			. 'try{'
 			. 'var a=links[i],raw=a.getAttribute("href");'
 			. 'if(!raw)continue;'
+			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.language_en,.language_ru,.language_zh-hans"))continue;'
 			. 'var u=new URL(raw,location.origin);'
 			. 'if(u.hostname!==location.hostname)continue;'
 			. 'if(u.searchParams.get("lang"))continue;'
@@ -1115,6 +1215,7 @@ final class Cindemir_SEO_Fixes {
 			. 'if(!t)return;'
 			. 'try{'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
+			. 'if(t.closest&&t.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls"))return;'
 			. 'var u=new URL(t.getAttribute("href"),location.origin);'
 			. 'if(u.hostname!==location.hostname)return;'
 			. 'if(u.searchParams.get("lang"))return;'
