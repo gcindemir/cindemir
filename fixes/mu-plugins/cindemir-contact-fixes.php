@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.3
+ * Version: 1.3.4
  * Author: Cindemir Law Office
  */
 
@@ -29,6 +29,8 @@ final class Cindemir_Contact_Fixes {
 		add_filter( 'script_loader_tag', array( __CLASS__, 'exclude_critical_scripts' ), 20, 3 );
 
 		add_action( 'wp_footer', array( __CLASS__, 'render_fallback_assets' ), 5 );
+		add_action( 'wp_head', array( __CLASS__, 'print_hide_joinchat_css' ), 1 );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'dequeue_joinchat_assets' ), 100 );
 		add_action( 'wp_mail_failed', array( __CLASS__, 'log_mail_failure' ) );
 		add_action( 'phpmailer_init', array( __CLASS__, 'fix_phpmailer' ), 20 );
 
@@ -41,10 +43,34 @@ final class Cindemir_Contact_Fixes {
 		// JoinChat stores settings in option "joinchat" (array). Stamp telephone only.
 		add_filter( 'option_joinchat', array( __CLASS__, 'force_joinchat_phone' ), 20 );
 		add_action( 'init', array( __CLASS__, 'persist_joinchat_phone' ), 20 );
+		add_filter( 'joinchat_show', '__return_false', 100 );
+		add_filter( 'joinchat_disable_front', '__return_true', 100 );
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'start_html_buffer' ), 1 );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
+	}
+
+	/** Early CSS so JoinChat cannot paint even before footer fallback loads. */
+	public static function print_hide_joinchat_css() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<style id="cindemir-hide-joinchat">.joinchat,.joinchat--show{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}</style>' . "\n";
+	}
+
+	/** Stop JoinChat CSS/JS from loading — one floating button only. */
+	public static function dequeue_joinchat_assets() {
+		if ( is_admin() ) {
+			return;
+		}
+		$handles = array( 'joinchat', 'joinchat-js', 'joinchat-css', 'creame-whatsapp-me', 'whatsapp-me' );
+		foreach ( $handles as $handle ) {
+			wp_dequeue_style( $handle );
+			wp_deregister_style( $handle );
+			wp_dequeue_script( $handle );
+			wp_deregister_script( $handle );
+		}
 	}
 
 	/** Normalize JoinChat settings array to the office WhatsApp number. */
@@ -245,6 +271,7 @@ final class Cindemir_Contact_Fixes {
 		$html = str_replace( '/contacts-2/?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		$html = str_replace( '/contacts-2?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		$html = self::rewrite_whatsapp_numbers( $html );
+		$html = self::strip_joinchat_markup( $html );
 		$next = preg_replace_callback(
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)(/[^"\']*?)(\?[^"\']*lang=[^"\']*)(\2)#i',
 			function ( $m ) {
@@ -359,6 +386,64 @@ final class Cindemir_Contact_Fixes {
 			),
 			$html
 		);
+
+		return is_string( $html ) ? $html : '';
+	}
+
+	/** Remove the JoinChat floating widget markup so only #cindemir-wa-fallback remains. */
+	private static function strip_joinchat_markup( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+
+		$needle = 'class="joinchat';
+		$pos    = stripos( $html, $needle );
+		if ( false === $pos ) {
+			$needle = "class='joinchat";
+			$pos    = stripos( $html, $needle );
+		}
+		if ( false === $pos ) {
+			return $html;
+		}
+
+		$start = strrpos( substr( $html, 0, $pos ), '<div' );
+		if ( false === $start ) {
+			return $html;
+		}
+
+		$depth = 0;
+		$len   = strlen( $html );
+		$i     = $start;
+		$end   = null;
+		while ( $i < $len ) {
+			$next_open  = stripos( $html, '<div', $i );
+			$next_close = stripos( $html, '</div>', $i );
+			if ( false === $next_close ) {
+				break;
+			}
+			if ( false !== $next_open && $next_open < $next_close ) {
+				++$depth;
+				$i = $next_open + 4;
+				continue;
+			}
+			--$depth;
+			$i = $next_close + 6;
+			if ( 0 === $depth ) {
+				$end = $i;
+				break;
+			}
+		}
+
+		if ( null === $end ) {
+			return $html;
+		}
+
+		$html = substr( $html, 0, $start ) . substr( $html, $end );
+
+		// Drop JoinChat CSS/JS leftovers that would otherwise re-create the button.
+		$html = preg_replace( '#<style\b[^>]*(?:id|class)=(["\'])[^"\']*joinchat[^"\']*\1[^>]*>[\s\S]*?</style>#i', '', $html );
+		$html = preg_replace( '#<script\b[^>]*(?:id|src)=(["\'])[^"\']*joinchat[^"\']*\1[^>]*>[\s\S]*?</script>#i', '', $html );
+		$html = preg_replace( '#<link\b[^>]*href=(["\'])[^"\']*joinchat[^"\']*\1[^>]*>#i', '', $html );
 
 		return is_string( $html ) ? $html : '';
 	}
@@ -1000,8 +1085,8 @@ final class Cindemir_Contact_Fixes {
 		}
 		?>
 <style id="cindemir-whatsapp-fallback-css">
-/* Single WhatsApp button — hide JoinChat widget to avoid duplicate launchers. */
-.joinchat{display:none!important;visibility:hidden!important;pointer-events:none!important}
+/* Single WhatsApp button only. */
+.joinchat,.joinchat--show,[class^="joinchat"],[class*=" joinchat"]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 #cindemir-wa-fallback{position:fixed;z-index:999990;left:20px;right:auto;bottom:20px;width:60px;height:60px;border-radius:50%;background:#25d366;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex!important;align-items:center;justify-content:center;text-decoration:none}
 #cindemir-wa-fallback svg{width:34px;height:34px;fill:#fff}
 </style>
@@ -1011,6 +1096,12 @@ final class Cindemir_Contact_Fixes {
 <script id="cindemir-whatsapp-fallback-js">
 (function () {
 	var PHONE = '<?php echo esc_js( $phone ); ?>';
+	function killJoinchat() {
+		var nodes = document.querySelectorAll('.joinchat');
+		for (var i = 0; i < nodes.length; i++) {
+			if (nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
+		}
+	}
 	function stampWaLinks() {
 		var links = document.querySelectorAll('a[href*="wa.me/"], a[href*="whatsapp.com/send"]');
 		for (var i = 0; i < links.length; i++) {
@@ -1018,19 +1109,13 @@ final class Cindemir_Contact_Fixes {
 				.replace(/wa\.me\/\+?\d+/i, 'wa.me/' + PHONE)
 				.replace(/([?&]phone=)\+?\d+/i, '$1' + PHONE);
 		}
-		var nodes = document.querySelectorAll('.joinchat[data-settings]');
-		for (var j = 0; j < nodes.length; j++) {
-			var raw = nodes[j].getAttribute('data-settings');
-			if (!raw) continue;
-			try {
-				var settings = JSON.parse(raw);
-				settings.telephone = PHONE;
-				nodes[j].setAttribute('data-settings', JSON.stringify(settings));
-			} catch (e) {}
-		}
 	}
+	killJoinchat();
 	stampWaLinks();
-	setInterval(stampWaLinks, 3000);
+	setInterval(function () { killJoinchat(); stampWaLinks(); }, 1500);
+	if (window.MutationObserver) {
+		new MutationObserver(function () { killJoinchat(); }).observe(document.documentElement, { childList: true, subtree: true });
+	}
 })();
 </script>
 		<?php
