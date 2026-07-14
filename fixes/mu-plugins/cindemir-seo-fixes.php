@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.3
+ * Version: 1.9.4
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.3';
+	const VERSION = '1.9.4';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -888,8 +888,24 @@ final class Cindemir_SEO_Fixes {
 		$label = esc_js( self::header_brand_label() );
 		$logo  = esc_js( self::HEADER_LOGO );
 		$home  = esc_js( home_url( '/' ) );
+		$lang  = esc_js( self::front_lang() );
 		echo '<script id="cindemir-header-brand-js">(function(){'
-			. 'function run(){'
+			. 'function stampLang(){'
+			. 'var lang="' . $lang . '";'
+			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
+			. 'var links=document.querySelectorAll("a[href]");'
+			. 'for(var i=0;i<links.length;i++){'
+			. 'try{'
+			. 'var a=links[i],u=new URL(a.href,location.origin);'
+			. 'if(u.hostname!==location.hostname)continue;'
+			. 'if(u.searchParams.get("lang"))continue;'
+			. 'if(/\\/(wp-content|wp-includes|wp-admin|wp-json|feed)(\\/|$)/.test(u.pathname))continue;'
+			. 'if(/\\.(css|js|jpe?g|png|gif|webp|svg|ico|woff2?|xml)(\\?|$)/i.test(u.pathname))continue;'
+			. 'u.searchParams.set("lang",lang);a.href=u.toString();'
+			. '}catch(e){}'
+			. '}'
+			. '}'
+			. 'function runBrand(){'
 			. 'if(document.querySelector(".cindemir-site-brand"))return;'
 			. 'var inner=document.querySelector("#header_main .inner-container");'
 			. 'if(!inner)return;'
@@ -899,7 +915,21 @@ final class Cindemir_SEO_Fixes {
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>\';'
 			. 'inner.insertBefore(a,inner.firstChild);'
 			. '}'
+			. 'function run(){stampLang();}'
 			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();'
+			. 'document.addEventListener("click",function(ev){'
+			. 'var t=ev.target&&ev.target.closest&&ev.target.closest("a[href]");'
+			. 'if(!t)return;'
+			. 'try{'
+			. 'var lang="' . $lang . '";'
+			. 'if(!lang||lang==="en")return;'
+			. 'var u=new URL(t.href,location.origin);'
+			. 'if(u.hostname!==location.hostname)return;'
+			. 'if(u.searchParams.get("lang"))return;'
+			. 'if(/\\/(wp-content|wp-includes|wp-admin|wp-json|feed)(\\/|$)/.test(u.pathname))return;'
+			. 'u.searchParams.set("lang",lang);t.href=u.toString();'
+			. '}catch(e){}'
+			. '},true);'
 			. '})();</script>';
 	}
 
@@ -934,6 +964,15 @@ final class Cindemir_SEO_Fixes {
 
 	public static function author_to_home( $link ) {
 		return home_url( '/' );
+	}
+
+	public static function exclude_brand_js( $exclude ) {
+		if ( ! is_array( $exclude ) ) {
+			$exclude = array();
+		}
+		$exclude[] = 'cindemir-header-brand-js';
+		$exclude[] = 'cindemir-header-brand';
+		return $exclude;
 	}
 
 	public static function nav_href( $atts, $item ) {
@@ -1106,11 +1145,6 @@ final class Cindemir_SEO_Fixes {
 				if ( $dest ) {
 					return ' href=' . $quote . esc_url( self::with_front_lang( $dest ) ) . $quote;
 				}
-				$full = ( isset( $m[3] ) && $m[3] ? $m[3] : '' ) . $pathq;
-				if ( '' === $full ) {
-					return $m[0];
-				}
-				// Relative path on this site — keep/add active language.
 				if ( 0 === strpos( $pathq, '/' ) ) {
 					$kept = self::with_front_lang( 'https://cindemirlaw.com' . $pathq );
 					return ' href=' . $quote . esc_url( $kept ) . $quote;
@@ -1119,7 +1153,36 @@ final class Cindemir_SEO_Fixes {
 			},
 			$html
 		);
+		$html = self::stamp_lang_on_internal_hrefs( $html );
 		return $html;
+	}
+
+	/**
+	 * Broad pass: ensure same-site hrefs keep the active ?lang= (menus, logos, switcher).
+	 */
+	private static function stamp_lang_on_internal_hrefs( $html ) {
+		$lang = self::front_lang();
+		if ( ! $lang || in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return $html;
+		}
+		return preg_replace_callback(
+			'#\bhref=(["\'])(https?://(?:www\.)?cindemirlaw\.com[^"\']*)\1#i',
+			function ( $m ) use ( $lang ) {
+				$url = html_entity_decode( $m[2], ENT_QUOTES, 'UTF-8' );
+				if ( false !== strpos( $url, 'lang=' ) ) {
+					return $m[0];
+				}
+				if ( preg_match( '#/(?:wp-content|wp-includes|wp-json|wp-admin|feed|xmlrpc)(/|$|\?)#i', $url ) ) {
+					return $m[0];
+				}
+				if ( preg_match( '#\.(?:css|js|jpe?g|png|gif|webp|svg|ico|woff2?|ttf|eot|map|xml)(?:\?|$)#i', $url ) ) {
+					return $m[0];
+				}
+				$stamped = add_query_arg( 'lang', $lang, $url );
+				return 'href=' . $m[1] . esc_url( $stamped ) . $m[1];
+			},
+			$html
+		);
 	}
 
 	private static function map_href( $href ) {

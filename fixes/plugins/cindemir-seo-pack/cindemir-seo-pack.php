@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Pack
  * Description: Ahrefs fixes — barobirlik badge, sitemap, hreflang, contacts. Deactivate from Plugins if needed.
- * Version: 1.9.3
+ * Version: 1.9.4
  * Author: Cindemir Law Office
  * Requires at least: 5.8
  * Requires PHP: 7.4
