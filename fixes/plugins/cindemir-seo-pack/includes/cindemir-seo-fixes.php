@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.8.9
+ * Version: 1.9.0
  * Author: Cindemir Law Office
  */
 
@@ -133,7 +133,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.8.9';
+	const VERSION = '1.9.0';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -800,13 +800,22 @@ final class Cindemir_SEO_Fixes {
 		$lang = 'en';
 		if ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
 			$lang = (string) ICL_LANGUAGE_CODE;
+		} elseif ( function_exists( 'pll_current_language' ) ) {
+			$pll = pll_current_language( 'slug' );
+			if ( is_string( $pll ) && '' !== $pll ) {
+				$lang = $pll;
+			}
 		} elseif ( ! empty( $_GET['lang'] ) ) {
 			$lang = sanitize_key( wp_unslash( $_GET['lang'] ) );
 		}
-		if ( 'tr' === $lang ) {
-			return 'Cindemir Hukuk Bürosu';
-		}
-		return 'Cindemir Law Office';
+		$labels = array(
+			'en'      => 'Cindemir Law Office',
+			'tr'      => 'Cindemir Hukuk Bürosu',
+			'ru'      => 'Юридическая фирма Cindemir',
+			'zh-hans' => '辛德米尔律师事务所',
+			'zh'      => '辛德米尔律师事务所',
+		);
+		return isset( $labels[ $lang ] ) ? $labels[ $lang ] : $labels['en'];
 	}
 
 	public static function header_brand_styles() {
