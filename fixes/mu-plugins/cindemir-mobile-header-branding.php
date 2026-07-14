@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Mobile Header Branding
  * Description: Fallback site-name in header (SEO pack also injects branding).
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Cindemir Law Office
  */
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 if ( defined( 'CINDEMIR_SEO_FIXES_LOADED' ) ) {
 	return;
-} // pack handles it
+}
 if ( defined( 'CINDEMIR_MOBILE_HEADER_BRANDING_LOADED' ) ) {
 	return;
 }
@@ -36,7 +36,7 @@ add_action(
 			'zh'      => '辛德米尔律师事务所',
 		);
 		$label = isset( $labels[ $lang ] ) ? $labels[ $lang ] : $labels['en'];
-		echo '<style id="cindemir-mobile-brand">@media(max-width:989px){#header .logo a{display:inline-flex!important;align-items:center;gap:8px}#header .logo img{max-height:38px!important;max-width:38px!important}#header .logo a::after{content:"' . esc_attr( $label ) . '";font-size:13px;font-weight:600;line-height:1.2;color:#336666;max-width:170px}}</style>';
+		echo '<style id="cindemir-mobile-brand">#header .logo a{display:inline-flex!important;align-items:center;gap:8px}#header .logo a::after{content:"' . esc_attr( $label ) . '";font-size:15px;font-weight:700;line-height:1.2;color:#244f4f;max-width:min(200px,52vw)}@media(max-width:989px){#header .logo img{max-height:36px!important;max-width:36px!important}}</style>';
 	},
 	50
 );
