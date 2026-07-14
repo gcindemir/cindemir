@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.9
+ * Version: 1.9.10
  * Author: Cindemir Law Office
  */
 
@@ -20,7 +20,12 @@ define( 'CINDEMIR_SEO_FIXES_LOADED', true );
  * WPML was not setting wp-wpml_current_language for ?lang= URLs, so menu clicks
  * to /about-us/ fell back to English. Propagate ?lang= from cookie before WPML boots.
  */
-if ( empty( $_GET['lang'] ) && ! empty( $_COOKIE['cindemir_lang'] ) ) {
+if ( ! empty( $_GET['cindemir_lang'] ) && 'en' === strtolower( (string) $_GET['cindemir_lang'] ) ) {
+	if ( ! defined( 'CINDEMIR_CLEAR_LANG' ) ) {
+		define( 'CINDEMIR_CLEAR_LANG', true );
+	}
+	unset( $_COOKIE['cindemir_lang'] );
+} elseif ( empty( $_GET['lang'] ) && ! empty( $_COOKIE['cindemir_lang'] ) ) {
 	$uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
 	if ( false === strpos( $uri, '/wp-admin' ) && false === strpos( $uri, 'wp-login.php' ) ) {
 		$raw = $_COOKIE['cindemir_lang'];
@@ -234,6 +239,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wpml_loaded', array( __CLASS__, 'switch_wpml_from_cookie' ), 0 );
 		add_action( 'plugins_loaded', array( __CLASS__, 'switch_wpml_from_cookie' ), 20 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_cookie_lang_to_query' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'clear_lang_cookie_redirect' ), 0 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
@@ -247,6 +253,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
+		add_action( 'wp_head', array( __CLASS__, 'language_switcher_boot_script' ), 0 );
 		// Early head script with data-nowprocket so Delay JS cannot defer lang stamping.
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_script' ), 2 );
 		add_action( 'wp_head', array( __CLASS__, 'noindex_utility' ), 1 );
@@ -780,6 +787,9 @@ final class Cindemir_SEO_Fixes {
 		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 			return;
 		}
+		if ( defined( 'CINDEMIR_CLEAR_LANG' ) && CINDEMIR_CLEAR_LANG ) {
+			return;
+		}
 		if ( ! defined( 'CINDEMIR_LANG_FROM_COOKIE' ) || ! CINDEMIR_LANG_FROM_COOKIE ) {
 			return;
 		}
@@ -792,6 +802,20 @@ final class Cindemir_SEO_Fixes {
 		$target = home_url( $path );
 		$target = add_query_arg( 'lang', $lang, $target );
 		wp_safe_redirect( $target, 302 );
+		exit;
+	}
+
+	/** English flag: clear language cookie and bounce to a clean URL. */
+	public static function clear_lang_cookie_redirect() {
+		if ( is_admin() || ! defined( 'CINDEMIR_CLEAR_LANG' ) || ! CINDEMIR_CLEAR_LANG ) {
+			return;
+		}
+		$secure = is_ssl();
+		setcookie( 'cindemir_lang', '', time() - YEAR_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, $secure, false );
+		unset( $_COOKIE['cindemir_lang'] );
+		$path = self::path();
+		$path = $path ? user_trailingslashit( $path ) : '/';
+		wp_safe_redirect( home_url( $path ), 302 );
 		exit;
 	}
 
@@ -1191,6 +1215,32 @@ final class Cindemir_SEO_Fixes {
 			. '</style>';
 	}
 
+	/**
+	 * Tiny undelayable handler: language flags navigate to the correct ?lang=
+	 * even when hrefs were stripped by an outer buffer / Delay JS.
+	 */
+	public static function language_switcher_boot_script() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<script id="cindemir-lang-switch" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1">'
+			. 'document.addEventListener("click",function(ev){'
+			. 'var li=ev.target&&ev.target.closest&&ev.target.closest("li[class*=\\"language_\\"],li[class*=\\"wpml-ls-item-\\"]");'
+			. 'if(!li)return;'
+			. 'var m=(li.className||"").match(/language_([a-z0-9\\-]+)/i)||(li.className||"").match(/wpml-ls-item-([a-z0-9\\-]+)/i);'
+			. 'if(!m)return;'
+			. 'var map={en:"",ru:"ru","zh-hans":"zh-hans",zh:"zh-hans",tr:"tr"};'
+			. 'var code=m[1].toLowerCase();'
+			. 'if(!Object.prototype.hasOwnProperty.call(map,code))return;'
+			. 'ev.preventDefault();ev.stopPropagation();'
+			. 'try{if(map[code]){document.cookie="cindemir_lang="+map[code]+";path=/;max-age=31536000;SameSite=Lax;Secure";}'
+			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax;Secure";document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}}catch(e){}'
+			. 'var path=location.pathname||"/";'
+			. 'location.href=map[code]?(path+((path.indexOf("?")>=0?"&":"?")+"lang="+map[code])):(path+((path.indexOf("?")>=0?"&":"?")+"cindemir_lang=en"));'
+			. '},true);'
+			. '</script>' . "\n";
+	}
+
 	/** Client-side sticky lang + brand inject. Must not be delayed by WP Rocket. */
 	public static function header_brand_script() {
 		if ( is_admin() ) {
@@ -1271,10 +1321,10 @@ final class Cindemir_SEO_Fixes {
 			. 'ev.preventDefault();'
 			. 'var path=location.pathname||"/";'
 			. 'try{'
-			. 'if(map[code]){document.cookie="cindemir_lang="+map[code]+";path=/;max-age=31536000;SameSite=Lax";}'
-			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}'
+			. 'if(map[code]){document.cookie="cindemir_lang="+map[code]+";path=/;max-age=31536000;SameSite=Lax;Secure";}'
+			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax;Secure";document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}'
 			. '}catch(e){}'
-			. 'location.href=path+(map[code]?("?lang="+map[code]):"");'
+			. 'location.href=map[code]?(path+((path.indexOf("?")>=0?"&":"?")+"lang="+map[code])):(path+((path.indexOf("?")>=0?"&":"?")+"cindemir_lang=en"));'
 			. 'return;'
 			. '}'
 			. '}'
@@ -1333,7 +1383,9 @@ final class Cindemir_SEO_Fixes {
 		}
 		$exclude[] = 'cindemir-header-brand-js';
 		$exclude[] = 'cindemir-header-brand';
+		$exclude[] = 'cindemir-lang-switch';
 		$exclude[] = 'stampLang';
+		$exclude[] = 'fixSwitcher';
 		$exclude[] = 'data-nowprocket';
 		return $exclude;
 	}
@@ -1344,7 +1396,9 @@ final class Cindemir_SEO_Fixes {
 			$exclude = array();
 		}
 		$exclude[] = 'stampLang';
+		$exclude[] = 'fixSwitcher';
 		$exclude[] = 'cindemir-header-brand-js';
+		$exclude[] = 'cindemir-lang-switch';
 		return $exclude;
 	}
 
