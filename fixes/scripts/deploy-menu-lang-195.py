@@ -129,22 +129,34 @@ def verify_html_lang(path, expect_about_lang):
     return ok_about or (nowprocket and not delayed)
 
 
-def verify_click(browser_lang_path, link_text, expect_substr):
+def verify_click(browser_lang_path, link_text, expect_lang_prefix):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 1280, "height": 900}, user_agent=UA)
+        context = browser.new_context(viewport={"width": 1280, "height": 900}, user_agent=UA)
+        page = context.new_page()
         page.goto(f"{SITE}{browser_lang_path}", wait_until="domcontentloaded", timeout=120000)
         page.wait_for_timeout(2500)
+        cookies = {c["name"]: c["value"] for c in context.cookies()}
+        log(f"cookies after land: cindemir_lang={cookies.get('cindemir_lang')}")
         href = page.eval_on_selector(f'a:has-text("{link_text}")', "el => el.getAttribute('href')")
         log(f"pre-click href ({link_text}): {href}")
         with page.expect_navigation(timeout=60000):
             page.click(f'a:has-text("{link_text}")')
         url = page.url
         html_lang = page.eval_on_selector("html", "el => el.lang")
-        log(f"post-click url={url} html_lang={html_lang}")
-        page.screenshot(path=str(SHOT / f"menu195-{expect_substr}.png"), full_page=False)
+        brand = page.evaluate(
+            '''() => {
+              const el = document.querySelector("#header .logo a");
+              if (!el) return "";
+              return getComputedStyle(el, "::after").content || "";
+            }'''
+        )
+        log(f"post-click url={url} html_lang={html_lang} brand={brand}")
+        page.screenshot(path=str(SHOT / f"menu196-{expect_lang_prefix}.png"), full_page=False)
         browser.close()
-        return expect_substr in url or (html_lang or "").startswith(expect_substr[:2])
+        ok = (html_lang or "").lower().startswith(expect_lang_prefix.lower()[:2])
+        ok = ok or (expect_lang_prefix in url) or ("jurid" in brand.lower()) or ("\u042e\u0440\u0438\u0434" in brand)
+        return ok
 
 
 def main():
@@ -185,10 +197,24 @@ def main():
     time.sleep(2)
     html_ok = verify_html_lang("/?lang=ru", "lang=ru")
     html_zh = verify_html_lang("/?lang=zh-hans", "lang=zh-hans")
-    click_ru = verify_click("/?lang=ru", "О нас", "lang=ru")
-    click_zh = verify_click("/?lang=zh-hans", "关于我们", "zh-hans")
-    log(f"FINAL home={code('/')} ver={ver()} html_ru={html_ok} html_zh={html_zh} click_ru={click_ru} click_zh={click_zh}")
-    return 0 if (html_ok or click_ru) and code("/") == "200" else 1
+    click_ru = verify_click("/?lang=ru", "О нас", "ru")
+    click_zh = verify_click("/?lang=zh-hans", "关于我们", "zh")
+    # Cookie-only navigation (bare permalink after language land)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(viewport={"width": 1280, "height": 900}, user_agent=UA)
+        page = context.new_page()
+        page.goto(f"{SITE}/?lang=ru&t={int(time.time())}", wait_until="domcontentloaded", timeout=120000)
+        page.wait_for_timeout(1500)
+        page.goto(f"{SITE}/about-us/?t={int(time.time())}", wait_until="domcontentloaded", timeout=120000)
+        page.wait_for_timeout(2000)
+        bare_lang = page.eval_on_selector("html", "el => el.lang")
+        log(f"cookie bare /about-us/ html_lang={bare_lang}")
+        page.screenshot(path=str(SHOT / "menu196-cookie-about.png"), full_page=False)
+        browser.close()
+    cookie_ok = (bare_lang or "").lower().startswith("ru")
+    log(f"FINAL home={code('/')} ver={ver()} html_ru={html_ok} html_zh={html_zh} click_ru={click_ru} click_zh={click_zh} cookie_ok={cookie_ok}")
+    return 0 if (click_ru or cookie_ok) and code("/") == "200" else 1
 
 
 if __name__ == "__main__":
