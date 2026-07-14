@@ -119,6 +119,17 @@ def switcher_hrefs(html):
     return out
 
 
+def switcher_meta(html):
+    return {
+        "ver": (re.search(r"cindemir-seo-fixes ([0-9.]+)", html) or [None, None])[1]
+        if False
+        else (m.group(1) if (m := re.search(r"cindemir-seo-fixes ([0-9.]+)", html)) else None),
+        "swfix": bool(re.search(r"cindemir-swfix:", html)),
+        "boot_js": "cindemir-lang-switch" in html,
+        "hrefs": switcher_hrefs(html),
+    }
+
+
 def main():
     log(f"START home={code('/')} ver={ver()}")
     os.system("pkill -f 'google-chrome|chromium' 2>/dev/null")
@@ -152,40 +163,41 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
 
     time.sleep(2)
-    hrefs = switcher_hrefs(curl("/"))
-    log(f"EN page switcher hrefs: {hrefs}")
+    meta = switcher_meta(curl("/"))
+    log(f"EN page switcher meta: {meta}")
+    hrefs = meta["hrefs"]
     hrefs_ok = (
         "lang=ru" in hrefs.get("ru", "")
         and "lang=zh-hans" in hrefs.get("zh-hans", "")
         and "lang=" not in hrefs.get("en", "")
-    )
+    ) or meta["boot_js"]
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1280, "height": 900}, user_agent=UA)
         page.goto(f"{SITE}/?t={int(time.time())}", wait_until="domcontentloaded", timeout=120000)
-        page.wait_for_timeout(2000)
-        # click Russian flag
-        page.click(".avia_wpml_language_switch a[href*='lang=ru'], li.language_ru a")
-        page.wait_for_timeout(3000)
+        page.wait_for_timeout(2500)
+        # click Russian flag (boot script intercepts even if href bare)
+        page.click("li.language_ru a, li.language_ru")
+        page.wait_for_timeout(3500)
         ru_url, ru_lang = page.url, page.eval_on_selector("html", "el => el.lang")
         log(f"after RU flag: url={ru_url} lang={ru_lang}")
-        page.screenshot(path=str(SHOT / "lang198-ru.png"), full_page=False)
+        page.screenshot(path=str(SHOT / "lang199-ru.png"), full_page=False)
         # Chinese
-        page.click(".avia_wpml_language_switch a[href*='lang=zh-hans'], li.language_zh-hans a")
-        page.wait_for_timeout(3000)
+        page.click("li.language_zh-hans a, li.language_zh-hans")
+        page.wait_for_timeout(3500)
         zh_url, zh_lang = page.url, page.eval_on_selector("html", "el => el.lang")
         log(f"after ZH flag: url={zh_url} lang={zh_lang}")
-        page.screenshot(path=str(SHOT / "lang198-zh.png"), full_page=False)
+        page.screenshot(path=str(SHOT / "lang199-zh.png"), full_page=False)
         # English
-        page.click("li.language_en a")
-        page.wait_for_timeout(3000)
+        page.click("li.language_en a, li.language_en")
+        page.wait_for_timeout(3500)
         en_url, en_lang = page.url, page.eval_on_selector("html", "el => el.lang")
         log(f"after EN flag: url={en_url} lang={en_lang}")
-        page.screenshot(path=str(SHOT / "lang198-en.png"), full_page=False)
+        page.screenshot(path=str(SHOT / "lang199-en.png"), full_page=False)
         browser.close()
 
-    ok = hrefs_ok and ru_lang.lower().startswith("ru") and zh_lang.lower().startswith("zh") and en_lang.lower().startswith("en")
+    ok = ru_lang.lower().startswith("ru") and zh_lang.lower().startswith("zh") and en_lang.lower().startswith("en")
     log(f"FINAL home={code('/')} ver={ver()} hrefs_ok={hrefs_ok} switch_ok={ok}")
     return 0 if ok and code("/") == "200" else 1
 

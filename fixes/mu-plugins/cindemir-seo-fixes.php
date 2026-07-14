@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.8
+ * Version: 1.9.9
  * Author: Cindemir Law Office
  */
 
@@ -165,7 +165,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.8';
+	const VERSION = '1.9.9';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -239,7 +239,8 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'strip_default_lang_redirect' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
-		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 1 );
+		// Start FIRST so our rewrite is the outermost buffer (runs after WPML Absolute Links).
+		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), -999 );
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_legacy_media_in_content' ), 15 );
@@ -632,36 +633,67 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		if ( false === strpos( $html, 'language_' ) && false === strpos( $html, 'wpml-ls-' ) ) {
+		if ( false === strpos( $html, 'language_' ) && false === strpos( $html, 'wpml-ls-' ) && false === strpos( $html, 'avia_wpml_language_switch' ) ) {
 			return $html;
 		}
 		$path = self::path();
 		$path = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
 		$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
+		$en   = $base;
+		$ru   = self::raw_append_lang( $base, 'ru' );
+		$zh   = self::raw_append_lang( $base, 'zh-hans' );
 
-		// Avia: <li class='language_ru ...'><a href='...'>
+		// Operate on each language-switcher <ul> block so we never miss quote variants.
 		$out = preg_replace_callback(
-			'#(<li\b[^>]*\bclass=(["\'])([^"\']*\blanguage_([a-z0-9\-]+)[^"\']*)\2[^>]*>\s*<a\b[^>]*?\bhref=)(["\'])([^"\']*)\5#i',
-			function ( $m ) use ( $base ) {
-				$url = self::language_target_url( $m[4], $base );
-				return $m[1] . $m[5] . esc_attr( $url ) . $m[5];
+			'#(<ul\b[^>]*\b(?:avia_wpml_language_switch|wpml-ls)[^>]*>)(.*?)(</ul>)#is',
+			function ( $um ) use ( $en, $ru, $zh ) {
+				$inner = $um[2];
+				$inner = preg_replace_callback(
+					'#(<li\b[^>]*\blanguage_([a-z0-9\-]+)[^>]*>\s*<a\b[^>]*\bhref=)(["\'])([^"\']*)\3#i',
+					function ( $m ) use ( $en, $ru, $zh ) {
+						$code = strtolower( $m[2] );
+						$url  = $en;
+						if ( 'ru' === $code ) {
+							$url = $ru;
+						} elseif ( 'zh-hans' === $code || 'zh' === $code ) {
+							$url = $zh;
+						} elseif ( 'tr' === $code ) {
+							$url = self::raw_append_lang( $en, 'tr' );
+						}
+						return $m[1] . $m[3] . esc_attr( $url ) . $m[3];
+					},
+					$inner
+				);
+				$inner = preg_replace_callback(
+					'#(<li\b[^>]*\bwpml-ls-item-([a-z0-9\-]+)[^>]*>\s*<a\b[^>]*\bhref=)(["\'])([^"\']*)\3#i',
+					function ( $m ) use ( $en, $ru, $zh ) {
+						$code = strtolower( $m[2] );
+						$url  = $en;
+						if ( 'ru' === $code ) {
+							$url = $ru;
+						} elseif ( 'zh-hans' === $code || 'zh' === $code ) {
+							$url = $zh;
+						}
+						return $m[1] . $m[3] . esc_attr( $url ) . $m[3];
+					},
+					$inner
+				);
+				return $um[1] . $inner . $um[3];
 			},
 			$html
 		);
-		if ( null !== $out ) {
-			$html = $out;
+		if ( null === $out ) {
+			return $html;
 		}
-
-		// WPML Language Switcher blocks: wpml-ls-item-ru
-		$out = preg_replace_callback(
-			'#(<li\b[^>]*\bclass=(["\'])([^"\']*\bwpml-ls-item-([a-z0-9\-]+)[^"\']*)\2[^>]*>\s*<a\b[^>]*?\bhref=)(["\'])([^"\']*)\5#i',
-			function ( $m ) use ( $base ) {
-				$url = self::language_target_url( $m[4], $base );
-				return $m[1] . $m[5] . esc_attr( $url ) . $m[5];
-			},
-			$html
-		);
-		return ( null === $out ) ? $html : $out;
+		if ( false === strpos( $out, 'cindemir-swfix' ) ) {
+			$out = preg_replace(
+				'/<head\b[^>]*>/i',
+				'$0<!--cindemir-swfix:en=' . esc_attr( $en ) . ';ru=' . esc_attr( $ru ) . ';zh=' . esc_attr( $zh ) . '-->',
+				$out,
+				1
+			);
+		}
+		return $out;
 	}
 
 	/** Persist WPML query-string mode in icl_sitepress_settings if drifted. */
@@ -1181,6 +1213,23 @@ final class Cindemir_SEO_Fixes {
 			. 'if(lang&&lang!=="en"&&lang!=="en-us"){document.cookie="cindemir_lang="+encodeURIComponent(lang)+";path=/;max-age=31536000;SameSite=Lax";}'
 			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}'
 			. '}catch(e){}'
+			. 'function fixSwitcher(){'
+			. 'var map={en:"",ru:"ru","zh-hans":"zh-hans",zh:"zh-hans",tr:"tr"};'
+			. 'var nodes=document.querySelectorAll(".avia_wpml_language_switch li,.wpml-ls-item,li[class*=\\"language_\\"]");'
+			. 'for(var i=0;i<nodes.length;i++){'
+			. 'var li=nodes[i],cls=li.className||"";'
+			. 'var m=cls.match(/language_([a-z0-9\\-]+)/i)||cls.match(/wpml-ls-item-([a-z0-9\\-]+)/i);'
+			. 'if(!m)continue;'
+			. 'var code=m[1].toLowerCase();'
+			. 'if(!Object.prototype.hasOwnProperty.call(map,code))continue;'
+			. 'var a=li.querySelector("a[href]");'
+			. 'if(!a)continue;'
+			. 'var path=location.pathname||"/";'
+			. 'var href=path;'
+			. 'if(map[code]){href=path+(path.indexOf("?")>=0?"&":"?")+"lang="+map[code];}'
+			. 'a.setAttribute("href",href);'
+			. '}'
+			. '}'
 			. 'function stampLang(){'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
 			. 'var links=document.querySelectorAll("a[href]");'
@@ -1188,7 +1237,7 @@ final class Cindemir_SEO_Fixes {
 			. 'try{'
 			. 'var a=links[i],raw=a.getAttribute("href");'
 			. 'if(!raw)continue;'
-			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.language_en,.language_ru,.language_zh-hans"))continue;'
+			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls"))continue;'
 			. 'var u=new URL(raw,location.origin);'
 			. 'if(u.hostname!==location.hostname)continue;'
 			. 'if(u.searchParams.get("lang"))continue;'
@@ -1208,9 +1257,28 @@ final class Cindemir_SEO_Fixes {
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>\';'
 			. 'inner.insertBefore(a,inner.firstChild);'
 			. '}'
-			. 'function run(){stampLang();runBrand();}'
+			. 'function run(){fixSwitcher();stampLang();runBrand();}'
 			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();'
 			. 'document.addEventListener("click",function(ev){'
+			. 'var li=ev.target&&ev.target.closest&&ev.target.closest("li[class*=\\"language_\\"],li[class*=\\"wpml-ls-item-\\"]");'
+			. 'if(li){'
+			. 'var cls=li.className||"";'
+			. 'var m=cls.match(/language_([a-z0-9\\-]+)/i)||cls.match(/wpml-ls-item-([a-z0-9\\-]+)/i);'
+			. 'if(m){'
+			. 'var map={en:"",ru:"ru","zh-hans":"zh-hans",zh:"zh-hans",tr:"tr"};'
+			. 'var code=m[1].toLowerCase();'
+			. 'if(Object.prototype.hasOwnProperty.call(map,code)){'
+			. 'ev.preventDefault();'
+			. 'var path=location.pathname||"/";'
+			. 'try{'
+			. 'if(map[code]){document.cookie="cindemir_lang="+map[code]+";path=/;max-age=31536000;SameSite=Lax";}'
+			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}'
+			. '}catch(e){}'
+			. 'location.href=path+(map[code]?("?lang="+map[code]):"");'
+			. 'return;'
+			. '}'
+			. '}'
+			. '}'
 			. 'var t=ev.target&&ev.target.closest&&ev.target.closest("a[href]");'
 			. 'if(!t)return;'
 			. 'try{'
