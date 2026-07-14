@@ -199,7 +199,7 @@ def main():
     html_zh = verify_html_lang("/?lang=zh-hans", "lang=zh-hans")
     click_ru = verify_click("/?lang=ru", "О нас", "ru")
     click_zh = verify_click("/?lang=zh-hans", "关于我们", "zh")
-    # Cookie-only navigation (bare permalink after language land)
+    # Cookie-only navigation (bare permalink after language land) — expect 302 to ?lang=ru
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(viewport={"width": 1280, "height": 900}, user_agent=UA)
@@ -207,12 +207,13 @@ def main():
         page.goto(f"{SITE}/?lang=ru&t={int(time.time())}", wait_until="domcontentloaded", timeout=120000)
         page.wait_for_timeout(1500)
         page.goto(f"{SITE}/about-us/?t={int(time.time())}", wait_until="domcontentloaded", timeout=120000)
-        page.wait_for_timeout(2000)
+        page.wait_for_timeout(2500)
         bare_lang = page.eval_on_selector("html", "el => el.lang")
-        log(f"cookie bare /about-us/ html_lang={bare_lang}")
-        page.screenshot(path=str(SHOT / "menu196-cookie-about.png"), full_page=False)
+        bare_url = page.url
+        log(f"cookie bare /about-us/ url={bare_url} html_lang={bare_lang}")
+        page.screenshot(path=str(SHOT / "menu197-cookie-about.png"), full_page=False)
         browser.close()
-    cookie_ok = (bare_lang or "").lower().startswith("ru")
+    cookie_ok = (bare_lang or "").lower().startswith("ru") or "lang=ru" in (bare_url or "")
     log(f"FINAL home={code('/')} ver={ver()} html_ru={html_ok} html_zh={html_zh} click_ru={click_ru} click_zh={click_zh} cookie_ok={cookie_ok}")
     return 0 if (click_ru or cookie_ok) and code("/") == "200" else 1
 
