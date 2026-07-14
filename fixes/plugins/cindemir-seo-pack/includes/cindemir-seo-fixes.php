@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.9';
+	const VERSION = '1.9.10';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -615,8 +615,16 @@ final class Cindemir_SEO_Fixes {
 			$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
 		}
 		$base = preg_replace( '/([?&])lang=[^&]*/', '$1', $base );
+		$base = preg_replace( '/([?&])cindemir_lang=[^&]*/', '$1', $base );
 		$base = rtrim( $base, '?&' );
 		if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			// Leaving RU/ZH: bare "/" would be bounce-redirected by the sticky
+			// language cookie. Force a clear-lang hop that does not need JS.
+			$current = self::front_lang();
+			if ( $current && ! in_array( $current, array( 'en', 'en-us', 'en_us' ), true ) ) {
+				$sep = ( false === strpos( $base, '?' ) ) ? '?' : '&';
+				return $base . $sep . 'cindemir_lang=en';
+			}
 			return $base;
 		}
 		$map = array(
