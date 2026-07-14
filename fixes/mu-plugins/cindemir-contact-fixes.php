@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: Cindemir Law Office
  */
 
@@ -74,9 +74,19 @@ final class Cindemir_Contact_Fixes {
 	}
 
 	private static function whatsapp_digits() {
-		$phone = apply_filters( 'cindemir_whatsapp_phone', self::WHATSAPP_PHONE );
+		$phone  = apply_filters( 'cindemir_whatsapp_phone', self::WHATSAPP_PHONE );
 		$digits = preg_replace( '/\D+/', '', (string) $phone );
-		return is_string( $digits ) && $digits !== '' ? $digits : self::WHATSAPP_PHONE;
+		if ( ! is_string( $digits ) || '' === $digits ) {
+			return self::WHATSAPP_PHONE;
+		}
+		// Guard against intl-tel-input storing the office number under +1 (US/CA).
+		if ( '1902165506775' === $digits || ( strlen( $digits ) > 12 && 0 === strpos( $digits, '1' ) && substr( $digits, -12 ) === self::WHATSAPP_PHONE ) ) {
+			return self::WHATSAPP_PHONE;
+		}
+		if ( in_array( $digits, array( self::WHATSAPP_PHONE_OLD, '05325680647', '5325680647' ), true ) ) {
+			return self::WHATSAPP_PHONE;
+		}
+		return $digits;
 	}
 
 	/** Use a domain mailbox as envelope sender (visitor email as From gets dropped on Bluehost). */
@@ -990,10 +1000,11 @@ final class Cindemir_Contact_Fixes {
 		}
 		?>
 <style id="cindemir-whatsapp-fallback-css">
-/* Always show a WhatsApp button; hide only when native JoinChat is visible. */
-#cindemir-wa-fallback{position:fixed;z-index:999990;left:20px;bottom:20px;width:60px;height:60px;border-radius:50%;background:#25d366;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex!important;align-items:center;justify-content:center;text-decoration:none}
+/* Always-on WhatsApp launcher (right). Keep JoinChat on the left when it loads. */
+#cindemir-wa-fallback{position:fixed;z-index:999990;right:20px;left:auto;bottom:20px;width:60px;height:60px;border-radius:50%;background:#25d366;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex!important;align-items:center;justify-content:center;text-decoration:none}
 #cindemir-wa-fallback svg{width:34px;height:34px;fill:#fff}
-.joinchat.joinchat--show ~ #cindemir-wa-fallback{display:none!important}
+.joinchat.joinchat--show{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+.joinchat[hidden]{display:block!important}
 </style>
 <a id="cindemir-wa-fallback" class="is-visible" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.516 3.516c4.686-4.686 12.284-4.686 16.97 0s4.686 12.283 0 16.97a12 12 0 0 1-13.754 2.299l-5.814.735a.392.392 0 0 1-.438-.44l.748-5.788A12 12 0 0 1 3.517 3.517zm3.61 17.043.3.158a9.85 9.85 0 0 0 11.534-1.758c3.843-3.843 3.843-10.074 0-13.918s-10.075-3.843-13.918 0a9.85 9.85 0 0 0-1.747 11.554l.16.303-.51 3.942a.196.196 0 0 0 .219.22zm6.534-7.003-.933 1.164a9.84 9.84 0 0 1-3.497-3.495l1.166-.933a.79.79 0 0 0 .23-.94L9.561 6.96a.79.79 0 0 0-.924-.445l-2.023.524a.797.797 0 0 0-.588.88 11.754 11.754 0 0 0 10.005 10.005.797.797 0 0 0 .88-.587l.525-2.023a.79.79 0 0 0-.445-.923L14.6 13.327a.79.79 0 0 0-.94.23z"/></svg>
@@ -1005,16 +1016,26 @@ final class Cindemir_Contact_Fixes {
 	function stampJoinchat() {
 		var nodes = document.querySelectorAll('.joinchat[data-settings]');
 		for (var i = 0; i < nodes.length; i++) {
-			var raw = nodes[i].getAttribute('data-settings');
+			var node = nodes[i];
+			node.removeAttribute('hidden');
+			node.classList.add('joinchat--show');
+			var raw = node.getAttribute('data-settings');
 			if (!raw) continue;
 			try {
 				var settings = JSON.parse(raw);
 				settings.telephone = PHONE;
-				nodes[i].setAttribute('data-settings', JSON.stringify(settings));
+				settings.button_delay = 0;
+				node.setAttribute('data-settings', JSON.stringify(settings));
 			} catch (e) {}
 		}
 		if (window.joinchat_obj && window.joinchat_obj.settings) {
 			window.joinchat_obj.settings.telephone = PHONE;
+			window.joinchat_obj.settings.button_delay = 0;
+			if (typeof window.joinchat_obj.show === 'function') {
+				try { window.joinchat_obj.show(); } catch (e) {}
+			} else if (typeof window.joinchat_obj.resume === 'function') {
+				try { window.joinchat_obj.resume(); } catch (e) {}
+			}
 		}
 		var links = document.querySelectorAll('a[href*="wa.me/"], a[href*="whatsapp.com/send"]');
 		for (var j = 0; j < links.length; j++) {
@@ -1022,33 +1043,14 @@ final class Cindemir_Contact_Fixes {
 				.replace(/wa\.me\/\+?\d+/i, 'wa.me/' + PHONE)
 				.replace(/([?&]phone=)\+?\d+/i, '$1' + PHONE);
 		}
-	}
-	function syncVisibility() {
-		if (!fb) return;
-		if (document.querySelector('.joinchat.joinchat--show')) {
-			fb.style.setProperty('display', 'none', 'important');
-		} else {
-			fb.style.setProperty('display', 'flex', 'important');
-		}
+		if (fb) fb.style.setProperty('display', 'flex', 'important');
 	}
 	stampJoinchat();
-	syncVisibility();
-	document.addEventListener('joinchat:show', function () {
-		stampJoinchat();
-		syncVisibility();
-	});
-	setInterval(function () { stampJoinchat(); syncVisibility(); }, 2000);
-	if (window.joinchat_obj && typeof window.joinchat_obj.resume === 'function') {
-		document.addEventListener('click', function () {
-			setTimeout(function () {
-				if (!document.querySelector('.joinchat.joinchat--show')) {
-					try { window.joinchat_obj.resume(); } catch (e) {}
-				}
-				stampJoinchat();
-				syncVisibility();
-			}, 0);
-		}, true);
-	}
+	document.addEventListener('joinchat:show', stampJoinchat);
+	setInterval(stampJoinchat, 2000);
+	document.addEventListener('click', function () {
+		setTimeout(stampJoinchat, 0);
+	}, true);
 })();
 </script>
 		<?php
