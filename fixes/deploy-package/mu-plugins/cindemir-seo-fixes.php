@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.10
+ * Version: 1.9.12
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.10';
+	const VERSION = '1.9.12';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -265,6 +265,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 999, 2 );
+		add_filter( 'wp_get_nav_menu_items', array( __CLASS__, 'fix_nav_menu_items' ), 99, 3 );
+		add_filter( 'nav_menu_item_title', array( __CLASS__, 'fix_nav_menu_item_title' ), 99, 4 );
 		add_filter( 'wp_nav_menu', array( __CLASS__, 'stamp_lang_on_menu_html' ), 999 );
 		add_filter( 'page_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'post_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
@@ -654,7 +656,7 @@ final class Cindemir_SEO_Fixes {
 		$path = self::path();
 		$path = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
 		$base = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
-		$en   = $base;
+		$en   = self::language_target_url( 'en', $base );
 		$ru   = self::raw_append_lang( $base, 'ru' );
 		$zh   = self::raw_append_lang( $base, 'zh-hans' );
 
@@ -1104,8 +1106,33 @@ final class Cindemir_SEO_Fixes {
 		$html = self::normalize_robots_meta( $html );
 		// Final pass after other rewriters — keep menu/site links on active lang.
 		$html = self::stamp_lang_on_internal_hrefs( $html );
+		$html = self::fix_menu_label_html( $html );
 		// Language switcher must point at TARGET language, not the current one.
 		$html = self::fix_language_switcher_html( $html );
+		return $html;
+	}
+
+	/**
+	 * Last-resort rewrite of wrong Chinese menu labels in rendered HTML
+	 * (covers WP Rocket full-page cache generation and Avia walkers).
+	 */
+	private static function fix_menu_label_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$lang = self::front_lang();
+		if ( ! in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
+			return $html;
+		}
+		$replacements = array(
+			'>研讨<'     => '>文章<',
+			'>招聘信息<' => '>我们的团队<',
+			'>支持<'     => '>媒体报道<',
+			'>招聘<'     => '>我们的团队<',
+		);
+		foreach ( $replacements as $from => $to ) {
+			$html = str_replace( $from, $to, $html );
+		}
 		return $html;
 	}
 
@@ -1417,6 +1444,151 @@ final class Cindemir_SEO_Fixes {
 		$atts['href'] = self::map_href( $atts['href'] );
 		$atts['href'] = self::with_front_lang( $atts['href'] );
 		return $atts;
+	}
+
+	/**
+	 * Correct mistranslated Chinese (and normalize) front menu labels.
+	 * Source of truth: EN slugs ↔ av.tr/zh menu wording.
+	 */
+	private static function menu_title_map() {
+		return array(
+			'zh-hans' => array(
+				'home'      => '首页',
+				'about-us'  => '关于我们',
+				'articles'  => '文章',
+				'services'  => '服务',
+				'team'      => '我们的团队',
+				'contacts'  => '联系我们',
+				'press'     => '媒体报道',
+			),
+			'zh'      => array(
+				'home'      => '首页',
+				'about-us'  => '关于我们',
+				'articles'  => '文章',
+				'services'  => '服务',
+				'team'      => '我们的团队',
+				'contacts'  => '联系我们',
+				'press'     => '媒体报道',
+			),
+			'ru'      => array(
+				'home'      => 'Главная',
+				'about-us'  => 'О нас',
+				'articles'  => 'Статьи',
+				'services'  => 'Услуги',
+				'team'      => 'Наша команда',
+				'contacts'  => 'Контакты',
+				'press'     => 'О нас в прессе',
+			),
+		);
+	}
+
+	/** Map a menu item URL to a stable EN slug key. */
+	private static function menu_item_slug_key( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return '';
+		}
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$path = untrailingslashit( strtolower( rawurldecode( $path ) ) );
+		if ( '' === $path || '/' === $path ) {
+			return 'home';
+		}
+		$base = basename( $path );
+		$map  = array(
+			'about-us'  => 'about-us',
+			'articles'  => 'articles',
+			'services'  => 'services',
+			'team'      => 'team',
+			'contacts'  => 'contacts',
+			'contacts-2'=> 'contacts',
+			'press'     => 'press',
+			'support-zn'=> 'press',
+			'support'   => 'press',
+		);
+		return isset( $map[ $base ] ) ? $map[ $base ] : $base;
+	}
+
+	public static function fix_nav_menu_item_title( $title, $item, $args = null, $depth = 0 ) {
+		if ( is_admin() ) {
+			return $title;
+		}
+		$lang = self::front_lang();
+		$maps = self::menu_title_map();
+		if ( ! isset( $maps[ $lang ] ) ) {
+			return $title;
+		}
+		$url = '';
+		if ( is_object( $item ) && ! empty( $item->url ) ) {
+			$url = $item->url;
+		}
+		$key = self::menu_item_slug_key( $url );
+		if ( $key && isset( $maps[ $lang ][ $key ] ) ) {
+			return $maps[ $lang ][ $key ];
+		}
+		return $title;
+	}
+
+	/**
+	 * Fix ZH/RU menu item titles and ensure Contacts exists for Chinese menu.
+	 *
+	 * @param array    $items Menu items.
+	 * @param WP_Term  $menu  Menu object.
+	 * @param stdClass $args  Args.
+	 * @return array
+	 */
+	public static function fix_nav_menu_items( $items, $menu = null, $args = null ) {
+		if ( is_admin() || ! is_array( $items ) || ! $items ) {
+			return $items;
+		}
+		$lang = self::front_lang();
+		$maps = self::menu_title_map();
+		if ( ! isset( $maps[ $lang ] ) ) {
+			return $items;
+		}
+		$have_contacts = false;
+		$max_id        = 0;
+		$top_order     = 0;
+		foreach ( $items as $item ) {
+			if ( ! is_object( $item ) ) {
+				continue;
+			}
+			$max_id = max( $max_id, (int) $item->ID );
+			if ( empty( $item->menu_item_parent ) || '0' === (string) $item->menu_item_parent ) {
+				$top_order = max( $top_order, (int) $item->menu_order );
+			}
+			$key = self::menu_item_slug_key( isset( $item->url ) ? $item->url : '' );
+			if ( 'contacts' === $key ) {
+				$have_contacts = true;
+			}
+			if ( $key && isset( $maps[ $lang ][ $key ] ) ) {
+				$item->title = $maps[ $lang ][ $key ];
+				if ( isset( $item->post_title ) ) {
+					$item->post_title = $maps[ $lang ][ $key ];
+				}
+			}
+		}
+		// Chinese primary menu historically omitted Contacts — add it.
+		if ( ! $have_contacts && in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
+			$new             = new stdClass();
+			$new->ID         = $max_id + 91001;
+			$new->db_id      = $new->ID;
+			$new->object_id  = $new->ID;
+			$new->object     = 'custom';
+			$new->type       = 'custom';
+			$new->type_label = 'Custom';
+			$new->title      = $maps[ $lang ]['contacts'];
+			$new->url        = self::with_front_lang( 'https://cindemirlaw.com/contacts/' );
+			$new->menu_order = $top_order + 1;
+			$new->menu_item_parent = 0;
+			$new->target     = '';
+			$new->attr_title = '';
+			$new->description = '';
+			$new->classes    = array( 'menu-item', 'menu-item-type-custom', 'menu-item-object-custom', 'menu-item-top-level' );
+			$new->xfn        = '';
+			$new->status     = 'publish';
+			$new->post_parent = 0;
+			$items[]         = $new;
+		}
+		return $items;
 	}
 
 	/** Keep permalink filters on the active front-end language. */
