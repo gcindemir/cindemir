@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.12
+ * Version: 1.9.13
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.12';
+	const VERSION = '1.9.13';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -267,6 +267,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 999, 2 );
 		add_filter( 'wp_get_nav_menu_items', array( __CLASS__, 'fix_nav_menu_items' ), 99, 3 );
 		add_filter( 'nav_menu_item_title', array( __CLASS__, 'fix_nav_menu_item_title' ), 99, 4 );
+		add_filter( 'wp_nav_menu_items', array( __CLASS__, 'append_lang_items_to_menu' ), 99, 2 );
 		add_filter( 'wp_nav_menu', array( __CLASS__, 'stamp_lang_on_menu_html' ), 999 );
 		add_filter( 'page_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'post_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
@@ -1246,6 +1247,24 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header .logo a::after,#top #header .cindemir-site-brand__text{'
 			. 'font-size:14px!important;white-space:normal!important;max-width:min(180px,48vw)}'
 			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
+			. '#header_meta{display:block!important;visibility:visible!important;min-height:34px!important}'
+			. '#header_meta .avia_wpml_language_switch{'
+			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
+			. 'align-items:center;gap:8px;overflow:visible!important;flex-wrap:nowrap}'
+			. '#header_meta .avia_wpml_language_switch li,'
+			. '#header_meta .avia_wpml_language_switch .language_flag,'
+			. '#header_meta .avia_wpml_language_switch img{'
+			. 'display:inline-block!important;visibility:visible!important;opacity:1!important;'
+			. 'width:22px!important;height:auto!important;max-width:22px!important}'
+			. '.html_av-overlay-active .cindemir-lang-item,'
+			. '#av-burger-menu-ul .cindemir-lang-item{'
+			. 'display:block!important;border-top:1px solid rgba(0,0,0,.08);margin-top:8px;padding-top:4px}'
+			. '.html_av-overlay-active .cindemir-lang-item a{font-weight:700!important}'
+			. '}'
+			. '@media only screen and (min-width:990px){'
+			. '#top #header .cindemir-lang-item .avia-menu-text{font-size:13px;opacity:.9}'
+			. '#top #header .cindemir-lang-item.avia_current_lang .avia-menu-text,'
+			. '#top #header .cindemir-lang-item.current-menu-item .avia-menu-text{opacity:1;font-weight:700}'
 			. '}'
 			. '</style>';
 	}
@@ -1589,6 +1608,48 @@ final class Cindemir_SEO_Fixes {
 			$items[]         = $new;
 		}
 		return $items;
+	}
+
+	/**
+	 * Append visible EN / 中文 / Русский entries to the primary Avia menu
+	 * so languages appear inside the desktop nav and mobile burger (not only
+	 * as tiny flags in #header_meta).
+	 */
+	public static function append_lang_items_to_menu( $items, $args ) {
+		if ( is_admin() || ! is_string( $items ) ) {
+			return $items;
+		}
+		$menu_id    = isset( $args->menu_id ) ? (string) $args->menu_id : '';
+		$menu_class = isset( $args->menu_class ) ? (string) $args->menu_class : '';
+		$theme_loc  = isset( $args->theme_location ) ? (string) $args->theme_location : '';
+		$is_main    = ( 'avia-menu' === $menu_id )
+			|| false !== strpos( $menu_class, 'av-main-' )
+			|| false !== strpos( $menu_class, 'avia-menu' )
+			|| in_array( $theme_loc, array( 'avia', 'primary', 'main' ), true );
+		if ( ! $is_main ) {
+			return $items;
+		}
+		if ( false !== strpos( $items, 'cindemir-lang-item' ) ) {
+			return $items;
+		}
+		$current = self::front_lang();
+		$path    = self::path();
+		$path    = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
+		$base    = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
+		$langs   = array(
+			'en'      => array( 'label' => 'English', 'url' => self::language_target_url( 'en', $base ) ),
+			'zh-hans' => array( 'label' => '中文', 'url' => self::language_target_url( 'zh-hans', $base ) ),
+			'ru'      => array( 'label' => 'Русский', 'url' => self::language_target_url( 'ru', $base ) ),
+		);
+		$html = '';
+		foreach ( $langs as $code => $info ) {
+			$active = ( $current === $code || ( 'zh' === $current && 'zh-hans' === $code ) ) ? ' avia_current_lang current-menu-item' : '';
+			$html  .= '<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-top-level cindemir-lang-item language_' . esc_attr( $code ) . $active . '">'
+				. '<a href="' . esc_attr( $info['url'] ) . '" hreflang="' . esc_attr( $code ) . '">'
+				. '<span class="avia-menu-text">' . esc_html( $info['label'] ) . '</span>'
+				. '</a></li>';
+		}
+		return $items . $html;
 	}
 
 	/** Keep permalink filters on the active front-end language. */
