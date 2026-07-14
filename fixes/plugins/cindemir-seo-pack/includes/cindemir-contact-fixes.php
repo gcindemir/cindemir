@@ -1086,7 +1086,7 @@ final class Cindemir_Contact_Fixes {
 		?>
 <style id="cindemir-whatsapp-fallback-css">
 /* Single WhatsApp button only. */
-.joinchat,.joinchat--show,[class^="joinchat"],[class*=" joinchat"]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+.joinchat,.joinchat--show{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 #cindemir-wa-fallback{position:fixed;z-index:999990;left:20px;right:auto;bottom:20px;width:60px;height:60px;border-radius:50%;background:#25d366;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex!important;align-items:center;justify-content:center;text-decoration:none}
 #cindemir-wa-fallback svg{width:34px;height:34px;fill:#fff}
 </style>
