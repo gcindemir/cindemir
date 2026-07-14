@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.5
+ * Version: 1.9.6
  * Author: Cindemir Law Office
  */
 
@@ -14,6 +14,26 @@ if ( defined( 'CINDEMIR_SEO_FIXES_LOADED' ) ) {
 	return;
 }
 define( 'CINDEMIR_SEO_FIXES_LOADED', true );
+
+/**
+ * Persist active language across bare permalinks (Rocket-cached pages included).
+ * WPML was not setting wp-wpml_current_language for ?lang= URLs, so menu clicks
+ * to /about-us/ fell back to English. Propagate ?lang= from cookie before WPML boots.
+ */
+if ( empty( $_GET['lang'] ) && ! empty( $_COOKIE['cindemir_lang'] ) ) {
+	$uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+	if ( false === strpos( $uri, '/wp-admin' ) && false === strpos( $uri, 'wp-login.php' ) ) {
+		$raw = $_COOKIE['cindemir_lang'];
+		if ( function_exists( 'wp_unslash' ) ) {
+			$raw = wp_unslash( $raw );
+		}
+		$cindemir_cookie_lang = strtolower( preg_replace( '/[^a-z0-9\-]/i', '', (string) $raw ) );
+		if ( in_array( $cindemir_cookie_lang, array( 'ru', 'zh-hans', 'zh', 'tr' ), true ) ) {
+			$_GET['lang']     = $cindemir_cookie_lang;
+			$_REQUEST['lang'] = $cindemir_cookie_lang;
+		}
+	}
+}
 
 final class Cindemir_SEO_Fixes {
 
@@ -133,7 +153,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.5';
+	const VERSION = '1.9.6';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -197,6 +217,8 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
+		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
+		add_action( 'send_headers', array( __CLASS__, 'persist_lang_cookie' ), 0 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
@@ -220,6 +242,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_link', array( __CLASS__, 'author_to_home' ), 20 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 20, 2 );
 		add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'nav_href' ), 999, 2 );
+		add_filter( 'wp_nav_menu', array( __CLASS__, 'stamp_lang_on_menu_html' ), 999 );
 		add_filter( 'page_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'post_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'post_type_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
@@ -228,10 +251,12 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'year_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'month_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
 		add_filter( 'day_link', array( __CLASS__, 'filter_front_permalink' ), 99 );
+		add_filter( 'wpml_setting', array( __CLASS__, 'filter_wpml_setting' ), 1, 2 );
 		add_filter( 'rocket_exclude_defer_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_exclude_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
+		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
@@ -287,6 +312,7 @@ final class Cindemir_SEO_Fixes {
 		}
 		update_option( $key, self::VERSION, false );
 		self::strip_yoast_press_redirects();
+		self::ensure_wpml_query_lang_mode_force();
 		flush_rewrite_rules( false );
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
@@ -295,6 +321,9 @@ final class Cindemir_SEO_Fixes {
 			WPSEO_Sitemaps_Cache::clear();
 		}
 		delete_transient( 'wpseo_sitemap_cache_validator_page' );
+		if ( function_exists( 'rocket_generate_config_file' ) ) {
+			rocket_generate_config_file();
+		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
 		}
@@ -514,12 +543,69 @@ final class Cindemir_SEO_Fixes {
 		return $options;
 	}
 
-	/** WPML: prefer directory format without forcing ?lang= on default pages. */
+	/** WPML: keep query-string language URLs (?lang=ru / ?lang=zh-hans). */
 	public static function filter_wpml_setting( $value, $key ) {
-		// Do not rewrite WPML language URL mode. The site uses query-string
-		// negotiation (?lang=ru / ?lang=zh-hans); forcing directories breaks menus
-		// and language switcher links.
+		if ( 'language_negotiation_type' === $key ) {
+			return '3';
+		}
 		return $value;
+	}
+
+	/** Persist WPML query-string mode in icl_sitepress_settings if drifted. */
+	public static function ensure_wpml_query_lang_mode() {
+		if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			// Front requests: filter is enough; avoid option writes on every hit.
+			return;
+		}
+		$settings = get_option( 'icl_sitepress_settings' );
+		if ( ! is_array( $settings ) ) {
+			return;
+		}
+		if ( isset( $settings['language_negotiation_type'] ) && (int) $settings['language_negotiation_type'] === 3 ) {
+			return;
+		}
+		$settings['language_negotiation_type'] = 3;
+		update_option( 'icl_sitepress_settings', $settings );
+	}
+
+	/** Remember active front language so bare permalinks keep serving it. */
+	public static function persist_lang_cookie() {
+		if ( is_admin() ) {
+			return;
+		}
+		$lang = self::front_lang();
+		if ( ! $lang ) {
+			return;
+		}
+		$secure = is_ssl();
+		if ( in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			if ( ! empty( $_COOKIE['cindemir_lang'] ) ) {
+				setcookie( 'cindemir_lang', '', time() - YEAR_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, $secure, true );
+			}
+			return;
+		}
+		if ( ! in_array( $lang, array( 'ru', 'zh-hans', 'zh', 'tr' ), true ) ) {
+			return;
+		}
+		if ( ! empty( $_COOKIE['cindemir_lang'] ) && $_COOKIE['cindemir_lang'] === $lang ) {
+			return;
+		}
+		setcookie( 'cindemir_lang', $lang, time() + YEAR_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, $secure, false );
+		$_COOKIE['cindemir_lang'] = $lang;
+	}
+
+	/** Vary WP Rocket page cache by language cookie. */
+	public static function rocket_dynamic_lang_cookie( $cookies ) {
+		if ( ! is_array( $cookies ) ) {
+			$cookies = array();
+		}
+		$cookies[] = 'cindemir_lang';
+		return array_values( array_unique( $cookies ) );
+	}
+
+	/** Stamp lang onto rendered menu HTML (Enfold / WP walker). */
+	public static function stamp_lang_on_menu_html( $html ) {
+		return self::stamp_lang_on_internal_hrefs( $html );
 	}
 
 	/** Redirect ?lang=en away from canonical English URLs. */
@@ -768,6 +854,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
 		$html = self::normalize_robots_meta( $html );
+		// Final pass after other rewriters — keep menu/site links on active lang.
+		$html = self::stamp_lang_on_internal_hrefs( $html );
 		return $html;
 	}
 
@@ -900,15 +988,21 @@ final class Cindemir_SEO_Fixes {
 		$home  = esc_js( self::with_front_lang( home_url( '/' ) ) );
 		$lang  = esc_js( self::front_lang() );
 		// data-nowprocket / nowprocket: skip Delay JS so stampLang runs before first click.
-		echo '<script id="cindemir-header-brand-js" data-nowprocket nowprocket data-no-minify="1">'
+		echo '<script id="cindemir-header-brand-js" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1">'
 			. '(function(){'
-			. 'function stampLang(){'
 			. 'var lang="' . $lang . '";'
+			. 'try{'
+			. 'if(lang&&lang!=="en"&&lang!=="en-us"){document.cookie="cindemir_lang="+encodeURIComponent(lang)+";path=/;max-age=31536000;SameSite=Lax";}'
+			. 'else{document.cookie="cindemir_lang=;path=/;max-age=0;SameSite=Lax";}'
+			. '}catch(e){}'
+			. 'function stampLang(){'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
 			. 'var links=document.querySelectorAll("a[href]");'
 			. 'for(var i=0;i<links.length;i++){'
 			. 'try{'
-			. 'var a=links[i],u=new URL(a.getAttribute("href"),location.origin);'
+			. 'var a=links[i],raw=a.getAttribute("href");'
+			. 'if(!raw)continue;'
+			. 'var u=new URL(raw,location.origin);'
 			. 'if(u.hostname!==location.hostname)continue;'
 			. 'if(u.searchParams.get("lang"))continue;'
 			. 'if(/\\/(wp-content|wp-includes|wp-admin|wp-json|feed)(\\/|$)/.test(u.pathname))continue;'
@@ -933,7 +1027,6 @@ final class Cindemir_SEO_Fixes {
 			. 'var t=ev.target&&ev.target.closest&&ev.target.closest("a[href]");'
 			. 'if(!t)return;'
 			. 'try{'
-			. 'var lang="' . $lang . '";'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
 			. 'var u=new URL(t.getAttribute("href"),location.origin);'
 			. 'if(u.hostname!==location.hostname)return;'
@@ -1218,12 +1311,15 @@ final class Cindemir_SEO_Fixes {
 	 */
 	private static function stamp_lang_on_internal_hrefs( $html ) {
 		$lang = self::front_lang();
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
 		if ( ! $lang || in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
 			return $html;
 		}
 		$stamped = 0;
 		$out     = preg_replace_callback(
-			'#\bhref=(["\'])((?:https?:)?(?://(?:www\.)?cindemirlaw\.com)?/[^"\']*|https?://(?:www\.)?cindemirlaw\.com/?)\1#i',
+			'#\bhref=(["\'])(https?://(?:www\.)?cindemirlaw\.com(?:/[^"\']*)?|/[^"\']+)\1#i',
 			function ( $m ) use ( $lang, &$stamped ) {
 				$url = html_entity_decode( $m[2], ENT_QUOTES, 'UTF-8' );
 				if ( false !== strpos( $url, 'lang=' ) ) {
