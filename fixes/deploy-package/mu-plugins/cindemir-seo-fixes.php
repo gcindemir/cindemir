@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.23
+ * Version: 1.9.24
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.23';
+	const VERSION = '1.9.24';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -888,7 +888,8 @@ final class Cindemir_SEO_Fixes {
 		}
 		echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-		echo '<link rel="dns-prefetch" href="//www.googletagmanager.com">' . "\n";
+		echo '<link rel="dns-prefetch" href="https://www.googletagmanager.com">' . "\n";
+		echo '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' . "\n";
 		if ( is_front_page() || is_page( 15 ) ) {
 			// Preload the actual on-disk hero (WebP is uploaded alongside when available).
 			$hero_webp = WP_CONTENT_DIR . '/uploads/2020/10/540664430.webp';
@@ -988,6 +989,23 @@ final class Cindemir_SEO_Fixes {
 		// Strip Google Identity Services client (unused on public pages; triggers console errors).
 		$html = preg_replace(
 			'#<script\b[^>]*(?:accounts\.google\.com/gsi/client|gsi/client)[^>]*>\s*</script>#i',
+			'',
+			$html
+		);
+		if ( null === $html ) {
+			return '';
+		}
+		// Site Kit "Sign in with Google" front-end block (~console errors + unused JS).
+		$html = preg_replace(
+			'#<!--\s*Sign in with Google.*?</script>\s*<!--\s*End Sign in with Google[^>]*-->#is',
+			'',
+			$html
+		);
+		if ( null === $html ) {
+			return '';
+		}
+		$html = preg_replace(
+			'#<script\b[^>]*(?:data-siwg-config|googlesitekit-sign-in)[^>]*>.*?</script>#is',
 			'',
 			$html
 		);
