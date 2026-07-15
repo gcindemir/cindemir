@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.16
+ * Version: 1.9.17
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.16';
+	const VERSION = '1.9.17';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1777,16 +1777,14 @@ final class Cindemir_SEO_Fixes {
 			. '#socket .container{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 12px;padding-top:10px;padding-bottom:10px}'
 			. '#socket .copyright{display:block;width:100%;text-align:center;margin:0;line-height:1.35}'
 			. '#socket .cindemir-footer-meta{display:block;width:100%;margin:0;padding:0;font-size:12px;line-height:1.4;text-align:center;opacity:1}'
-			. '#socket .cindemir-footer-meta nav{display:inline}'
 			. '#socket .cindemir-footer-meta a{color:inherit;text-decoration:underline;text-underline-offset:2px}'
 			. '#socket .cindemir-footer-meta a:hover{opacity:.85}'
 			. '#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.95}'
-			. '#socket .cindemir-footer-meta .sep{opacity:.55;margin:0 .28em}'
 			. '@media (max-width:767px){#socket .container{padding-top:12px;padding-bottom:12px}#socket .cindemir-footer-meta{font-size:11px}}'
 			. '</style>' . "\n";
 	}
 
-	/** Compact footer row inside theme socket — visible KVKK link + short note. */
+	/** Compact footer row inside theme socket — KVKK link + short note only. */
 	public static function render_compact_footer_meta() {
 		if ( is_admin() ) {
 			return;
@@ -1794,12 +1792,7 @@ final class Cindemir_SEO_Fixes {
 		$s = self::privacy_strings();
 		?>
 <div class="cindemir-footer-meta" hidden aria-hidden="true">
-	<nav class="cindemir-footer-links" aria-label="<?php echo esc_attr( $s['nav_label'] ); ?>">
-		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/privacy-policy/' ) ) ); ?>"><?php echo esc_html( $s['link'] ); ?></a><span class="sep">·</span>
-		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/our-videos/' ) ) ); ?>"><?php echo esc_html( $s['videos'] ); ?></a><span class="sep">·</span>
-		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/appointment/' ) ) ); ?>"><?php echo esc_html( $s['appointment'] ); ?></a><span class="sep">·</span>
-		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/about-us/' ) ) ); ?>"><?php echo esc_html( $s['about'] ); ?></a>
-	</nav>
+	<a href="<?php echo esc_url( self::with_front_lang( home_url( '/privacy-policy/' ) ) ); ?>"><?php echo esc_html( $s['link'] ); ?></a>
 	<span class="cindemir-footer-note"> <?php echo esc_html( $s['note'] ); ?></span>
 </div>
 <script>
@@ -1820,36 +1813,20 @@ final class Cindemir_SEO_Fixes {
 		$lang = self::front_lang();
 		$map  = array(
 			'en'      => array(
-				'nav_label'   => 'Legal and site links',
-				'link'        => 'KVKK / Privacy Policy',
-				'videos'      => 'Videos',
-				'appointment' => 'Appointment',
-				'about'       => 'About',
-				'note'        => '— Personal data is processed under KVKK. Essential cookies only.',
+				'link' => 'KVKK / Privacy Policy',
+				'note' => '— Personal data is processed under KVKK. Essential cookies only.',
 			),
 			'ru'      => array(
-				'nav_label'   => 'Правовые и служебные ссылки',
-				'link'        => 'KVKK / Политика конфиденциальности',
-				'videos'      => 'Видео',
-				'appointment' => 'Запись',
-				'about'       => 'О нас',
-				'note'        => '— Персональные данные обрабатываются по KVKK. Только необходимые cookie.',
+				'link' => 'KVKK / Политика конфиденциальности',
+				'note' => '— Персональные данные обрабатываются по KVKK. Только необходимые cookie.',
 			),
 			'zh-hans' => array(
-				'nav_label'   => '法律与网站链接',
-				'link'        => 'KVKK / 隐私政策',
-				'videos'      => '视频',
-				'appointment' => '预约',
-				'about'       => '关于',
-				'note'        => '— 个人数据依 KVKK 处理。仅使用必要 Cookie。',
+				'link' => 'KVKK / 隐私政策',
+				'note' => '— 个人数据依 KVKK 处理。仅使用必要 Cookie。',
 			),
 			'zh'      => array(
-				'nav_label'   => '法律与网站链接',
-				'link'        => 'KVKK / 隐私政策',
-				'videos'      => '视频',
-				'appointment' => '预约',
-				'about'       => '关于',
-				'note'        => '— 个人数据依 KVKK 处理。仅使用必要 Cookie。',
+				'link' => 'KVKK / 隐私政策',
+				'note' => '— 个人数据依 KVKK 处理。仅使用必要 Cookie。',
 			),
 		);
 		if ( isset( $map[ $lang ] ) ) {
