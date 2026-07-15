@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.6
+ * Version: 1.3.7
  * Author: Cindemir Law Office
  */
 
@@ -208,19 +208,31 @@ final class Cindemir_Contact_Fixes {
 			'joinchat',
 			'avia_ajax_form',
 			'avia-framework',
+			'cindemir-contact-form-fallback',
+			'cindemir-whatsapp-fallback',
+			'__cindemirContactBound',
+			'data-nowprocket',
 		);
 		return array_values( array_unique( array_merge( $exclusions, $patterns ) ) );
 	}
 
 	/** Remove delay-load attributes from scripts required for forms/chat. */
 	public static function exclude_critical_scripts( $tag, $handle, $src ) {
-		if ( ! $src ) {
+		if ( ! $src && false === strpos( (string) $tag, 'cindemir-' ) ) {
 			return $tag;
 		}
-		$needles = array( 'debloat/js/bb1fbc', 'debloat/js/bcab097', 'joinchat', 'jquery' );
-		$match   = false;
+		$needles = array(
+			'debloat/js/bb1fbc',
+			'debloat/js/bcab097',
+			'joinchat',
+			'jquery',
+			'cindemir-contact-form-fallback',
+			'cindemir-whatsapp-fallback',
+		);
+		$match = false;
+		$hay   = (string) $src . (string) $tag . (string) $handle;
 		foreach ( $needles as $needle ) {
-			if ( false !== strpos( $src, $needle ) ) {
+			if ( false !== strpos( $hay, $needle ) ) {
 				$match = true;
 				break;
 			}
@@ -229,9 +241,10 @@ final class Cindemir_Contact_Fixes {
 			return $tag;
 		}
 		$tag = preg_replace( '/\sdata-rocketlazyloadscript=(["\']).*?\1/i', '', $tag );
+		$tag = preg_replace( '/\stype=(["\'])rocketlazyloadscript\1/i', ' type="text/javascript"', $tag );
 		$tag = str_replace( ' data-cfasync="false"', '', $tag );
 		if ( false === strpos( $tag, 'data-cfasync' ) ) {
-			$tag = str_replace( '<script ', '<script data-cfasync="false" ', $tag );
+			$tag = str_replace( '<script ', '<script data-cfasync="false" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" ', $tag );
 		}
 		return $tag;
 	}
@@ -582,7 +595,7 @@ final class Cindemir_Contact_Fixes {
 	<?php echo esc_html( $s['text'] ); ?>
 	<a href="<?php echo esc_url( self::privacy_policy_url() ); ?>"><?php echo esc_html( $s['link'] ); ?></a>.
 </p>
-<script>
+<script data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false">
 (function () {
 	var note = document.querySelector('.cindemir-privacy-form-notice');
 	if (!note) return;
@@ -1291,15 +1304,23 @@ final class Cindemir_Contact_Fixes {
 	}
 
 	private static function is_contacts_page() {
-		if ( function_exists( 'is_page' ) && is_page( 'contacts' ) ) {
+		if ( function_exists( 'is_page' ) && ( is_page( 'contacts' ) || is_page( array( 'contacts', 'contacts-2' ) ) ) ) {
 			return true;
 		}
 		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
-		return ( false !== strpos( $path, '/contacts' ) );
+		if ( false !== strpos( $path, '/contacts' ) ) {
+			return true;
+		}
+		// Builder content may appear on non-/contacts paths; still enable fallback when form HTML is what we need.
+		return false;
 	}
 
 	public static function render_fallback_assets() {
-		if ( is_admin() || ! self::is_contacts_page() ) {
+		if ( is_admin() ) {
+			return;
+		}
+		// WhatsApp button site-wide; form notice/script only when contacts (or form present later via SEO inject).
+		if ( ! self::is_contacts_page() ) {
 			self::render_whatsapp_fallback_only();
 			return;
 		}
@@ -1331,7 +1352,7 @@ final class Cindemir_Contact_Fixes {
 <a id="cindemir-wa-fallback" class="is-visible" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.516 3.516c4.686-4.686 12.284-4.686 16.97 0s4.686 12.283 0 16.97a12 12 0 0 1-13.754 2.299l-5.814.735a.392.392 0 0 1-.438-.44l.748-5.788A12 12 0 0 1 3.517 3.517zm3.61 17.043.3.158a9.85 9.85 0 0 0 11.534-1.758c3.843-3.843 3.843-10.074 0-13.918s-10.075-3.843-13.918 0a9.85 9.85 0 0 0-1.747 11.554l.16.303-.51 3.942a.196.196 0 0 0 .219.22zm6.534-7.003-.933 1.164a9.84 9.84 0 0 1-3.497-3.495l1.166-.933a.79.79 0 0 0 .23-.94L9.561 6.96a.79.79 0 0 0-.924-.445l-2.023.524a.797.797 0 0 0-.588.88 11.754 11.754 0 0 0 10.005 10.005.797.797 0 0 0 .88-.587l.525-2.023a.79.79 0 0 0-.445-.923L14.6 13.327a.79.79 0 0 0-.94.23z"/></svg>
 </a>
-<script id="cindemir-whatsapp-fallback-js">
+<script id="cindemir-whatsapp-fallback-js" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false">
 (function () {
 	var PHONE = '<?php echo esc_js( $phone ); ?>';
 	function killJoinchat() {
@@ -1360,9 +1381,12 @@ final class Cindemir_Contact_Fixes {
 	}
 
 	private static function render_contact_form_fallback_script() {
+		// SEO-fixes HTML buffer also injects a hardened copy; keep a footer copy as backup.
 		?>
-<script id="cindemir-contact-form-fallback-js">
+<script id="cindemir-contact-form-fallback-js" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false">
 (function () {
+	if (window.__cindemirContactBound) return;
+	window.__cindemirContactBound = true;
 	var forms = document.querySelectorAll('form.avia_ajax_form');
 	if (!forms.length) return;
 
@@ -1372,29 +1396,35 @@ final class Cindemir_Contact_Fixes {
 	function validate(form) {
 		var errors = [];
 		qsa(form, 'input[type="text"], input[type="email"], textarea').forEach(function (el) {
+			if (el.type === 'hidden' || (el.className || '').indexOf('hidden') !== -1) return;
 			var cls = el.className || '';
 			var label = form.querySelector('label[for="' + el.id + '"]');
-			var name = label ? label.textContent.replace(/\*/g, '').trim() : el.name;
+			var name = label ? label.textContent.replace(/\*/g, '').trim() : (el.name || 'field');
 			var val = (el.value || '').trim();
-			if (cls.indexOf('is_empty') !== -1 && !val) errors.push(name);
-			if (cls.indexOf('is_email') !== -1 && val && !/^[\w|\.|\-]+@\w[\w|\.|\-]*\.[a-zA-Z]{2,20}$/.test(val)) errors.push(name);
-			if (cls.indexOf('is_phone') !== -1 && val && !/^(\d|\s|\-|\/|\(|\)|\[|\]|e|x|t|ension|\.|\+|\_|\,|\:|\;){3,}$/.test(val)) errors.push(name);
+			var required = cls.indexOf('is_empty') !== -1 || cls.indexOf('is_email') !== -1 || el.required;
+			if (required && !val) { errors.push(name); return; }
+			if (cls.indexOf('is_email') !== -1 && val && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) errors.push(name);
+			if (cls.indexOf('is_phone') !== -1 && val && val.replace(/\D/g, '').length < 7) errors.push(name);
 		});
 		return errors;
 	}
 
 	function showMessage(form, html, isError) {
-		var box = form.parentElement.querySelector('.ajaxresponse') || form.nextElementSibling;
-		if (!box) {
+		var box = (form.parentElement && form.parentElement.querySelector('.ajaxresponse')) || form.nextElementSibling;
+		if (!box || !(box.className || '').match(/ajaxresponse/)) {
 			box = document.createElement('div');
-			box.className = 'ajaxresponse hidden';
+			box.className = 'ajaxresponse';
 			form.insertAdjacentElement('afterend', box);
 		}
 		box.classList.remove('hidden');
-		box.style.display = 'block';
+		box.style.cssText = 'display:block!important;margin:1rem 0;padding:1rem 1.25rem;border-radius:4px;font-size:16px;line-height:1.5;'
+			+ (isError
+				? 'background:#fdecea;color:#611a15;border:1px solid #f5c2c0;'
+				: 'background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;');
 		box.innerHTML = isError
 			? '<div class="av-form-error-container"><p>' + html + '</p></div>'
 			: html;
+		try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
 		if (!isError) form.style.display = 'none';
 	}
 
@@ -1404,12 +1434,13 @@ final class Cindemir_Contact_Fixes {
 
 		form.addEventListener('submit', function (ev) {
 			ev.preventDefault();
+			if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
 			var btn = qs(form, 'input[type="submit"], button[type="submit"]');
 			var sending = btn && btn.getAttribute('data-sending-label');
 			var original = btn ? (btn.value || btn.textContent) : '';
 			var errs = validate(form);
 			if (errs.length) {
-				showMessage(form, '<?php echo esc_js( __( 'Please check these fields:', 'cindemir' ) ); ?> ' + errs.join(', '), true);
+				showMessage(form, 'Please check these fields: ' + errs.join(', '), true);
 				return;
 			}
 
@@ -1417,7 +1448,7 @@ final class Cindemir_Contact_Fixes {
 			body.append('ajax', 'true');
 			qsa(form, 'input, textarea, select').forEach(function (el) {
 				if (!el.name || el.type === 'submit') return;
-				if (el.type === 'checkbox' && !el.checked) return;
+				if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return;
 				body.append(el.name, el.value || '');
 			});
 
@@ -1428,16 +1459,17 @@ final class Cindemir_Contact_Fixes {
 			}
 
 			var action = form.getAttribute('action') || window.location.href;
-			var controller = new AbortController();
-			var timeout = setTimeout(function () { controller.abort(); }, 25000);
-
-			fetch(action, {
+			var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+			var timeout = setTimeout(function () { if (controller) controller.abort(); }, 25000);
+			var opts = {
 				method: 'POST',
 				body: body,
 				credentials: 'same-origin',
-				signal: controller.signal,
 				headers: { 'X-Requested-With': 'XMLHttpRequest' }
-			})
+			};
+			if (controller) opts.signal = controller.signal;
+
+			fetch(action, opts)
 				.then(function (res) {
 					clearTimeout(timeout);
 					if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1448,18 +1480,18 @@ final class Cindemir_Contact_Fixes {
 					var fragment = doc.querySelector('.ajaxresponse');
 					if (!fragment) throw new Error('missing response');
 					var msg = fragment.innerHTML;
-					var isErr = /av-form-error|error-container/i.test(msg);
+					var isErr = /av-form-error|error-container/i.test(msg) && !/avia-form-success/i.test(msg);
 					showMessage(form, msg, isErr);
 					if (!isErr) {
 						qsa(form, 'input[type="text"], input[type="email"], textarea').forEach(function (el) {
-							el.value = '';
+							if ((el.className || '').indexOf('hidden') === -1) el.value = '';
 						});
 					}
 				})
 				.catch(function () {
 					showMessage(
 						form,
-						'<?php echo esc_js( __( 'Message could not be sent. Please try again or email gokhan@cindemir.av.tr directly.', 'cindemir' ) ); ?>',
+						'Message could not be sent. Please try again or email gokhan@cindemir.av.tr directly.',
 						true
 					);
 				})
@@ -1470,7 +1502,7 @@ final class Cindemir_Contact_Fixes {
 						else btn.textContent = original;
 					}
 				});
-		});
+		}, true);
 	});
 })();
 </script>

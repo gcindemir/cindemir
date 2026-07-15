@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.29';
+	const VERSION = '1.9.30';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1175,6 +1175,14 @@ final class Cindemir_SEO_Fixes {
 						$blob .= ' ' . $decoded;
 					}
 				}
+				if ( false !== strpos( $blob, 'cindemir-contact-form-fallback' )
+					|| false !== strpos( $blob, 'cindemir-whatsapp-fallback' )
+					|| false !== strpos( $blob, 'cindemir-header-brand' )
+					|| false !== strpos( $blob, 'cindemir-lang-switch' )
+					|| false !== strpos( $open, 'data-nowprocket' )
+					|| false !== strpos( $open, 'nowprocket' ) ) {
+					return $m[0];
+				}
 				if ( false !== strpos( $blob, 'AW-1027764587' )
 					|| false !== strpos( $blob, 'GTM-T6PQ95' )
 					|| false !== strpos( $blob, 'GT-WV3LSZHW' )
@@ -1514,7 +1522,175 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_language_switcher_html( $html );
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
+		$html = self::ensure_contact_form_fallback_html( $html );
 		return $html;
+	}
+
+	/**
+	 * Inject/replace an undelayable contact-form submit handler when an Enfold
+	 * form is present. Debloat/Rocket often base64-delays or drops the mu-plugin
+	 * footer script (especially on RU/ZH contact pages).
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function ensure_contact_form_fallback_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		if ( false === stripos( $html, 'avia_ajax_form' ) ) {
+			return $html;
+		}
+		$script = self::contact_form_fallback_script_tag();
+		// Drop any prior copy (inline or Debloat data-URI) so only one handler remains.
+		$html = preg_replace(
+			'#<script\b[^>]*(?:id=["\']cindemir-contact-form-fallback-js["\']|cindemir-contact-form-fallback)[^>]*>[\s\S]*?</script>#i',
+			'',
+			$html
+		);
+		if ( null === $html ) {
+			return '';
+		}
+		if ( false !== stripos( $html, '</body>' ) ) {
+			return (string) preg_replace( '#</body>#i', $script . "\n</body>", $html, 1 );
+		}
+		return $html . $script;
+	}
+
+	/** ASCII-only contact submit fallback — must not be delayed by Rocket/Debloat. */
+	private static function contact_form_fallback_script_tag() {
+		$js = <<<'JS'
+(function () {
+	if (window.__cindemirContactBound) return;
+	window.__cindemirContactBound = true;
+	function ready(fn) {
+		if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+		else fn();
+	}
+	ready(function () {
+		var forms = document.querySelectorAll('form.avia_ajax_form');
+		if (!forms.length) return;
+
+		function qs(form, sel) { return form.querySelector(sel); }
+		function qsa(form, sel) { return Array.prototype.slice.call(form.querySelectorAll(sel)); }
+
+		function validate(form) {
+			var errors = [];
+			qsa(form, 'input[type="text"], input[type="email"], textarea').forEach(function (el) {
+				if (el.type === 'hidden' || (el.className || '').indexOf('hidden') !== -1) return;
+				var cls = el.className || '';
+				var label = form.querySelector('label[for="' + el.id + '"]');
+				var name = label ? label.textContent.replace(/\*/g, '').trim() : (el.name || 'field');
+				var val = (el.value || '').trim();
+				var required = cls.indexOf('is_empty') !== -1 || cls.indexOf('is_email') !== -1 || el.required;
+				if (required && !val) { errors.push(name); return; }
+				if (cls.indexOf('is_email') !== -1 && val && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) errors.push(name);
+				if (cls.indexOf('is_phone') !== -1 && val && val.replace(/\D/g, '').length < 7) errors.push(name);
+			});
+			return errors;
+		}
+
+		function showMessage(form, html, isError) {
+			var box = (form.parentElement && form.parentElement.querySelector('.ajaxresponse')) || form.nextElementSibling;
+			if (!box || !(box.className || '').match(/ajaxresponse/)) {
+				box = document.createElement('div');
+				box.className = 'ajaxresponse';
+				form.insertAdjacentElement('afterend', box);
+			}
+			box.classList.remove('hidden');
+			box.style.cssText = 'display:block!important;margin:1rem 0;padding:1rem 1.25rem;border-radius:4px;font-size:16px;line-height:1.5;'
+				+ (isError
+					? 'background:#fdecea;color:#611a15;border:1px solid #f5c2c0;'
+					: 'background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;');
+			box.innerHTML = isError
+				? '<div class="av-form-error-container"><p>' + html + '</p></div>'
+				: html;
+			try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+			if (!isError) form.style.display = 'none';
+		}
+
+		Array.prototype.forEach.call(forms, function (form) {
+			if (form.dataset.cindemirBound === '1') return;
+			form.dataset.cindemirBound = '1';
+
+			form.addEventListener('submit', function (ev) {
+				ev.preventDefault();
+				if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+
+				var btn = qs(form, 'input[type="submit"], button[type="submit"]');
+				var sending = btn && btn.getAttribute('data-sending-label');
+				var original = btn ? (btn.value || btn.textContent) : '';
+				var errs = validate(form);
+				if (errs.length) {
+					showMessage(form, 'Please check these fields: ' + errs.join(', '), true);
+					return;
+				}
+
+				var body = new URLSearchParams();
+				body.append('ajax', 'true');
+				qsa(form, 'input, textarea, select').forEach(function (el) {
+					if (!el.name || el.type === 'submit') return;
+					if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return;
+					body.append(el.name, el.value || '');
+				});
+
+				if (btn) {
+					btn.disabled = true;
+					if (btn.value !== undefined) btn.value = sending || 'Sending...';
+					else btn.textContent = sending || 'Sending...';
+				}
+
+				var action = form.getAttribute('action') || window.location.href;
+				var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+				var timeout = setTimeout(function () { if (controller) controller.abort(); }, 25000);
+				var opts = {
+					method: 'POST',
+					body: body,
+					credentials: 'same-origin',
+					headers: { 'X-Requested-With': 'XMLHttpRequest' }
+				};
+				if (controller) opts.signal = controller.signal;
+
+				fetch(action, opts)
+					.then(function (res) {
+						clearTimeout(timeout);
+						if (!res.ok) throw new Error('HTTP ' + res.status);
+						return res.text();
+					})
+					.then(function (html) {
+						var doc = new DOMParser().parseFromString(html, 'text/html');
+						var fragment = doc.querySelector('.ajaxresponse');
+						if (!fragment) throw new Error('missing response');
+						var msg = fragment.innerHTML;
+						var isErr = /av-form-error|error-container/i.test(msg) && !/avia-form-success/i.test(msg);
+						showMessage(form, msg, isErr);
+						if (!isErr) {
+							qsa(form, 'input[type="text"], input[type="email"], textarea').forEach(function (el) {
+								if ((el.className || '').indexOf('hidden') === -1) el.value = '';
+							});
+						}
+					})
+					.catch(function () {
+						showMessage(
+							form,
+							'Message could not be sent. Please try again or email gokhan@cindemir.av.tr directly.',
+							true
+						);
+					})
+					.finally(function () {
+						if (btn) {
+							btn.disabled = false;
+							if (btn.value !== undefined) btn.value = original;
+							else btn.textContent = original;
+						}
+					});
+			}, true);
+		});
+	});
+})();
+JS;
+		return '<script id="cindemir-contact-form-fallback-js" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false">'
+			. "\n" . $js . "\n</script>";
 	}
 
 	/**
@@ -1930,9 +2106,14 @@ final class Cindemir_SEO_Fixes {
 		$exclude[] = 'cindemir-header-brand-js';
 		$exclude[] = 'cindemir-header-brand';
 		$exclude[] = 'cindemir-lang-switch';
+		$exclude[] = 'cindemir-contact-form-fallback';
+		$exclude[] = 'cindemir-whatsapp-fallback';
+		$exclude[] = 'cindemir-privacy-form';
 		$exclude[] = 'stampLang';
 		$exclude[] = 'fixSwitcher';
+		$exclude[] = '__cindemirContactBound';
 		$exclude[] = 'data-nowprocket';
+		$exclude[] = 'avia_ajax_form';
 		return $exclude;
 	}
 
@@ -1945,6 +2126,9 @@ final class Cindemir_SEO_Fixes {
 		$exclude[] = 'fixSwitcher';
 		$exclude[] = 'cindemir-header-brand-js';
 		$exclude[] = 'cindemir-lang-switch';
+		$exclude[] = 'cindemir-contact-form-fallback';
+		$exclude[] = '__cindemirContactBound';
+		$exclude[] = 'avia_ajax_form';
 		return $exclude;
 	}
 
