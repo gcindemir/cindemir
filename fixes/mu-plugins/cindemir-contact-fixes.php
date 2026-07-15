@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.4
+ * Version: 1.3.5
  * Author: Cindemir Law Office
  */
 
@@ -352,10 +352,247 @@ final class Cindemir_Contact_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/setup-privacy-i18n',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'setup_privacy_i18n' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 	}
 
 	public static function joinchat_track_stub( $request ) {
 		return new WP_REST_Response( array( 'ok' => true ), 200 );
+	}
+
+	/** Create or update RU/ZH privacy-policy pages (WPML) — informational only, no consent UI. */
+	public static function setup_privacy_i18n( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( ! in_array( $key, array( 'seo-pack-2026', 'wpml-setup-zh-2026' ), true ) ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+
+		$source_id = 390;
+		$source    = get_post( $source_id );
+		if ( ! $source ) {
+			return new WP_REST_Response( array( 'error' => 'Source privacy page not found' ), 500 );
+		}
+
+		$trid = $source_id;
+		if ( isset( $GLOBALS['sitepress'] ) && $GLOBALS['sitepress'] ) {
+			$trid = (int) $GLOBALS['sitepress']->get_element_trid( $source_id, 'post_page' );
+			if ( ! $trid ) {
+				$GLOBALS['sitepress']->set_element_language_details( $source_id, 'post_page', null, 'en' );
+				$trid = (int) $GLOBALS['sitepress']->get_element_trid( $source_id, 'post_page' );
+			}
+		}
+
+		$langs = array(
+			'ru'      => array(
+				'title'   => 'Политика конфиденциальности',
+				'meta'    => 'Политика конфиденциальности Cindemir Law Office: как обрабатываются персональные данные посетителей сайта cindemirlaw.com.',
+				'canonic' => 'https://cindemirlaw.com/privacy-policy/?lang=ru',
+			),
+			'zh-hans' => array(
+				'title'   => '隐私政策',
+				'meta'    => '辛德米尔律师事务所隐私政策：说明 cindemirlaw.com 如何收集、使用和保护访客个人数据。',
+				'canonic' => 'https://cindemirlaw.com/privacy-policy/?lang=zh-hans',
+			),
+		);
+
+		global $wpdb;
+		$created = array( 'en' => $source_id );
+		foreach ( $langs as $lang => $cfg ) {
+			$existing = 0;
+			if ( $trid ) {
+				$existing = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT p.ID FROM {$wpdb->posts} p
+						 INNER JOIN {$wpdb->prefix}icl_translations t ON t.element_id = p.ID AND t.element_type = 'post_page'
+						 WHERE t.trid = %d AND t.language_code = %s AND p.post_status IN ('publish','draft')",
+						$trid,
+						$lang
+					)
+				);
+			}
+			$body = self::privacy_page_body( $lang );
+			if ( $existing ) {
+				wp_update_post(
+					array(
+						'ID'           => $existing,
+						'post_title'   => $cfg['title'],
+						'post_name'    => 'privacy-policy',
+						'post_content' => $body,
+						'post_status'  => 'publish',
+					)
+				);
+				$pid = $existing;
+			} else {
+				$pid = wp_insert_post(
+					array(
+						'post_title'   => $cfg['title'],
+						'post_name'    => 'privacy-policy',
+						'post_content' => $body,
+						'post_status'  => 'publish',
+						'post_type'    => 'page',
+						'post_author'  => $source->post_author,
+					),
+					true
+				);
+				if ( is_wp_error( $pid ) ) {
+					$created[ $lang ] = array( 'ok' => false, 'error' => $pid->get_error_message() );
+					continue;
+				}
+				if ( isset( $GLOBALS['sitepress'] ) && $GLOBALS['sitepress'] && $trid ) {
+					$GLOBALS['sitepress']->set_element_language_details( (int) $pid, 'post_page', $trid, $lang, 'en' );
+				}
+			}
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'privacy-policy' ), array( 'ID' => (int) $pid ), array( '%s' ), array( '%d' ) );
+			update_post_meta( (int) $pid, '_yoast_wpseo_canonical', $cfg['canonic'] );
+			update_post_meta( (int) $pid, '_yoast_wpseo_title', $cfg['title'] . ' | Cindemir Law Office' );
+			update_post_meta( (int) $pid, '_yoast_wpseo_metadesc', $cfg['meta'] );
+			delete_post_meta( (int) $pid, '_wp_old_slug' );
+			clean_post_cache( (int) $pid );
+			$created[ $lang ] = array( 'ok' => true, 'post_id' => (int) $pid );
+		}
+
+		flush_rewrite_rules( false );
+		wp_cache_flush();
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+
+		return new WP_REST_Response(
+			array(
+				'ok'    => true,
+				'pages' => $created,
+				'urls'  => array(
+					'en' => 'https://cindemirlaw.com/privacy-policy/',
+					'ru' => 'https://cindemirlaw.com/privacy-policy/?lang=ru',
+					'zh' => 'https://cindemirlaw.com/privacy-policy/?lang=zh-hans',
+				),
+			),
+			200
+		);
+	}
+
+	/** Privacy / KVKK page body per language (informational text only). */
+	private static function privacy_page_body( $lang ) {
+		$bodies = array(
+			'ru'      => '<h2>Кто мы</h2>
+<p>Владелец сайта cindemirlaw.com — Cindemir Law Office (İstanbul). По вопросам персональных данных: <a href="mailto:gokhan@cindemir.av.tr">gokhan@cindemir.av.tr</a>.</p>
+<h2>Какие данные мы обрабатываем</h2>
+<ul>
+<li>данные, которые вы добровольно указываете в контактной форме (имя, e-mail, телефон, текст сообщения);</li>
+<li>технические данные сервера (IP-адрес, тип браузера, дата и время запроса) — для безопасности и стабильной работы сайта;</li>
+<li>необходимые технические cookie (например, язык интерфейса) — без них сайт не может работать корректно.</li>
+</ul>
+<h2>Цели и правовые основания</h2>
+<p>Данные используются для ответа на запросы, оказания юридических услуг, выполнения договорных и законных обязанностей, а также для защиты законных интересов офиса. Отдельное согласие через флажок на сайте не требуется, если вы сами направляете нам сообщение.</p>
+<h2>Передача третьим лицам</h2>
+<p>Данные могут обрабатываться хостинг-провайдером, почтовыми сервисами и аналитическими инструментами (например, Google Analytics), только в объёме, необходимом для работы сайта. При переходе в WhatsApp действует политика Meta/WhatsApp.</p>
+<h2>Срок хранения</h2>
+<p>Контактные данные хранятся столько, сколько нужно для ответа на запрос и ведения дела, либо в сроки, установленные законом.</p>
+<h2>Ваши права</h2>
+<p>Вы можете запросить доступ, исправление, удаление или ограничение обработки данных, а также подать жалобу в KVKK (Турция). Для запроса напишите на <a href="mailto:gokhan@cindemir.av.tr">gokhan@cindemir.av.tr</a>.</p>',
+			'zh-hans' => '<h2>我们是谁</h2>
+<p>网站 cindemirlaw.com 由 Cindemir Law Office（伊斯坦布尔）运营。个人数据相关咨询：<a href="mailto:gokhan@cindemir.av.tr">gokhan@cindemir.av.tr</a>。</p>
+<h2>我们处理哪些数据</h2>
+<ul>
+<li>您在联系表单中自愿提供的信息（姓名、电子邮箱、电话、留言内容）；</li>
+<li>服务器技术日志（IP 地址、浏览器类型、访问时间）——用于安全与网站稳定运行；</li>
+<li>必要的技术性 Cookie（例如语言偏好）——保障网站基本功能。</li>
+</ul>
+<h2>处理目的与法律依据</h2>
+<p>数据用于回复咨询、提供法律服务、履行合同及法定义务，并维护律所的合法利益。当您主动提交表单时，无需额外勾选同意框。</p>
+<h2>向第三方提供</h2>
+<p>数据可能由主机服务商、邮件系统及分析工具（如 Google Analytics）在必要范围内处理。通过 WhatsApp 联系时，适用 Meta/WhatsApp 的相关政策。</p>
+<h2>保存期限</h2>
+<p>联系信息在回复咨询及办理案件所需期间内保存，或依照法律要求的期限保存。</p>
+<h2>您的权利</h2>
+<p>您可依法请求查阅、更正、删除或限制处理个人数据，亦可向土耳其 KVKK 机构投诉。请联系 <a href="mailto:gokhan@cindemir.av.tr">gokhan@cindemir.av.tr</a>。</p>',
+		);
+		return isset( $bodies[ $lang ] ) ? $bodies[ $lang ] : '';
+	}
+
+	private static function privacy_lang() {
+		if ( ! empty( $_GET['lang'] ) ) {
+			$get = sanitize_key( wp_unslash( $_GET['lang'] ) );
+			if ( $get ) {
+				return $get;
+			}
+		}
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
+			return (string) ICL_LANGUAGE_CODE;
+		}
+		if ( function_exists( 'apply_filters' ) ) {
+			$wpml = apply_filters( 'wpml_current_language', null );
+			if ( is_string( $wpml ) && '' !== $wpml ) {
+				return $wpml;
+			}
+		}
+		return 'en';
+	}
+
+	private static function privacy_policy_url() {
+		$lang = self::privacy_lang();
+		$url  = home_url( '/privacy-policy/' );
+		if ( $lang && ! in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			$url = add_query_arg( 'lang', $lang, $url );
+		}
+		return $url;
+	}
+
+	/** Contact-form informational notice — no consent checkbox. */
+	private static function privacy_form_notice_strings() {
+		$lang = self::privacy_lang();
+		$map  = array(
+			'en'      => array(
+				'text' => 'When you submit this form, you share your contact details with Cindemir Law Office only so we can respond to your enquiry. See our Privacy Policy for how we process personal data and your rights.',
+				'link' => 'Privacy Policy',
+			),
+			'ru'      => array(
+				'text' => 'Отправляя форму, вы передаёте контактные данные Cindemir Law Office исключительно для ответа на ваш запрос. Подробнее об обработке персональных данных и ваших правах — в Политике конфиденциальности.',
+				'link' => 'Политика конфиденциальности',
+			),
+			'zh-hans' => array(
+				'text' => '提交本表单即表示您向辛德米尔律师事务所提供联系方式，以便我们回复您的咨询。有关个人数据处理及您的权利，请参阅隐私政策。',
+				'link' => '隐私政策',
+			),
+			'zh'      => array(
+				'text' => '提交本表单即表示您向辛德米尔律师事务所提供联系方式，以便我们回复您的咨询。有关个人数据处理及您的权利，请参阅隐私政策。',
+				'link' => '隐私政策',
+			),
+		);
+		return isset( $map[ $lang ] ) ? $map[ $lang ] : $map['en'];
+	}
+
+	private static function render_privacy_form_notice() {
+		if ( is_admin() || ! self::is_contacts_page() ) {
+			return;
+		}
+		$s = self::privacy_form_notice_strings();
+		?>
+<p class="cindemir-privacy-form-notice" style="margin:1rem 0 1.5rem;font-size:14px;line-height:1.55;color:#555;">
+	<?php echo esc_html( $s['text'] ); ?>
+	<a href="<?php echo esc_url( self::privacy_policy_url() ); ?>"><?php echo esc_html( $s['link'] ); ?></a>.
+</p>
+<script>
+(function () {
+	var note = document.querySelector('.cindemir-privacy-form-notice');
+	if (!note) return;
+	var form = document.querySelector('form.avia_ajax_form');
+	if (form && form.parentNode) {
+		form.parentNode.insertBefore(note, form);
+	}
+})();
+</script>
+		<?php
 	}
 
 	/** Stamp every JoinChat / wa.me telephone onto the office WhatsApp number. */
@@ -1066,6 +1303,7 @@ final class Cindemir_Contact_Fixes {
 			self::render_whatsapp_fallback_only();
 			return;
 		}
+		self::render_privacy_form_notice();
 		self::render_whatsapp_fallback_only();
 		self::render_contact_form_fallback_script();
 	}
