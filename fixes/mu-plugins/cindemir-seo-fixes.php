@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.17
+ * Version: 1.9.18
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.17';
+	const VERSION = '1.9.18';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1186,15 +1186,9 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	private static function header_brand_label() {
-		$lang = self::front_lang();
-		$labels = array(
-			'en'      => 'Cindemir Law Office',
-			'tr'      => 'Cindemir Hukuk Bürosu',
-			'ru'      => 'Юридическая фирма Cindemir',
-			'zh-hans' => '辛德米尔律师事务所',
-			'zh'      => '辛德米尔律师事务所',
-		);
-		return isset( $labels[ $lang ] ) ? $labels[ $lang ] : $labels['en'];
+		// Keep a stable Latin brand in the header so RU/ZH labels do not inflate
+		// the logo row and shove the menu/banner around.
+		return 'Cindemir Law Office';
 	}
 
 	public static function header_brand_styles() {
@@ -1208,21 +1202,22 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header #header_main,'
 			. '#top #header #header_main .container,'
 			. '#top #header #header_main .inner-container{'
-			. 'min-height:64px!important;height:auto!important}'
+			. 'min-height:64px!important;height:auto!important;max-height:none}'
 			. '#top #header .logo{'
 			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
 			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
-			. 'z-index:50;align-items:center}'
+			. 'z-index:50;align-items:center;flex:0 1 auto;max-width:min(280px,34vw)!important}'
 			. '#top #header .logo a{'
 			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
-			. 'text-decoration:none!important;max-height:none!important;height:auto!important}'
+			. 'text-decoration:none!important;max-height:none!important;height:auto!important;min-width:0!important}'
 			. '#top #header .logo img,#top #header .logo picture{'
 			. 'display:inline-block!important;max-height:44px!important;width:auto!important;'
-			. 'height:auto!important;opacity:1!important;visibility:visible!important}'
+			. 'height:auto!important;opacity:1!important;visibility:visible!important;flex:0 0 auto}'
 			. '#top #header .logo a::after{'
 			. 'content:"' . $label . '"!important;display:inline-block!important;'
 			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:18px!important;font-weight:700!important;'
-			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap;max-width:min(260px,58vw)}'
+			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap;'
+			. 'overflow:hidden;text-overflow:ellipsis;max-width:min(200px,26vw)!important}'
 			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '#top #header .av-burger-menu-main{'
 			. 'display:block!important;visibility:visible!important;opacity:1!important;'
@@ -1230,23 +1225,25 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header .av-hamburger{display:inline-block!important;visibility:visible!important;'
 			. 'min-width:28px!important;min-height:22px!important}'
 			. '#top #header .cindemir-site-brand{'
-			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
-			. 'text-decoration:none!important;z-index:60;margin-right:12px}'
-			. '#top #header .cindemir-site-brand img{width:44px!important;height:44px!important;object-fit:contain}'
-			. '#top #header .cindemir-site-brand__text{'
-			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:18px!important;font-weight:700!important;'
-			. 'color:#244f4f!important;white-space:nowrap}'
+			. 'display:none!important}'
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
-			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:16px}'
-			. '#top #header .logo a::after{font-size:20px!important;max-width:none}'
+			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
+			. 'flex-wrap:nowrap!important;overflow:hidden}'
+			. '#top #header .logo a::after{font-size:18px!important;max-width:min(220px,22vw)!important}'
 			. '#top #header .main_menu{'
 			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
-			. 'margin-left:auto!important;flex:1 1 auto;text-align:right!important}'
+			. 'margin-left:auto!important;flex:1 1 auto;min-width:0;text-align:right!important}'
+			. '#top #header .av-main-nav{'
+			. 'display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important}'
+			. '#top #header .av-main-nav > li{flex:0 0 auto}'
+			/* Flags in #header_meta already switch language — hide text lang items on desktop so the menu does not wrap/swell. */
+			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			. '}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .logo a::after,#top #header .cindemir-site-brand__text{'
-			. 'font-size:14px!important;white-space:normal!important;max-width:min(180px,48vw)}'
+			. '#top #header .logo a::after{'
+			. 'font-size:14px!important;max-width:min(150px,42vw)!important}'
+			. '#top #header .logo{max-width:min(200px,58vw)!important}'
 			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
 			. '#header_meta{display:block!important;visibility:visible!important;min-height:34px!important}'
 			. '#header_meta .avia_wpml_language_switch{'
@@ -1261,11 +1258,7 @@ final class Cindemir_SEO_Fixes {
 			. '#av-burger-menu-ul .cindemir-lang-item{'
 			. 'display:block!important;border-top:1px solid rgba(0,0,0,.08);margin-top:8px;padding-top:4px}'
 			. '.html_av-overlay-active .cindemir-lang-item a{font-weight:700!important}'
-			. '}'
-			. '@media only screen and (min-width:990px){'
-			. '#top #header .cindemir-lang-item .avia-menu-text{font-size:13px;opacity:.9}'
-			. '#top #header .cindemir-lang-item.avia_current_lang .avia-menu-text,'
-			. '#top #header .cindemir-lang-item.current-menu-item .avia-menu-text{opacity:1;font-weight:700}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			. '}'
 			. '</style>';
 	}
@@ -1498,27 +1491,27 @@ final class Cindemir_SEO_Fixes {
 				'about-us'  => '关于我们',
 				'articles'  => '文章',
 				'services'  => '服务',
-				'team'      => '我们的团队',
+				'team'      => '团队',
 				'contacts'  => '联系我们',
-				'press'     => '媒体报道',
+				'press'     => '媒体',
 			),
 			'zh'      => array(
 				'home'      => '首页',
 				'about-us'  => '关于我们',
 				'articles'  => '文章',
 				'services'  => '服务',
-				'team'      => '我们的团队',
+				'team'      => '团队',
 				'contacts'  => '联系我们',
-				'press'     => '媒体报道',
+				'press'     => '媒体',
 			),
 			'ru'      => array(
 				'home'      => 'Главная',
 				'about-us'  => 'О нас',
 				'articles'  => 'Статьи',
 				'services'  => 'Услуги',
-				'team'      => 'Наша команда',
+				'team'      => 'Команда',
 				'contacts'  => 'Контакты',
-				'press'     => 'О нас в прессе',
+				'press'     => 'Пресса',
 			),
 		);
 	}
