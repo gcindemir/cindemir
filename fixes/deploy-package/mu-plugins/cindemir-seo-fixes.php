@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.28';
+	const VERSION = '1.9.29';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -300,6 +300,130 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_hreflang_links', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
 		add_filter( 'wpseo_opengraph_image', array( __CLASS__, 'rewrite_media_url' ) );
 		add_filter( 'wpseo_twitter_image', array( __CLASS__, 'rewrite_media_url' ) );
+		// Enfold blog/masonry queries often set suppress_filters and leak cross-language posts.
+		foreach ( array(
+			'avia_blog_post_query',
+			'avia_masonry_entries_query',
+			'avia_post_grid_query',
+			'avia_post_slide_query',
+			'avf_magazine_entries_query',
+		) as $avia_q ) {
+			add_filter( $avia_q, array( __CLASS__, 'force_wpml_on_avia_query' ), 5 );
+		}
+		add_action( 'pre_get_posts', array( __CLASS__, 'force_wpml_pre_get_posts' ), 1 );
+		add_filter( 'the_posts', array( __CLASS__, 'filter_posts_by_title_script' ), 20, 2 );
+	}
+
+	/**
+	 * Force WPML-aware Avia blog queries (suppress_filters must stay false).
+	 *
+	 * @param array $query Query args from Enfold shortcodes.
+	 * @return array
+	 */
+	public static function force_wpml_on_avia_query( $query ) {
+		if ( ! is_array( $query ) ) {
+			return $query;
+		}
+		$query['suppress_filters'] = false;
+		return $query;
+	}
+
+	/** Keep secondary front-end post queries WPML-aware. */
+	public static function force_wpml_pre_get_posts( $q ) {
+		if ( is_admin() || ! ( $q instanceof WP_Query ) ) {
+			return;
+		}
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
+		$pt = $q->get( 'post_type' );
+		$is_post = ( empty( $pt ) || 'post' === $pt || 'any' === $pt
+			|| ( is_array( $pt ) && ( in_array( 'post', $pt, true ) || in_array( 'any', $pt, true ) ) ) );
+		if ( ! $is_post ) {
+			return;
+		}
+		if ( $q->get( 'suppress_filters' ) ) {
+			$q->set( 'suppress_filters', false );
+		}
+	}
+
+	/**
+	 * Drop posts whose titles are clearly in another script than the active language.
+	 * Needed when WPML language assignment does not match the actual title language
+	 * (e.g. Cyrillic posts filed under English "uncategorized-en").
+	 *
+	 * @param WP_Post[] $posts Posts.
+	 * @param WP_Query  $query Query.
+	 * @return WP_Post[]
+	 */
+	public static function filter_posts_by_title_script( $posts, $query ) {
+		if ( is_admin() || empty( $posts ) || ! is_array( $posts ) ) {
+			return $posts;
+		}
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return $posts;
+		}
+		// Never hide the main singular document itself.
+		if ( $query instanceof WP_Query && $query->is_main_query() && $query->is_singular() ) {
+			return $posts;
+		}
+		$lang = self::normalize_front_lang( self::front_lang() );
+		$out  = array();
+		foreach ( $posts as $post ) {
+			if ( ! ( $post instanceof WP_Post ) ) {
+				$out[] = $post;
+				continue;
+			}
+			if ( 'post' !== $post->post_type ) {
+				$out[] = $post;
+				continue;
+			}
+			if ( self::title_matches_lang( $post->post_title, $lang ) ) {
+				$out[] = $post;
+			}
+		}
+		return $out;
+	}
+
+	/** Normalize front language codes to en|ru|zh-hans. */
+	private static function normalize_front_lang( $lang ) {
+		$lang = is_string( $lang ) ? strtolower( $lang ) : 'en';
+		if ( in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+			return 'en';
+		}
+		if ( in_array( $lang, array( 'zh', 'zh-hans', 'zh_cn', 'zh-cn' ), true ) ) {
+			return 'zh-hans';
+		}
+		if ( 'ru' === $lang ) {
+			return 'ru';
+		}
+		return $lang;
+	}
+
+	/**
+	 * Whether a post title belongs on the active language listing.
+	 *
+	 * @param string $title Post title.
+	 * @param string $lang  Normalized lang.
+	 * @return bool
+	 */
+	private static function title_matches_lang( $title, $lang ) {
+		$title = is_string( $title ) ? $title : '';
+		if ( '' === $title ) {
+			return true;
+		}
+		$has_cyr = (bool) preg_match( '/\p{Cyrillic}/u', $title );
+		$has_cjk = (bool) preg_match( '/[\x{4E00}-\x{9FFF}]/u', $title );
+		if ( 'en' === $lang ) {
+			return ! $has_cyr && ! $has_cjk;
+		}
+		if ( 'ru' === $lang ) {
+			return $has_cyr;
+		}
+		if ( 'zh-hans' === $lang ) {
+			return $has_cjk;
+		}
+		return true;
 	}
 
 	/** Download TBB badge locally (Ahrefs bots get 403 from d.barobirlik.org.tr). */
@@ -782,8 +906,8 @@ final class Cindemir_SEO_Fixes {
 		if ( $done || is_admin() ) {
 			return;
 		}
-		$lang = self::front_lang();
-		if ( ! $lang || in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
+		$lang = self::normalize_front_lang( self::front_lang() );
+		if ( ! $lang ) {
 			return;
 		}
 		$done = true;
@@ -1388,8 +1512,40 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_menu_label_html( $html );
 		// Language switcher must point at TARGET language, not the current one.
 		$html = self::fix_language_switcher_html( $html );
+		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
 		return $html;
+	}
+
+	/**
+	 * Last-resort: strip blog list entries whose titles are in the wrong script
+	 * for the active front language (covers WP Rocket HTML cache + Avia loops).
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function filter_post_entries_by_lang( $html ) {
+		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'post-entry' ) ) {
+			return $html;
+		}
+		$lang = self::normalize_front_lang( self::front_lang() );
+		return (string) preg_replace_callback(
+			'#<article\b[^>]*\bclass="[^"]*\bpost-entry\b[^"]*"[^>]*>.*?</article>#is',
+			function ( $m ) use ( $lang ) {
+				$block = $m[0];
+				$title = '';
+				if ( preg_match( '/<(?:h[1-6])[^>]*>\s*<a\b[^>]*>(.*?)<\/a>/is', $block, $tm ) ) {
+					$title = wp_strip_all_tags( $tm[1] );
+				} elseif ( preg_match( '/aria-label="Post:\s*([^"]+)"/i', $block, $am ) ) {
+					$title = html_entity_decode( $am[1], ENT_QUOTES, 'UTF-8' );
+				}
+				if ( '' === $title ) {
+					return $block;
+				}
+				return self::title_matches_lang( $title, $lang ) ? $block : '';
+			},
+			$html
+		);
 	}
 
 	/**
