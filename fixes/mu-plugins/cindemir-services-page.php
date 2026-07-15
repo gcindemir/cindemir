@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Services Page Redesign
  * Description: Replaces the cluttered Enfold Services page with a clearer, multilingual layout.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Cindemir Law Office
  */
 
@@ -17,7 +17,7 @@ define( 'CINDEMIR_SERVICES_PAGE_LOADED', true );
 
 final class Cindemir_Services_Page {
 
-	const VERSION = '1.0.0';
+	const VERSION = '1.0.1';
 
 	/** WordPress page IDs: EN services, RU WPML, ZH WPML, RU slug nashiyurist. */
 	private static $page_ids = array( 18, 2638, 2637, 56 );
@@ -61,7 +61,8 @@ final class Cindemir_Services_Page {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		if ( false !== strpos( $html, 'cindemir-services' ) ) {
+		// Detect injected markup only (CSS in <head> also contains "cindemir-services").
+		if ( false !== strpos( $html, 'data-cindemir-services=' ) ) {
 			return $html;
 		}
 

@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.30';
+	const VERSION = '1.9.31';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -549,7 +549,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.2.1' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
-			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.0' ),
+			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.1' ),
 		);
 
 		foreach ( $files as $name => $spec ) {
