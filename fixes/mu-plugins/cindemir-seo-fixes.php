@@ -523,7 +523,7 @@ final class Cindemir_SEO_Fixes {
 		}
 		set_transient( 'cindemir_seo_self_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
 
-		$branch = '11effdd';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
 		$url    = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/cindemir-seo-fixes.php';
 		$response = wp_remote_get(
 			$url,
@@ -560,7 +560,7 @@ final class Cindemir_SEO_Fixes {
 		}
 		set_transient( 'cindemir_sibling_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
 
-		$branch = '11effdd';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
 		$base   = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
 			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.3.9' ),
@@ -621,7 +621,7 @@ final class Cindemir_SEO_Fixes {
 		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
-		$branch = '11effdd';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
 		$base   = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
@@ -3042,7 +3042,7 @@ JS;
 		if ( ! $need ) {
 			return;
 		}
-		$url = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@11effdd/fixes/mu-plugins/cindemir-services-page.php';
+		$url = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@13ffcbc39087d97c75d289b7314b845a9c2068e4/cindemir-services-page.php';
 		$response = wp_remote_get( $url, array( 'timeout' => 45, 'headers' => array( 'User-Agent' => 'CindemirServicesInstall/' . self::VERSION ) ) );
 		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
 			return;
