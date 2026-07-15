@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.27
+ * Version: 1.9.28
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.27';
+	const VERSION = '1.9.28';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1034,6 +1034,33 @@ final class Cindemir_SEO_Fixes {
 		$html = preg_replace( '#\(function\(w,d,s,l,i\)\{[\s\S]*?GTM-T6PQ95[\s\S]*?\}\)\(window,document,\'script\',\'dataLayer\',\'GTM-T6PQ95\'\);#', '', $html );
 		$html = preg_replace( '#<noscript>\s*<iframe[^>]+googletagmanager\.com/ns\.html\?id=GTM-T6PQ95[^>]*>[\s\S]*?</iframe>\s*</noscript>#i', '', $html );
 		$html = preg_replace( '#<!-- Google tag \(gtag\.js\) -->[\s\S]*?GT-WV3LSZHW[\s\S]*?</script>#i', '', $html );
+		$html = preg_replace( '#<!--\s*Global site tag \(gtag\.js\) - Google Ads:[\s\S]*?</script>#i', '', $html );
+		$html = preg_replace( '#<!--\s*Event snippet for[\s\S]*?</script>#i', '', $html );
+		$html = preg_replace( '#<!--\s*Google Tag Manager snippet added by Site Kit\s*-->[\s\S]*?</script>#i', '', $html );
+		$html = preg_replace( '#<!--\s*End Google Tag Manager[^>]*-->#i', '', $html );
+		// Debloat/Rocket often base64-encode Ads/GTM snippets — drop those script tags by decoded payload.
+		$html = preg_replace_callback(
+			'#<script\b([^>]*)>(.*?)</script>#is',
+			static function ( $m ) {
+				$open = $m[1];
+				$inner = $m[2];
+				$blob  = $open . ' ' . $inner;
+				if ( preg_match( '/src=[\"\']data:text\\/javascript;base64,([A-Za-z0-9+\\/=]+)[\"\']/i', $open, $bm ) ) {
+					$decoded = base64_decode( $bm[1], true );
+					if ( is_string( $decoded ) ) {
+						$blob .= ' ' . $decoded;
+					}
+				}
+				if ( false !== strpos( $blob, 'AW-1027764587' )
+					|| false !== strpos( $blob, 'GTM-T6PQ95' )
+					|| false !== strpos( $blob, 'GT-WV3LSZHW' )
+					|| ( false !== strpos( $blob, 'googletagmanager.com/gtm.js' ) && false !== strpos( $blob, 'gtm.start' ) ) ) {
+					return '';
+				}
+				return $m[0];
+			},
+			$html
+		);
 		if ( null === $html ) {
 			return '';
 		}
