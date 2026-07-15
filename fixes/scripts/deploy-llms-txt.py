@@ -14,7 +14,7 @@ PROFILE = Path.home() / ".config/google-chrome"
 BASE = "https://cindemirlaw.com"
 LOG = ROOT / "fixes/llms-deploy.log"
 MU = ROOT / "fixes/mu-plugins"
-ZIP = ROOT / "fixes/deploy-package/cindemir-llms-txt.zip"
+ZIP = ROOT / "fixes/deploy-package/cindemir-llms-txt.zip"  # rebuilt in build_zip()
 
 
 def log(msg: str) -> None:
