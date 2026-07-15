@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.52 + SERVICES_BLANK_FIX_20260715 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.53 + SERVICES_BLANK_FIX_20260715 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.52
+ * Version: 1.9.53
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.52';
+	const VERSION = '1.9.53';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -624,12 +624,11 @@ final class Cindemir_SEO_Fixes {
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$marker = 'SERVICES_BLANK_FIX_20260715';
-		\$sha    = '39052c3a83dd6abce52a01c19b3f56f92171c6a1';
 		$bases  = array(
-			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $sha . '/fixes/mu-plugins/',
-			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $sha . '/fixes/mu-plugins/',
-			'https://raw.githack.com/gcindemir/cindemir/' . $sha . '/fixes/mu-plugins/',
-			'https://github.com/gcindemir/cindemir/raw/' . $sha . '/fixes/mu-plugins/',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
