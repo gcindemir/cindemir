@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.5
+ * Version: 1.3.6
  * Author: Cindemir Law Office
  */
 
@@ -553,20 +553,20 @@ final class Cindemir_Contact_Fixes {
 		$lang = self::privacy_lang();
 		$map  = array(
 			'en'      => array(
-				'text' => 'When you submit this form, you share your contact details with Cindemir Law Office only so we can respond to your enquiry. See our Privacy Policy for how we process personal data and your rights.',
-				'link' => 'Privacy Policy',
+				'text' => 'When you submit this form, personal data is processed under KVKK so we can respond to your enquiry. Details and your rights are in our Privacy Policy.',
+				'link' => 'KVKK / Privacy Policy',
 			),
 			'ru'      => array(
-				'text' => 'Отправляя форму, вы передаёте контактные данные Cindemir Law Office исключительно для ответа на ваш запрос. Подробнее об обработке персональных данных и ваших правах — в Политике конфиденциальности.',
-				'link' => 'Политика конфиденциальности',
+				'text' => 'Отправляя форму, вы передаёте персональные данные Cindemir Law Office в соответствии с KVKK — только для ответа на ваш запрос. Подробнее и ваши права — в Политике конфиденциальности.',
+				'link' => 'KVKK / Политика конфиденциальности',
 			),
 			'zh-hans' => array(
-				'text' => '提交本表单即表示您向辛德米尔律师事务所提供联系方式，以便我们回复您的咨询。有关个人数据处理及您的权利，请参阅隐私政策。',
-				'link' => '隐私政策',
+				'text' => '提交本表单时，我们将依 KVKK 处理您的个人数据，以便回复咨询。详情与您的权利见隐私政策。',
+				'link' => 'KVKK / 隐私政策',
 			),
 			'zh'      => array(
-				'text' => '提交本表单即表示您向辛德米尔律师事务所提供联系方式，以便我们回复您的咨询。有关个人数据处理及您的权利，请参阅隐私政策。',
-				'link' => '隐私政策',
+				'text' => '提交本表单时，我们将依 KVKK 处理您的个人数据，以便回复咨询。详情与您的权利见隐私政策。',
+				'link' => 'KVKK / 隐私政策',
 			),
 		);
 		return isset( $map[ $lang ] ) ? $map[ $lang ] : $map['en'];
