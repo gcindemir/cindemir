@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.5.9
+ * Version: 1.6.0
  * Author: Cindemir Law Office
  */
 
@@ -167,10 +167,23 @@ final class Cindemir_SEO_Fixes {
 		3874 => "Cindemir Law Office'in tarihçesi: Osmanlı mahkemelerinden günümüze uzanan hukuki geçmişi İstanbul üzerinden anlatılır.",
 	);
 
+	/** Neutral SEO titles (TBB-safe, no promotional language). */
+	private static $title_overrides = array(
+		16 => 'About Cindemir Law Office in Istanbul',
+		15 => 'Law Firms in Istanbul - Cindemir Law Office',
+	);
+
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_purge_after_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'apply_meta_descriptions_once' ), 20 );
+		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 21 );
 		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_yoast_metadesc' ), 20 );
+		add_filter( 'wpseo_title', array( __CLASS__, 'filter_yoast_title' ), 20 );
+		add_filter( 'wpseo_opengraph_title', array( __CLASS__, 'filter_yoast_og_title' ), 20 );
+		add_filter( 'wpseo_opengraph_desc', array( __CLASS__, 'filter_yoast_og_desc' ), 20 );
+		add_filter( 'wpseo_twitter_title', array( __CLASS__, 'filter_yoast_og_title' ), 20 );
+		add_filter( 'wpseo_twitter_description', array( __CLASS__, 'filter_yoast_og_desc' ), 20 );
+		add_filter( 'robots_txt', array( __CLASS__, 'filter_robots_txt' ), 99, 2 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
@@ -192,14 +205,16 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 	}
 
-	/** Keep redirecting Press page out of Yoast XML sitemaps. */
+	/** Keep redirecting Press page and utility pages out of Yoast XML sitemaps. */
 	public static function exclude_press_from_sitemap( $ids ) {
 		if ( ! is_array( $ids ) ) {
 			$ids = array();
 		}
-		$press = get_page_by_path( 'press' );
-		if ( $press ) {
-			$ids[] = (int) $press->ID;
+		foreach ( array( 'press', 'antimanual-assistant', 'embed-list' ) as $slug ) {
+			$page = get_page_by_path( $slug );
+			if ( $page ) {
+				$ids[] = (int) $page->ID;
+			}
 		}
 		return array_values( array_unique( array_map( 'intval', $ids ) ) );
 	}
@@ -285,14 +300,16 @@ final class Cindemir_SEO_Fixes {
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::shorten_title_tag( $html );
+		$html = self::apply_title_overrides_html( $html );
 		$html = self::fix_meta_description_html( $html );
+		$html = self::fix_og_tags_html( $html );
 		$html = self::normalize_robots_meta( $html );
 		$html = self::enhance_socket_footer_html( $html );
 		return $html;
 	}
 
 	public static function maybe_purge_after_upgrade() {
-		$version = '1.5.9';
+		$version = '1.6.0';
 		if ( get_option( 'cindemir_seo_fixes_version' ) === $version ) {
 			return;
 		}
@@ -302,6 +319,10 @@ final class Cindemir_SEO_Fixes {
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		delete_option( 'cindemir_seo_titles_v160_applied' );
 		update_option( 'cindemir_seo_fixes_version', $version, false );
 	}
 
@@ -437,6 +458,75 @@ final class Cindemir_SEO_Fixes {
 		return $desc;
 	}
 
+	public static function filter_yoast_title( $title ) {
+		$id = self::current_page_id();
+		if ( $id && isset( self::$title_overrides[ $id ] ) ) {
+			return self::$title_overrides[ $id ];
+		}
+		return $title;
+	}
+
+	public static function filter_yoast_og_title( $title ) {
+		$id = self::current_page_id();
+		if ( $id && isset( self::$title_overrides[ $id ] ) ) {
+			return self::$title_overrides[ $id ];
+		}
+		// Prefer the SEO title over bare post title ("Home Cindemir Law Office").
+		if ( function_exists( 'wpseo_replace_vars' ) && function_exists( 'YoastSEO' ) ) {
+			$seo_title = self::filter_yoast_title( $title );
+			if ( is_string( $seo_title ) && '' !== trim( $seo_title ) ) {
+				return $seo_title;
+			}
+		}
+		return $title;
+	}
+
+	public static function filter_yoast_og_desc( $desc ) {
+		$id = self::current_page_id();
+		if ( $id && isset( self::$meta_descriptions[ $id ] ) ) {
+			return self::$meta_descriptions[ $id ];
+		}
+		if ( function_exists( 'YoastSEO' ) ) {
+			$meta = get_post_meta( $id, '_yoast_wpseo_metadesc', true );
+			if ( is_string( $meta ) && '' !== trim( $meta ) ) {
+				return $meta;
+			}
+		}
+		return $desc;
+	}
+
+	/** Point robots.txt Sitemap to Yoast index URL (avoid 301 hop via /sitemap.xml). */
+	public static function filter_robots_txt( $output, $public ) {
+		$sitemap = 'Sitemap: https://cindemirlaw.com/sitemap_index.xml';
+		$output  = preg_replace( '/^Sitemap:\s*.+$/mi', '', (string) $output );
+		$output  = trim( $output ) . "\n\n" . $sitemap . "\n";
+		return $output;
+	}
+
+	private static function current_page_id() {
+		if ( function_exists( 'is_front_page' ) && is_front_page() ) {
+			$front = (int) get_option( 'page_on_front' );
+			if ( $front ) {
+				return $front;
+			}
+		}
+		return function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+	}
+
+	/** Persist neutral titles into Yoast SEO title meta once after deploy. */
+	public static function apply_title_overrides_once() {
+		if ( get_option( 'cindemir_seo_titles_v160_applied' ) ) {
+			return;
+		}
+		foreach ( self::$title_overrides as $id => $title ) {
+			if ( ! get_post( $id ) ) {
+				continue;
+			}
+			update_post_meta( (int) $id, '_yoast_wpseo_title', $title );
+		}
+		update_option( 'cindemir_seo_titles_v160_applied', 1, false );
+	}
+
 	public static function register_rest_routes() {
 		register_rest_route(
 			'cindemir/v1',
@@ -467,7 +557,7 @@ final class Cindemir_SEO_Fixes {
 		return new WP_REST_Response(
 			array(
 				'ok'      => true,
-				'version' => '1.5.7',
+				'version' => '1.6.0',
 				'pages'   => $results,
 			),
 			200
@@ -492,6 +582,78 @@ final class Cindemir_SEO_Fixes {
 			$html,
 			1
 		);
+		return $html;
+	}
+
+	/** Force neutral titles for About / Home in rendered HTML. */
+	private static function apply_title_overrides_html( $html ) {
+		$id = self::current_page_id();
+		if ( ! $id || ! isset( self::$title_overrides[ $id ] ) ) {
+			return $html;
+		}
+		$title = esc_html( self::$title_overrides[ $id ] );
+		return preg_replace( '/<title>.*?<\/title>/is', '<title>' . $title . '</title>', $html, 1 );
+	}
+
+	/**
+	 * Align Open Graph / Twitter cards with the page <title> and meta description.
+	 * Fixes weak Yoast defaults like "Home Cindemir Law Office".
+	 */
+	private static function fix_og_tags_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+
+		$title = '';
+		if ( preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
+			$title = trim( wp_strip_all_tags( html_entity_decode( $tm[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) );
+		}
+
+		$desc = '';
+		if ( preg_match( '/<meta\s+name=(["\'])description\1[^>]*content=(["\'])(.*?)\2/is', $html, $dm ) ) {
+			$desc = html_entity_decode( $dm[3], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		} elseif ( preg_match( '/<meta\s+content=(["\'])(.*?)\1[^>]*name=(["\'])description\3/is', $html, $dm ) ) {
+			$desc = html_entity_decode( $dm[2], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		}
+
+		$id = self::current_page_id();
+		if ( $id && isset( self::$title_overrides[ $id ] ) ) {
+			$title = self::$title_overrides[ $id ];
+		}
+		if ( $id && isset( self::$meta_descriptions[ $id ] ) ) {
+			$desc = self::$meta_descriptions[ $id ];
+		}
+
+		if ( '' === $title && '' === $desc ) {
+			return $html;
+		}
+
+		if ( '' !== $title ) {
+			$et = esc_attr( $title );
+			$html = self::upsert_meta_tag( $html, 'property', 'og:title', $et );
+			$html = self::upsert_meta_tag( $html, 'name', 'twitter:title', $et );
+		}
+		if ( '' !== $desc ) {
+			$ed = esc_attr( $desc );
+			$html = self::upsert_meta_tag( $html, 'property', 'og:description', $ed );
+			$html = self::upsert_meta_tag( $html, 'name', 'twitter:description', $ed );
+		}
+		return $html;
+	}
+
+	private static function upsert_meta_tag( $html, $attr, $key, $content ) {
+		$pattern = '/<meta\s+' . $attr . '=(["\'])' . preg_quote( $key, '/' ) . '\1[^>]*>/i';
+		$tag     = '<meta ' . $attr . '="' . esc_attr( $key ) . '" content="' . $content . '" />';
+		if ( preg_match( $pattern, $html ) ) {
+			return preg_replace( $pattern, $tag, $html, 1 );
+		}
+		$pattern2 = '/<meta\s+content=(["\'])[^"\']*\1[^>]*' . $attr . '=(["\'])' . preg_quote( $key, '/' ) . '\2[^>]*>/i';
+		if ( preg_match( $pattern2, $html ) ) {
+			return preg_replace( $pattern2, $tag, $html, 1 );
+		}
+		if ( preg_match( '/<\/head>/i', $html ) ) {
+			return preg_replace( '/<\/head>/i', $tag . "\n</head>", $html, 1 );
+		}
 		return $html;
 	}
 
