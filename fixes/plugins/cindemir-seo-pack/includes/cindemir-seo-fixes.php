@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.22
+ * Version: 1.9.23
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.22';
+	const VERSION = '1.9.23';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -890,8 +890,13 @@ final class Cindemir_SEO_Fixes {
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
 		echo '<link rel="dns-prefetch" href="//www.googletagmanager.com">' . "\n";
 		if ( is_front_page() || is_page( 15 ) ) {
-			$hero = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.webp';
-			echo '<link rel="preload" as="image" href="' . esc_url( $hero ) . '" type="image/webp" fetchpriority="high">' . "\n";
+			// Preload the actual on-disk hero (WebP is uploaded alongside when available).
+			$hero_webp = WP_CONTENT_DIR . '/uploads/2020/10/540664430.webp';
+			if ( file_exists( $hero_webp ) ) {
+				echo '<link rel="preload" as="image" href="' . esc_url( content_url( 'uploads/2020/10/540664430.webp' ) ) . '" type="image/webp" fetchpriority="high">' . "\n";
+			} else {
+				echo '<link rel="preload" as="image" href="' . esc_url( content_url( 'uploads/2020/10/540664430.jpg' ) ) . '" fetchpriority="high">' . "\n";
+			}
 		}
 		echo '<style id="cindemir-font-display">@font-face{font-display:swap!important}'
 			. '.avia-font-entypo-fontello,.av-icon-char{font-display:swap}'
@@ -926,6 +931,10 @@ final class Cindemir_SEO_Fixes {
 			. 'color:#ffffff!important}'
 			. '.avia_textblock a{text-decoration:underline!important;text-underline-offset:2px;'
 			. 'color:#1f4f4f!important}'
+			/* White text blocks on teal cards: keep light links, still underlined. */
+			. '.avia_textblock.av_inherit_color a,'
+			. '.av_textblock_section .avia_textblock.av_inherit_color a{'
+			. 'color:#ffffff!important;text-decoration:underline!important;text-underline-offset:2px}'
 			. '.avia-section.alternate_color{background-color:#286060!important}'
 			. '.avia-section.alternate_color .avia_textblock,'
 			. '.avia-section.alternate_color .avia_textblock h3,'
@@ -945,10 +954,13 @@ final class Cindemir_SEO_Fixes {
 		}
 		foreach ( (array) $wp_scripts->registered as $handle => $obj ) {
 			$src = isset( $obj->src ) ? (string) $obj->src : '';
-			if ( false !== strpos( $src, 'accounts.google.com/gsi' )
-				|| false !== strpos( $src, 'gsi/client' )
-				|| false !== strpos( $handle, 'google-one-tap' )
-				|| false !== strpos( $handle, 'googlesitekit-signin' ) ) {
+			$hay = $src . '|' . (string) $handle;
+			if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
+				|| false !== strpos( $hay, 'gsi/client' )
+				|| false !== strpos( $hay, 'google-one-tap' )
+				|| false !== strpos( $hay, 'googlesitekit-signin' )
+				|| false !== strpos( $hay, 'googlesitekit-events-provider' )
+				|| ( false !== strpos( $hay, 'googlesitekit' ) && false !== strpos( $hay, 'signin' ) ) ) {
 				wp_dequeue_script( $handle );
 				wp_deregister_script( $handle );
 			}
@@ -982,31 +994,40 @@ final class Cindemir_SEO_Fixes {
 		if ( null === $html ) {
 			return '';
 		}
-		// Avia marks the main nav as role="menu" (application menu) which conflicts with <li> children.
-		$html = preg_replace(
-			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*)\srole=[\"\']menu[\"\']#i',
-			'$1',
-			$html,
-			1
-		);
+		// Avia marks the main nav as role="menu" with role="menuitem" children —
+		// that conflicts with list semantics. Strip both for a normal <ul>/<li> nav.
 		$html = preg_replace(
 			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*)\srole=[\"\']menu[\"\']#i',
 			'$1',
 			$html
 		);
-		// Also strip role=menu when it appears before id.
 		$html = preg_replace(
 			'#(<ul\b[^>]*)\srole=[\"\']menu[\"\']([^>]*\bid=[\"\']avia-menu[\"\'])#i',
 			'$1$2',
 			$html
 		);
-
-		// Prefer WebP for known large backgrounds / images when files exist on disk / CDN path.
-		$webp_map = array(
-			'/wp-content/uploads/2020/10/540664430.jpg'     => '/wp-content/uploads/2020/10/540664430.webp',
-			'/wp-content/uploads/2020/06/5295681199059.jpg' => '/wp-content/uploads/2020/06/5295681199059.webp',
+		$html = preg_replace_callback(
+			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*>)(.*?)(</ul>)#is',
+			static function ( $m ) {
+				$inner = preg_replace( '/\srole=[\"\']menuitem[\"\']/i', '', $m[2] );
+				return $m[1] . ( null !== $inner ? $inner : $m[2] ) . $m[3];
+			},
+			$html,
+			1
 		);
-		foreach ( $webp_map as $jpg => $webp ) {
+
+		// Prefer WebP only when the optimized file already exists on disk (avoids 404s).
+		$webp_map = array(
+			'/uploads/2020/10/540664430.jpg'     => '/uploads/2020/10/540664430.webp',
+			'/uploads/2020/06/5295681199059.jpg' => '/uploads/2020/06/5295681199059.webp',
+		);
+		foreach ( $webp_map as $jpg_rel => $webp_rel ) {
+			$abs = WP_CONTENT_DIR . $webp_rel;
+			if ( ! file_exists( $abs ) ) {
+				continue;
+			}
+			$jpg  = '/wp-content' . $jpg_rel;
+			$webp = '/wp-content' . $webp_rel;
 			$html = str_replace(
 				array(
 					'https://cindemirlaw.com' . $jpg,
