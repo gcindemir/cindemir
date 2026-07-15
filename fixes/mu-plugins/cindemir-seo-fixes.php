@@ -1,9 +1,10 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.51 + jsdelivr write */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.52 + SERVICES_BLANK_FIX_20260715 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.51
+ * Version: 1.9.52
+ * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
 
@@ -171,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.51';
+	const VERSION = '1.9.52';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -622,7 +623,11 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$marker = 'SERVICES_BLANK_FIX_20260715';
+		$bases  = array(
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+		);
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
 			'cindemir-contact-fixes.php'     => 20000,
@@ -632,25 +637,44 @@ final class Cindemir_SEO_Fixes {
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
-			$response = wp_remote_get(
-				$base . $name,
-				array(
-					'timeout' => 60,
-					'headers' => array( 'User-Agent' => 'CindemirPull/' . self::VERSION ),
-				)
-			);
-			if ( is_wp_error( $response ) ) {
-				$out[ $name ] = array( 'ok' => false, 'error' => $response->get_error_message() );
+			$body = '';
+			$src  = '';
+			foreach ( $bases as $base ) {
+				$response = wp_remote_get(
+					$base . $name . '?v=' . rawurlencode( $marker ),
+					array(
+						'timeout' => 60,
+						'headers' => array(
+							'User-Agent'    => 'CindemirPull/' . self::VERSION,
+							'Cache-Control' => 'no-cache',
+						),
+					)
+				);
+				if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+					continue;
+				}
+				$tmp = (string) wp_remote_retrieve_body( $response );
+				if ( strlen( $tmp ) < $min ) {
+					continue;
+				}
+				if ( in_array( $name, array( 'cindemir-contact-fixes.php', 'cindemir-services-page.php', 'cindemir-purge-cache.php', 'cindemir-seo-fixes.php' ), true )
+					&& false === strpos( $tmp, $marker ) ) {
+					continue;
+				}
+				$body = $tmp;
+				$src  = $base;
+				break;
+			}
+			if ( '' === $body ) {
+				$out[ $name ] = array( 'ok' => false, 'error' => 'no-fresh-source' );
 				continue;
 			}
-			$body  = (string) wp_remote_retrieve_body( $response );
-			$bytes = strlen( $body );
-			if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || $bytes < $min ) {
-				$out[ $name ] = array( 'ok' => false, 'bytes' => $bytes );
-				continue;
+			$dest = trailingslashit( WPMU_PLUGIN_DIR ) . $name;
+			file_put_contents( $dest, $body );
+			if ( function_exists( 'opcache_invalidate' ) ) {
+				@opcache_invalidate( $dest, true );
 			}
-			file_put_contents( trailingslashit( WPMU_PLUGIN_DIR ) . $name, $body );
-			$out[ $name ] = array( 'ok' => true, 'bytes' => $bytes );
+			$out[ $name ] = array( 'ok' => true, 'bytes' => strlen( $body ), 'src' => $src );
 		}
 		delete_option( 'cindemir_seo_fixes_version' );
 		wp_cache_flush();
@@ -3060,20 +3084,32 @@ JS;
 		$need = true;
 		if ( file_exists( $dest ) && filesize( $dest ) > 10000 ) {
 			$local = file_get_contents( $dest );
-			if ( is_string( $local ) && false !== strpos( $local, "data-cindemir-services=" ) && false !== strpos( $local, "VERSION = '1.0.2'" ) ) {
+			if ( is_string( $local ) && false !== strpos( $local, 'SERVICES_BLANK_FIX_20260715' ) && false !== strpos( $local, "VERSION = '1.0.3'" ) ) {
 				$need = false;
 			}
 		}
 		if ( ! $need ) {
 			return;
 		}
-		$url = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@13ffcbc39087d97c75d289b7314b845a9c2068e4/cindemir-services-page.php';
-		$response = wp_remote_get( $url, array( 'timeout' => 45, 'headers' => array( 'User-Agent' => 'CindemirServicesInstall/' . self::VERSION ) ) );
-		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-			return;
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$urls   = array(
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/cindemir-services-page.php?v=SERVICES_BLANK_FIX_20260715',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/cindemir-services-page.php',
+		);
+		$body = '';
+		foreach ( $urls as $url ) {
+			$response = wp_remote_get( $url, array( 'timeout' => 45, 'headers' => array( 'User-Agent' => 'CindemirServicesInstall/' . self::VERSION, 'Cache-Control' => 'no-cache' ) ) );
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				continue;
+			}
+			$tmp = (string) wp_remote_retrieve_body( $response );
+			if ( strlen( $tmp ) < 10000 || false === strpos( $tmp, 'Cindemir_Services_Page' ) || false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) {
+				continue;
+			}
+			$body = $tmp;
+			break;
 		}
-		$body = (string) wp_remote_retrieve_body( $response );
-		if ( strlen( $body ) < 10000 || false === strpos( $body, 'Cindemir_Services_Page' ) ) {
+		if ( '' === $body ) {
 			return;
 		}
 		file_put_contents( $dest, $body );

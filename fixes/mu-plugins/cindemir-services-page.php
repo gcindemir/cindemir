@@ -2,7 +2,8 @@
 /**
  * Plugin Name: Cindemir Services Page Redesign
  * Description: Replaces the cluttered Enfold Services page with a clearer, multilingual layout.
- * Version: 1.0.2
+ * Version: 1.0.3
+ * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
 
@@ -17,7 +18,7 @@ define( 'CINDEMIR_SERVICES_PAGE_LOADED', true );
 
 final class Cindemir_Services_Page {
 
-	const VERSION = '1.0.2';
+	const VERSION = '1.0.3';
 
 	/** WordPress page IDs: EN services, RU WPML, ZH WPML, RU slug nashiyurist. */
 	private static $page_ids = array( 18, 2638, 2637, 56 );
@@ -25,7 +26,9 @@ final class Cindemir_Services_Page {
 	private static $hero_image = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg';
 
 	public static function boot() {
-		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 2 );
+		// Priority 0: start buffer BEFORE contact-fixes (priority 1) so JoinChat
+		// strip runs on the original HTML, not the post-inject giant page.
+		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 0 );
 		add_action( 'wp_head', array( __CLASS__, 'print_assets' ), 40 );
 	}
 
@@ -70,10 +73,11 @@ final class Cindemir_Services_Page {
 		// Prefer replacing the full #main inner HTML so old builder markup is removed.
 		$markup = self::render();
 		// Inject only — do not regex-replace the whole #main body (PCRE backtrack → null → blank page).
+		// Escape $ / \ in markup so preg_replace does not treat them as backrefs.
 		$count = 0;
 		$new   = preg_replace(
 			'#(<div\b[^>]*\bid=(["\'])main\2[^>]*>)#i',
-			'$1' . $markup,
+			'${1}' . addcslashes( $markup, '\\$' ),
 			$html,
 			1,
 			$count

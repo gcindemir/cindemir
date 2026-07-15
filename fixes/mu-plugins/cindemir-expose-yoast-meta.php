@@ -3,12 +3,44 @@
  * Plugin Name: Cindemir – Expose Yoast Meta to REST (pages)
  * Description: Yoast REST expose + one-shot download of cindemir-seo-fixes.php v1.7.0 from GitHub when missing.
  * Author: Cindemir Law
- * Version: 1.2
+ * Version: 1.3
+ * SERVICES_BLANK_FIX_20260715
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+// Emergency: stop broken Services rewrite (pre-1.0.3) that returned empty HTML.
+add_action(
+	'template_redirect',
+	static function () {
+		if ( ! class_exists( 'Cindemir_Services_Page', false ) ) {
+			return;
+		}
+		if ( version_compare( (string) Cindemir_Services_Page::VERSION, '1.0.3', '>=' ) ) {
+			return;
+		}
+		remove_action( 'template_redirect', array( 'Cindemir_Services_Page', 'start_buffer' ), 2 );
+		remove_action( 'template_redirect', array( 'Cindemir_Services_Page', 'start_buffer' ), 0 );
+		remove_action( 'wp_head', array( 'Cindemir_Services_Page', 'print_assets' ), 40 );
+		$GLOBALS['cindemir_services_rescue_active'] = true;
+	},
+	-1
+);
+add_action(
+	'wp_head',
+	static function () {
+		if ( empty( $GLOBALS['cindemir_services_rescue_active'] ) ) {
+			return;
+		}
+		if ( ! function_exists( 'is_page' ) || ! is_page( array( 18, 2638, 2637, 56 ) ) ) {
+			return;
+		}
+		echo '<style id="cindemir-services-rescue-undo">#top.page-id-18 #main > *,#top.page-id-2638 #main > *,#top.page-id-2637 #main > *,#top.page-id-56 #main > *{display:revert!important}</style>';
+	},
+	99
+);
 
 add_action( 'init', function () {
 	$fields = array(
