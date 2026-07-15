@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.24
+ * Version: 1.9.25
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.24';
+	const VERSION = '1.9.25';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -961,7 +961,10 @@ final class Cindemir_SEO_Fixes {
 				|| false !== strpos( $hay, 'google-one-tap' )
 				|| false !== strpos( $hay, 'googlesitekit-signin' )
 				|| false !== strpos( $hay, 'googlesitekit-events-provider' )
-				|| ( false !== strpos( $hay, 'googlesitekit' ) && false !== strpos( $hay, 'signin' ) ) ) {
+				|| ( false !== strpos( $hay, 'googlesitekit' ) && false !== strpos( $hay, 'signin' ) )
+				|| false !== strpos( $hay, 'AW-1027764587' )
+				|| false !== strpos( $hay, 'googleads.g.doubleclick.net' )
+				|| false !== strpos( $hay, 'pagead/viewthroughconversion' ) ) {
 				wp_dequeue_script( $handle );
 				wp_deregister_script( $handle );
 			}
@@ -973,7 +976,10 @@ final class Cindemir_SEO_Fixes {
 			return $tag;
 		}
 		$hay = (string) $src . (string) $handle . (string) $tag;
-		if ( false !== strpos( $hay, 'accounts.google.com/gsi' ) || false !== strpos( $hay, 'gsi/client' ) ) {
+		if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
+			|| false !== strpos( $hay, 'gsi/client' )
+			|| false !== strpos( $hay, 'AW-1027764587' )
+			|| false !== strpos( $hay, 'googleads.g.doubleclick.net' ) ) {
 			return '';
 		}
 		return $tag;
@@ -1012,27 +1018,18 @@ final class Cindemir_SEO_Fixes {
 		if ( null === $html ) {
 			return '';
 		}
+		// Drop broken relativedns prefetch remnants and Ads conversion scripts that
+		// set third-party cookies / deprecated APIs (crush Best Practices score).
+		$html = preg_replace( '#<link[^>]+href=[\"\']https?://cindemirlaw\.com/+www\.[^\"\']+[\"\'][^>]*>#i', '', $html );
+		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion)[^>]*>.*?</script>#is', '', $html );
+		if ( null === $html ) {
+			return '';
+		}
+
 		// Avia marks the main nav as role="menu" with role="menuitem" children —
-		// that conflicts with list semantics. Strip both for a normal <ul>/<li> nav.
-		$html = preg_replace(
-			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*)\srole=[\"\']menu[\"\']#i',
-			'$1',
-			$html
-		);
-		$html = preg_replace(
-			'#(<ul\b[^>]*)\srole=[\"\']menu[\"\']([^>]*\bid=[\"\']avia-menu[\"\'])#i',
-			'$1$2',
-			$html
-		);
-		$html = preg_replace_callback(
-			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*>)(.*?)(</ul>)#is',
-			static function ( $m ) {
-				$inner = preg_replace( '/\srole=[\"\']menuitem[\"\']/i', '', $m[2] );
-				return $m[1] . ( null !== $inner ? $inner : $m[2] ) . $m[3];
-			},
-			$html,
-			1
-		);
+		// that conflicts with list semantics. Strip menu roles site-wide in header nav.
+		$html = preg_replace( '/\srole=[\"\']menu[\"\']/i', '', $html );
+		$html = preg_replace( '/\srole=[\"\']menuitem[\"\']/i', '', $html );
 
 		// Prefer WebP only when the optimized file already exists on disk (avoids 404s).
 		$webp_map = array(
