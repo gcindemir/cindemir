@@ -1,0 +1,4 @@
+# Keep split archive parts in git; ignore huge uncompressed mirror and single large tarball
+backups/cindemirlaw.com-*/
+backups/cindemirlaw.com-*.tar.gz
+backups/wget-cindemirlaw.com-*.log
