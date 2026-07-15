@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.34 + jsdelivr write */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.51 + jsdelivr write */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.34
+ * Version: 1.9.51
  * Author: Cindemir Law Office
  */
 
@@ -171,7 +171,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.34';
+	const VERSION = '1.9.51';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -308,6 +308,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_twitter_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
 		add_filter( 'wpseo_twitter_description', array( __CLASS__, 'filter_page_og_desc' ), 20 );
 		add_filter( 'robots_txt', array( __CLASS__, 'filter_robots_txt' ), 99, 2 );
+		add_action( 'init', array( __CLASS__, 'maybe_rewrite_static_robots' ), 23 );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_utility_from_sitemap' ), 10 );
 		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 22 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
@@ -522,8 +523,8 @@ final class Cindemir_SEO_Fixes {
 		}
 		set_transient( 'cindemir_seo_self_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
 
-		$branch = '11effdd';
-		$url    = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/cindemir-seo-fixes.php';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
+		$url    = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/cindemir-seo-fixes.php';
 		$response = wp_remote_get(
 			$url,
 			array(
@@ -559,13 +560,13 @@ final class Cindemir_SEO_Fixes {
 		}
 		set_transient( 'cindemir_sibling_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
 
-		$branch = '11effdd';
-		$base   = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
 			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.3.9' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
-			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.1' ),
+			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.2' ),
 		);
 
 		foreach ( $files as $name => $spec ) {
@@ -620,8 +621,8 @@ final class Cindemir_SEO_Fixes {
 		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
-		$branch = '11effdd';
-		$base   = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/';
+		Kffcbc39087d97c75d289b7314b845a9c2068e4';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
 			'cindemir-contact-fixes.php'     => 20000,
@@ -2884,6 +2885,31 @@ JS;
 		return $desc;
 	}
 
+
+	/** Overwrite physical /robots.txt if present (Bluehost static file bypasses robots_txt filter). */
+	public static function maybe_rewrite_static_robots() {
+		if ( get_option( 'cindemir_robots_txt_v1935' ) ) {
+			return;
+		}
+		$path = trailingslashit( ABSPATH ) . 'robots.txt';
+		$body = "User-agent: *\nAllow: /\n\n"
+			. "User-agent: OAI-SearchBot\nAllow: /\n\n"
+			. "User-agent: GPTBot\nAllow: /\n\n"
+			. "User-agent: ChatGPT-User\nAllow: /\n\n"
+			. "User-agent: AhrefsBot\nAllow: /\n\n"
+			. "User-agent: Yandex\nAllow: /\n\n"
+			. "Sitemap: https://cindemirlaw.com/sitemap_index.xml\n";
+		if ( file_exists( $path ) ) {
+			if ( ! @unlink( $path ) ) {
+				@file_put_contents( $path, $body );
+			}
+		}
+		update_option( 'cindemir_robots_txt_v1935', 1, false );
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+	}
+
 	public static function filter_robots_txt( $output, $public ) {
 		$sitemap = 'Sitemap: https://cindemirlaw.com/sitemap_index.xml';
 		$output  = preg_replace( '/^Sitemap:\s*.+$/mi', '', (string) $output );
@@ -3034,14 +3060,14 @@ JS;
 		$need = true;
 		if ( file_exists( $dest ) && filesize( $dest ) > 10000 ) {
 			$local = file_get_contents( $dest );
-			if ( is_string( $local ) && false !== strpos( $local, "data-cindemir-services=" ) && false !== strpos( $local, "VERSION = '1.0.1'" ) ) {
+			if ( is_string( $local ) && false !== strpos( $local, "data-cindemir-services=" ) && false !== strpos( $local, "VERSION = '1.0.2'" ) ) {
 				$need = false;
 			}
 		}
 		if ( ! $need ) {
 			return;
 		}
-		$url = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@11effdd/fixes/mu-plugins/cindemir-services-page.php';
+		$url = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@13ffcbc39087d97c75d289b7314b845a9c2068e4/cindemir-services-page.php';
 		$response = wp_remote_get( $url, array( 'timeout' => 45, 'headers' => array( 'User-Agent' => 'CindemirServicesInstall/' . self::VERSION ) ) );
 		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
 			return;
