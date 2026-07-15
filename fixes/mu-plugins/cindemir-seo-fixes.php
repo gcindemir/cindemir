@@ -1333,6 +1333,13 @@ final class Cindemir_SEO_Fixes {
 			. '},true);'
 			. 'if(document.readyState!=="loading")cindemirEnsureBurgerLangs();'
 			. 'else document.addEventListener("DOMContentLoaded",cindemirEnsureBurgerLangs);'
+			. 'function cindemirSyncHeaderH(){'
+			. 'try{var hdr=document.querySelector("#header");if(!hdr)return;'
+			. 'document.documentElement.style.setProperty("--cindemir-header-h",Math.round(hdr.getBoundingClientRect().height||82)+"px");}catch(e){}'
+			. '}'
+			. 'cindemirSyncHeaderH();'
+			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",cindemirSyncHeaderH);'
+			. 'window.addEventListener("resize",cindemirSyncHeaderH);'
 			. '</script>' . "\n";
 	}
 
