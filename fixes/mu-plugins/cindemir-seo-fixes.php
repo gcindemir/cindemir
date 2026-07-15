@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.35 + jsdelivr write */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.36 + jsdelivr write */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.35
+ * Version: 1.9.36
  * Author: Cindemir Law Office
  */
 
@@ -171,7 +171,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.35';
+	const VERSION = '1.9.36';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -308,6 +308,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'wpseo_twitter_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
 		add_filter( 'wpseo_twitter_description', array( __CLASS__, 'filter_page_og_desc' ), 20 );
 		add_filter( 'robots_txt', array( __CLASS__, 'filter_robots_txt' ), 99, 2 );
+		add_action( 'init', array( __CLASS__, 'maybe_rewrite_static_robots' ), 23 );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_utility_from_sitemap' ), 10 );
 		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 22 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
