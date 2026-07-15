@@ -15,6 +15,7 @@ Deploy rehberi: [`fixes/INSTALL.md`](fixes/INSTALL.md)
 | Yoast REST mu-plugin | Hazır | [`fixes/mu-plugins/cindemir-expose-yoast-meta.php`](fixes/mu-plugins/cindemir-expose-yoast-meta.php) |
 | `?lang=` redirect | wp-admin ayarı gerekli | [`fixes/LANG-REDIRECT.md`](fixes/LANG-REDIRECT.md) |
 | Bozuk görseller | mu-plugin v1.5.6 rewrite | [`fixes/BROKEN-IMAGES.md`](fixes/BROKEN-IMAGES.md) |
+| Services sayfa tasarımı | mu-plugin v1.0.0 | [`fixes/SERVICES-PAGE.md`](fixes/SERVICES-PAGE.md) |
 
 ## Backups
 
