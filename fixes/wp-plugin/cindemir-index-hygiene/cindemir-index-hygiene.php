@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Index Hygiene
  * Description: Improves Google index ratio: noindex utility pages, fix RU html lang, replace broken EN↔RU Yoast hreflang pairs.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Cindemir Law Office
  */
 
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class Cindemir_Index_Hygiene {
-	const VERSION = '1.0.0';
+	const VERSION = '1.0.1';
 
 	/** Slugs that should never compete for Google index budget. */
 	const NOINDEX_SLUGS = array(
@@ -57,9 +57,11 @@ final class Cindemir_Index_Hygiene {
 
 		add_filter('language_attributes', array(__CLASS__, 'filter_language_attributes'), 20);
 
-		// Must register before Yoast renders head presenters.
-		add_action('template_redirect', array(__CLASS__, 'maybe_prepare_hreflang_fix'), 5);
-		add_action('wp_head', array(__CLASS__, 'maybe_print_hreflang'), 1);
+		// Strip Yoast/WPML broken alternates on known pairs, then print correct ones.
+		add_filter('wpseo_frontend_presenter_classes', array(__CLASS__, 'remove_yoast_hreflang_presenter'), 99);
+		add_filter('wpseo_frontend_presenters', array(__CLASS__, 'remove_yoast_hreflang_presenter_objects'), 99);
+		add_action('template_redirect', array(__CLASS__, 'maybe_start_hreflang_buffer'), 0);
+		add_action('wp_head', array(__CLASS__, 'maybe_print_hreflang'), 99);
 	}
 
 	private static function current_path() {
@@ -187,35 +189,84 @@ final class Cindemir_Index_Hygiene {
 		return trim($output . ' lang="ru"');
 	}
 
-	public static function maybe_prepare_hreflang_fix() {
+	public static function maybe_start_hreflang_buffer() {
 		if (self::pair_for_current_path() === null) {
 			return;
 		}
-		// Only on known broken EN↔RU pairs: drop Yoast's self-referencing alternates.
-		add_filter('wpseo_frontend_presenter_classes', array(__CLASS__, 'remove_yoast_hreflang_presenter'), 20);
-	}
-
-	public static function maybe_print_hreflang() {
-		$pair = self::pair_for_current_path();
-		if ($pair === null) {
+		if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || (defined('DOING_AJAX') && DOING_AJAX)) {
 			return;
 		}
+		ob_start(array(__CLASS__, 'filter_hreflang_buffer'));
+	}
 
+	public static function filter_hreflang_buffer($html) {
+		if (!is_string($html) || $html === '') {
+			return $html;
+		}
+		// Remove all existing alternate hreflang tags; we print the correct set.
+		$html = preg_replace('/\s*<link[^>]+rel=(["\'])alternate\1[^>]*hreflang=[^>]+>/i', '', $html);
+		$html = preg_replace('/\s*<link[^>]+hreflang=[^>]+rel=(["\'])alternate\1[^>]*>/i', '', $html);
+
+		$pair = self::pair_for_current_path();
+		if ($pair === null) {
+			return $html;
+		}
 		list($en_path, $ru_path) = $pair;
 		$en = home_url($en_path . '/');
 		$ru = home_url($ru_path . '/');
+		$tags = "\n" .
+			'<link rel="alternate" href="' . esc_url($en) . '" hreflang="en" />' . "\n" .
+			'<link rel="alternate" href="' . esc_url($ru) . '" hreflang="ru" />' . "\n" .
+			'<link rel="alternate" href="' . esc_url($en) . '" hreflang="x-default" />' . "\n";
 
+		if (stripos($html, '</head>') !== false) {
+			return preg_replace('/<\/head>/i', $tags . '</head>', $html, 1);
+		}
+		return $html . $tags;
+	}
+
+	public static function maybe_print_hreflang() {
+		// Tags are injected via output buffer near </head> so they survive Yoast/WPML.
+		// Fallback echo if buffering did not start (some page builders).
+		if (self::pair_for_current_path() === null) {
+			return;
+		}
+		if (ob_get_level() > 0) {
+			return;
+		}
+		list($en_path, $ru_path) = self::pair_for_current_path();
+		$en = home_url($en_path . '/');
+		$ru = home_url($ru_path . '/');
 		echo '<link rel="alternate" href="' . esc_url($en) . '" hreflang="en" />' . "\n";
 		echo '<link rel="alternate" href="' . esc_url($ru) . '" hreflang="ru" />' . "\n";
 		echo '<link rel="alternate" href="' . esc_url($en) . '" hreflang="x-default" />' . "\n";
 	}
 
 	public static function remove_yoast_hreflang_presenter($presenters) {
-		if (!is_array($presenters)) {
+		if (self::pair_for_current_path() === null || !is_array($presenters)) {
 			return $presenters;
 		}
 		return array_values(array_filter($presenters, function ($presenter) {
-			return $presenter !== 'Yoast\WP\SEO\Presenters\Rel_Alternate_Presenter';
+			if (!is_string($presenter)) {
+				return true;
+			}
+			return strpos($presenter, 'Rel_Alternate_Presenter') === false
+				&& strpos($presenter, 'Hreflang') === false;
+		}));
+	}
+
+	public static function remove_yoast_hreflang_presenter_objects($presenters) {
+		if (self::pair_for_current_path() === null || !is_array($presenters)) {
+			return $presenters;
+		}
+		return array_values(array_filter($presenters, function ($presenter) {
+			if (!is_object($presenter)) {
+				return true;
+			}
+			$class = get_class($presenter);
+			return strpos($class, 'Rel_Alternate_Presenter') === false
+				&& stripos($class, 'Hreflang') === false
+				&& stripos($class, 'Alternate') === false;
 		}));
 	}
 }

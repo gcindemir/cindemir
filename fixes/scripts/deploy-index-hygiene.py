@@ -56,15 +56,25 @@ def main():
         user = page.locator("#user_login")
         if user.count():
             log(f"user={user.input_value()!r}")
-        page.locator("#wp-submit").click(timeout=10000)
-        time.sleep(10)
+        page.locator("#wp-submit").click(timeout=15000, no_wait_after=True)
+        try:
+            page.wait_for_url("**/wp-admin/**", timeout=60000)
+        except Exception as e:
+            log(f"wait_admin={e}")
+            time.sleep(15)
         log(f"after={page.url}")
         page.screenshot(path=str(ROOT / "fixes/index-hygiene-1.png"), full_page=True)
 
-        if "wp-admin" not in page.url or "login" in page.url.lower():
-            log("LOGIN FAILED")
-            ctx.close()
-            return 1
+        if "wp-admin" not in page.url or "wp-login" in page.url.lower():
+            # Retry once if still on login
+            if page.locator("#wp-submit").count():
+                page.locator("#wp-submit").click(timeout=15000, no_wait_after=True)
+                time.sleep(20)
+                log(f"retry_after={page.url}")
+            if "wp-admin" not in page.url or "wp-login" in page.url.lower():
+                log("LOGIN FAILED")
+                ctx.close()
+                return 1
 
         page.goto(f"{BASE}/wp-admin/plugin-install.php?tab=upload", timeout=90000)
         time.sleep(4)
@@ -75,9 +85,9 @@ def main():
                 log("zip selected")
                 break
         time.sleep(6)
-        page.locator("#install-plugin-submit").click(timeout=15000)
+        page.locator("#install-plugin-submit").click(timeout=15000, no_wait_after=True)
         log("install clicked")
-        time.sleep(30)
+        time.sleep(35)
         page.screenshot(path=str(ROOT / "fixes/index-hygiene-2.png"), full_page=True)
         for sel in [
             'a:has-text("Replace current with uploaded")',
