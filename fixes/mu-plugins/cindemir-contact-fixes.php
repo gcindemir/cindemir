@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.10
+ * Version: 1.3.11
  * Author: Cindemir Law Office
  */
 
@@ -47,6 +47,7 @@ final class Cindemir_Contact_Fixes {
 		add_filter( 'joinchat_disable_front', '__return_true', 100 );
 
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
+		add_action( 'init', array( __CLASS__, 'rewrite_static_robots_once' ), 5 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_html_buffer' ), 1 );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 	}
@@ -308,6 +309,33 @@ final class Cindemir_Contact_Fixes {
 			return false;
 		}
 		return $url;
+	}
+
+
+	/** One-shot: fix physical robots.txt Sitemap target (GSC). */
+	public static function rewrite_static_robots_once() {
+		if ( get_option( 'cindemir_contact_robots_v1311' ) ) {
+			return;
+		}
+		$path = trailingslashit( ABSPATH ) . 'robots.txt';
+		$body = "User-agent: *\nAllow: /\n\n"
+			. "User-agent: OAI-SearchBot\nAllow: /\n\n"
+			. "User-agent: GPTBot\nAllow: /\n\n"
+			. "User-agent: ChatGPT-User\nAllow: /\n\n"
+			. "User-agent: AhrefsBot\nAllow: /\n\n"
+			. "User-agent: Yandex\nAllow: /\n\n"
+			. "Sitemap: https://cindemirlaw.com/sitemap_index.xml\n";
+		if ( file_exists( $path ) ) {
+			if ( ! @unlink( $path ) ) {
+				@file_put_contents( $path, $body );
+			}
+		} else {
+			@file_put_contents( $path, $body );
+		}
+		update_option( 'cindemir_contact_robots_v1311', 1, false );
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
 	}
 
 	public static function register_rest_routes() {
@@ -877,7 +905,7 @@ final class Cindemir_Contact_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$base   = 'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/';
+		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
 			'cindemir-contact-fixes.php'     => 20000,
