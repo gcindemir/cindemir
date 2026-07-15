@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Services Page Redesign
  * Description: Replaces the cluttered Enfold Services page with a clearer, multilingual layout.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Cindemir Law Office
  */
 
@@ -17,7 +17,7 @@ define( 'CINDEMIR_SERVICES_PAGE_LOADED', true );
 
 final class Cindemir_Services_Page {
 
-	const VERSION = '1.0.1';
+	const VERSION = '1.0.2';
 
 	/** WordPress page IDs: EN services, RU WPML, ZH WPML, RU slug nashiyurist. */
 	private static $page_ids = array( 18, 2638, 2637, 56 );
@@ -69,26 +69,19 @@ final class Cindemir_Services_Page {
 		// Enfold Avia keeps most Services content as siblings after a short <main>.
 		// Prefer replacing the full #main inner HTML so old builder markup is removed.
 		$markup = self::render();
-		$count  = 0;
-		$new    = preg_replace(
-			'#(<div\b[^>]*\bid=(["\'])main\2[^>]*>)(.*?)(</div>\s*<!--\s*close default \.container_wrap element\s*-->)#si',
-			'$1' . $markup . '$4',
-			$html,
-			1,
-			$count
-		);
-		if ( $count > 0 ) {
-			return $new;
-		}
-
-		$new = preg_replace(
+		// Inject only — do not regex-replace the whole #main body (PCRE backtrack → null → blank page).
+		$count = 0;
+		$new   = preg_replace(
 			'#(<div\b[^>]*\bid=(["\'])main\2[^>]*>)#i',
 			'$1' . $markup,
 			$html,
 			1,
 			$count
 		);
-		return $count > 0 ? $new : $html;
+		if ( null === $new || $count < 1 ) {
+			return $html;
+		}
+		return $new;
 	}
 
 	private static function lang() {

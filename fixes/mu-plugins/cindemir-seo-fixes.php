@@ -566,7 +566,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.3.9' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
-			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.1' ),
+			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.2' ),
 		);
 
 		foreach ( $files as $name => $spec ) {
@@ -3035,7 +3035,7 @@ JS;
 		$need = true;
 		if ( file_exists( $dest ) && filesize( $dest ) > 10000 ) {
 			$local = file_get_contents( $dest );
-			if ( is_string( $local ) && false !== strpos( $local, "data-cindemir-services=" ) && false !== strpos( $local, "VERSION = '1.0.1'" ) ) {
+			if ( is_string( $local ) && false !== strpos( $local, "data-cindemir-services=" ) && false !== strpos( $local, "VERSION = '1.0.2'" ) ) {
 				$need = false;
 			}
 		}
