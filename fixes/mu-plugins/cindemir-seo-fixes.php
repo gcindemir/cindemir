@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.36 + jsdelivr write */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.37 + jsdelivr write */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.36
+ * Version: 1.9.37
  * Author: Cindemir Law Office
  */
 
@@ -171,7 +171,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.50';
+	const VERSION = '1.9.37';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -2883,6 +2883,31 @@ JS;
 			return $meta;
 		}
 		return $desc;
+	}
+
+
+	/** Overwrite physical /robots.txt if present (Bluehost static file bypasses robots_txt filter). */
+	public static function maybe_rewrite_static_robots() {
+		if ( get_option( 'cindemir_robots_txt_v1935' ) ) {
+			return;
+		}
+		$path = trailingslashit( ABSPATH ) . 'robots.txt';
+		$body = "User-agent: *\nAllow: /\n\n"
+			. "User-agent: OAI-SearchBot\nAllow: /\n\n"
+			. "User-agent: GPTBot\nAllow: /\n\n"
+			. "User-agent: ChatGPT-User\nAllow: /\n\n"
+			. "User-agent: AhrefsBot\nAllow: /\n\n"
+			. "User-agent: Yandex\nAllow: /\n\n"
+			. "Sitemap: https://cindemirlaw.com/sitemap_index.xml\n";
+		if ( file_exists( $path ) ) {
+			if ( ! @unlink( $path ) ) {
+				@file_put_contents( $path, $body );
+			}
+		}
+		update_option( 'cindemir_robots_txt_v1935', 1, false );
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
 	}
 
 	public static function filter_robots_txt( $output, $public ) {
