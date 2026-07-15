@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.19
+ * Version: 1.9.20
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.19';
+	const VERSION = '1.9.20';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1225,10 +1225,9 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header .av-hamburger{display:inline-block!important;visibility:visible!important;'
 			. 'min-width:28px!important;min-height:22px!important}'
 			. '#top #header .cindemir-site-brand{display:none!important}'
-			/* Keep socials in meta, but remove the top flag strip — languages live in the main menu. */
-			. '#header_meta .avia_wpml_language_switch,'
-			. '#header_meta .wpml-ls,'
-			. '#header_meta .sub_menu{display:none!important}'
+			/* Drop the entire top meta strip (socials + old lang bar). Socials already live in the footer. */
+			. '#top #header #header_meta,'
+			. '#header_meta{display:none!important;height:0!important;min-height:0!important;overflow:hidden!important;padding:0!important;margin:0!important;border:0!important}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item{'
 			. 'display:inline-flex!important;align-items:center;margin-left:2px}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item:first-of-type,'
