@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.20
+ * Version: 1.9.21
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.20';
+	const VERSION = '1.9.21';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1261,6 +1261,16 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header .logo{max-width:min(200px,58vw)!important}'
 			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
+			/* Enfold forces #header {position:relative} under .responsive — restore sticky so the burger follows scroll. */
+			. '.responsive.html_header_sticky #top #wrap_all #header,'
+			. '.responsive #top #wrap_all #header.av_header_sticky,'
+			. 'html.responsive #top #wrap_all #header{'
+			. 'position:fixed!important;top:0!important;left:0!important;right:0!important;'
+			. 'width:100%!important;float:none!important;z-index:1001!important;margin:0!important;'
+			. 'background-color:#fff!important;box-shadow:0 1px 0 rgba(0,0,0,.06)}'
+			. '.responsive.html_header_sticky #top #main,'
+			. 'html.responsive #top #main{'
+			. 'padding-top:var(--cindemir-header-h,82px)!important;margin-top:0!important}'
 			. '.html_av-overlay-active .cindemir-lang-item,'
 			. '#av-burger-menu-ul .cindemir-lang-item{'
 			. 'display:block!important;border-top:1px solid rgba(0,0,0,.08);margin-top:8px;padding-top:4px}'
@@ -1392,8 +1402,18 @@ final class Cindemir_SEO_Fixes {
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>\';'
 			. 'inner.insertBefore(a,inner.firstChild);'
 			. '}'
-			. 'function run(){fixSwitcher();stampLang();runBrand();}'
+			. 'function syncHeaderHeight(){'
+			. 'try{'
+			. 'var hdr=document.querySelector("#header");'
+			. 'if(!hdr)return;'
+			. 'var h=Math.round(hdr.getBoundingClientRect().height)||82;'
+			. 'document.documentElement.style.setProperty("--cindemir-header-h",h+"px");'
+			. '}catch(e){}'
+			. '}'
+			. 'function run(){fixSwitcher();stampLang();runBrand();syncHeaderHeight();}'
 			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();'
+			. 'window.addEventListener("resize",syncHeaderHeight);'
+			. 'window.addEventListener("orientationchange",syncHeaderHeight);'
 			. 'document.addEventListener("click",function(ev){'
 			. 'var li=ev.target&&ev.target.closest&&ev.target.closest("li[class*=\\"language_\\"],li[class*=\\"wpml-ls-item-\\"]");'
 			. 'if(li){'
