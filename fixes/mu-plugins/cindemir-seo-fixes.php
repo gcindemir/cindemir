@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.14
+ * Version: 1.9.15
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.14';
+	const VERSION = '1.9.15';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -250,8 +250,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_legacy_media_in_content' ), 15 );
-		add_action( 'wp_footer', array( __CLASS__, 'privacy_footer_notice' ), 19 );
-		add_action( 'wp_footer', array( __CLASS__, 'orphan_links' ), 20 );
+		add_action( 'wp_head', array( __CLASS__, 'footer_meta_styles' ), 51 );
+		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
 		add_action( 'wp_head', array( __CLASS__, 'language_switcher_boot_script' ), 0 );
@@ -1769,17 +1769,40 @@ final class Cindemir_SEO_Fixes {
 		);
 	}
 
-	public static function orphan_links() {
+	public static function footer_meta_styles() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<style id="cindemir-footer-meta-css">#socket .cindemir-footer-meta{margin-top:2px;font-size:11px;line-height:1.35;opacity:.92}#socket .cindemir-footer-meta nav{display:inline}#socket .cindemir-footer-meta a{color:inherit;text-decoration:none}#socket .cindemir-footer-meta a:hover{text-decoration:underline}#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.85}#socket .cindemir-footer-meta .sep{opacity:.55;margin:0 .25em}</style>' . "\n";
+	}
+
+	/** Compact footer row inside theme socket — privacy links + short KVKK note, no extra block height. */
+	public static function render_compact_footer_meta() {
 		if ( is_admin() ) {
 			return;
 		}
 		$s = self::privacy_strings();
-		echo "\n<nav class=\"cindemir-orphan-links\" aria-label=\"Additional pages\" style=\"max-width:1200px;margin:0 auto 1rem;padding:0 20px;font-size:14px;\">";
-		echo '<a href="' . esc_url( self::with_front_lang( home_url( '/privacy-policy/' ) ) ) . '">' . esc_html( $s['link'] ) . '</a> · ';
-		echo '<a href="' . esc_url( self::with_front_lang( home_url( '/our-videos/' ) ) ) . '">' . esc_html( $s['videos'] ) . '</a> · ';
-		echo '<a href="' . esc_url( self::with_front_lang( home_url( '/appointment/' ) ) ) . '">' . esc_html( $s['appointment'] ) . '</a> · ';
-		echo '<a href="' . esc_url( self::with_front_lang( home_url( '/about-us/' ) ) ) . '">' . esc_html( $s['about'] ) . '</a>';
-		echo "</nav>\n";
+		?>
+<div class="cindemir-footer-meta" hidden aria-hidden="true">
+	<nav class="cindemir-footer-links" aria-label="<?php echo esc_attr( $s['nav_label'] ); ?>">
+		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/privacy-policy/' ) ) ); ?>"><?php echo esc_html( $s['link'] ); ?></a><span class="sep">·</span>
+		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/our-videos/' ) ) ); ?>"><?php echo esc_html( $s['videos'] ); ?></a><span class="sep">·</span>
+		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/appointment/' ) ) ); ?>"><?php echo esc_html( $s['appointment'] ); ?></a><span class="sep">·</span>
+		<a href="<?php echo esc_url( self::with_front_lang( home_url( '/about-us/' ) ) ); ?>"><?php echo esc_html( $s['about'] ); ?></a>
+	</nav>
+	<span class="cindemir-footer-note"> <?php echo esc_html( $s['note'] ); ?></span>
+</div>
+<script>
+(function () {
+	var meta = document.querySelector('.cindemir-footer-meta');
+	var socket = document.querySelector('#socket .container');
+	if (!meta || !socket) return;
+	meta.removeAttribute('hidden');
+	meta.setAttribute('aria-hidden', 'false');
+	socket.appendChild(meta);
+})();
+</script>
+		<?php
 	}
 
 	/** Short KVKK / privacy disclosure labels (no consent checkbox). */
@@ -1787,51 +1810,42 @@ final class Cindemir_SEO_Fixes {
 		$lang = self::front_lang();
 		$map  = array(
 			'en'      => array(
-				'link'        => 'Privacy Policy',
-				'videos'      => 'Our Videos',
-				'appointment' => 'Book an Appointment',
-				'about'       => 'About Us',
-				'footer'      => 'Personal data is processed as described in our Privacy Policy. Only essential technical cookies are used to keep the site working.',
+				'nav_label'   => 'Legal and site links',
+				'link'        => 'Privacy',
+				'videos'      => 'Videos',
+				'appointment' => 'Appointment',
+				'about'       => 'About',
+				'note'        => '· Essential cookies only.',
 			),
 			'ru'      => array(
-				'link'        => 'Политика конфиденциальности',
-				'videos'      => 'Наши видео',
-				'appointment' => 'Записаться на приём',
+				'nav_label'   => 'Правовые и служебные ссылки',
+				'link'        => 'Конфиденциальность',
+				'videos'      => 'Видео',
+				'appointment' => 'Запись',
 				'about'       => 'О нас',
-				'footer'      => 'Персональные данные обрабатываются в соответствии с нашей Политикой конфиденциальности. Используются только необходимые технические cookie для работы сайта.',
+				'note'        => '· Только необходимые cookie.',
 			),
 			'zh-hans' => array(
-				'link'        => '隐私政策',
-				'videos'      => '我们的视频',
-				'appointment' => '预约咨询',
-				'about'       => '关于我们',
-				'footer'      => '个人数据的处理请参阅我们的隐私政策。网站仅使用保障正常运行所必需的技术性 Cookie。',
+				'nav_label'   => '法律与网站链接',
+				'link'        => '隐私',
+				'videos'      => '视频',
+				'appointment' => '预约',
+				'about'       => '关于',
+				'note'        => '· 仅使用必要 Cookie。',
 			),
 			'zh'      => array(
-				'link'        => '隐私政策',
-				'videos'      => '我们的视频',
-				'appointment' => '预约咨询',
-				'about'       => '关于我们',
-				'footer'      => '个人数据的处理请参阅我们的隐私政策。网站仅使用保障正常运行所必需的技术性 Cookie。',
+				'nav_label'   => '法律与网站链接',
+				'link'        => '隐私',
+				'videos'      => '视频',
+				'appointment' => '预约',
+				'about'       => '关于',
+				'note'        => '· 仅使用必要 Cookie。',
 			),
 		);
 		if ( isset( $map[ $lang ] ) ) {
 			return $map[ $lang ];
 		}
 		return $map['en'];
-	}
-
-	/** Site-wide informational privacy notice — no cookie banner or consent checkbox. */
-	public static function privacy_footer_notice() {
-		if ( is_admin() ) {
-			return;
-		}
-		$s    = self::privacy_strings();
-		$href = self::with_front_lang( home_url( '/privacy-policy/' ) );
-		echo "\n<p class=\"cindemir-privacy-notice\" style=\"max-width:1200px;margin:0 auto 1.25rem;padding:0 20px;font-size:13px;line-height:1.5;color:#666;\">";
-		echo esc_html( $s['footer'] ) . ' ';
-		echo '<a href="' . esc_url( $href ) . '">' . esc_html( $s['link'] ) . '</a>';
-		echo "</p>\n";
 	}
 
 	/** True when utility/tag URLs must stay out of the index. */
