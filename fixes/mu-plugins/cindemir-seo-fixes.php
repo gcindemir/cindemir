@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.18
+ * Version: 1.9.19
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.18';
+	const VERSION = '1.9.19';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1224,8 +1224,27 @@ final class Cindemir_SEO_Fixes {
 			. 'min-width:44px!important;min-height:44px!important;line-height:44px!important}'
 			. '#top #header .av-hamburger{display:inline-block!important;visibility:visible!important;'
 			. 'min-width:28px!important;min-height:22px!important}'
-			. '#top #header .cindemir-site-brand{'
-			. 'display:none!important}'
+			. '#top #header .cindemir-site-brand{display:none!important}'
+			/* Keep socials in meta, but remove the top flag strip — languages live in the main menu. */
+			. '#header_meta .avia_wpml_language_switch,'
+			. '#header_meta .wpml-ls,'
+			. '#header_meta .sub_menu{display:none!important}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item{'
+			. 'display:inline-flex!important;align-items:center;margin-left:2px}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item:first-of-type,'
+			. '#top #header .av-main-nav > li.cindemir-lang-item.cindemir-lang-first{'
+			. 'margin-left:14px;padding-left:14px;border-left:1px solid rgba(36,79,79,.18)}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item > a{'
+			. 'display:inline-flex!important;align-items:center!important;gap:6px!important;'
+			. 'padding:0 8px!important;min-height:44px}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item .cindemir-lang-flag{'
+			. 'display:inline-block;width:18px;height:12px;object-fit:cover;border-radius:2px;'
+			. 'box-shadow:0 0 0 1px rgba(0,0,0,.08);flex:0 0 auto}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item .avia-menu-text{'
+			. 'font-size:12px!important;font-weight:600!important;letter-spacing:.02em;opacity:.88}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item.avia_current_lang .avia-menu-text,'
+			. '#top #header .av-main-nav > li.cindemir-lang-item.current-menu-item .avia-menu-text{opacity:1;font-weight:700!important}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item .avia-menu-fx{display:none!important}'
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
 			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
@@ -1237,28 +1256,20 @@ final class Cindemir_SEO_Fixes {
 			. '#top #header .av-main-nav{'
 			. 'display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important}'
 			. '#top #header .av-main-nav > li{flex:0 0 auto}'
-			/* Flags in #header_meta already switch language — hide text lang items on desktop so the menu does not wrap/swell. */
-			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			. '}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .logo a::after{'
-			. 'font-size:14px!important;max-width:min(150px,42vw)!important}'
+			. '#top #header .logo a::after{font-size:14px!important;max-width:min(150px,42vw)!important}'
 			. '#top #header .logo{max-width:min(200px,58vw)!important}'
 			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
-			. '#header_meta{display:block!important;visibility:visible!important;min-height:34px!important}'
-			. '#header_meta .avia_wpml_language_switch{'
-			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
-			. 'align-items:center;gap:8px;overflow:visible!important;flex-wrap:nowrap}'
-			. '#header_meta .avia_wpml_language_switch li,'
-			. '#header_meta .avia_wpml_language_switch .language_flag,'
-			. '#header_meta .avia_wpml_language_switch img{'
-			. 'display:inline-block!important;visibility:visible!important;opacity:1!important;'
-			. 'width:22px!important;height:auto!important;max-width:22px!important}'
+			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			. '.html_av-overlay-active .cindemir-lang-item,'
 			. '#av-burger-menu-ul .cindemir-lang-item{'
 			. 'display:block!important;border-top:1px solid rgba(0,0,0,.08);margin-top:8px;padding-top:4px}'
-			. '.html_av-overlay-active .cindemir-lang-item a{font-weight:700!important}'
-			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
+			. '.html_av-overlay-active .cindemir-lang-item a,'
+			. '#av-burger-menu-ul .cindemir-lang-item a{'
+			. 'display:flex!important;align-items:center;gap:10px;font-weight:700!important}'
+			. '.html_av-overlay-active .cindemir-lang-flag,'
+			. '#av-burger-menu-ul .cindemir-lang-flag{width:22px;height:15px;border-radius:2px}'
 			. '}'
 			. '</style>';
 	}
@@ -1290,13 +1301,19 @@ final class Cindemir_SEO_Fixes {
 			. 'var ul=document.querySelector("#av-burger-menu-ul");'
 			. 'if(!ul||ul.querySelector(".cindemir-lang-item"))return;'
 			. 'var path=location.pathname||"/";'
-			. 'var langs=[["en","English"],["zh-hans","中文"],["ru","Русский"]];'
-			. 'langs.forEach(function(pair){'
+			. 'var origin=location.origin||"https://cindemirlaw.com";'
+			. 'var langs=['
+			. '["en","EN",origin+"/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png"],'
+			. '["zh-hans","中文",origin+"/wp-content/uploads/flags/china-flag-xs.png"],'
+			. '["ru","RU",origin+"/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png"]'
+			. '];'
+			. 'langs.forEach(function(pair,idx){'
 			. 'var li=document.createElement("li");'
-			. 'li.className="menu-item cindemir-lang-item language_"+pair[0];'
+			. 'li.className="menu-item cindemir-lang-item language_"+pair[0]+(idx===0?" cindemir-lang-first":"");'
 			. 'var a=document.createElement("a");'
 			. 'a.href=pair[0]==="en"?(path+"?cindemir_lang=en"):(path+((path.indexOf("?")>=0?"&":"?")+"lang="+pair[0]));'
-			. 'a.innerHTML="<span class=\\"avia-menu-text\\">"+pair[1]+"</span>";'
+			. 'a.setAttribute("hreflang",pair[0]);'
+			. 'a.innerHTML="<img class=\\"cindemir-lang-flag\\" src=\\""+pair[2]+"\\" alt=\\"\\" width=\\"18\\" height=\\"12\\" loading=\\"lazy\\" decoding=\\"async\\"><span class=\\"avia-menu-text\\">"+pair[1]+"</span>";'
 			. 'li.appendChild(a);ul.appendChild(li);'
 			. '});'
 			. '}'
@@ -1356,7 +1373,7 @@ final class Cindemir_SEO_Fixes {
 			. 'try{'
 			. 'var a=links[i],raw=a.getAttribute("href");'
 			. 'if(!raw)continue;'
-			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls"))continue;'
+			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))continue;'
 			. 'var u=new URL(raw,location.origin);'
 			. 'if(u.hostname!==location.hostname)continue;'
 			. 'if(u.searchParams.get("lang"))continue;'
@@ -1402,7 +1419,7 @@ final class Cindemir_SEO_Fixes {
 			. 'if(!t)return;'
 			. 'try{'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
-			. 'if(t.closest&&t.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls"))return;'
+			. 'if(t.closest&&t.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))return;'
 			. 'var u=new URL(t.getAttribute("href"),location.origin);'
 			. 'if(u.hostname!==location.hostname)return;'
 			. 'if(u.searchParams.get("lang"))return;'
@@ -1626,9 +1643,8 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Append visible EN / 中文 / Русский entries to the primary Avia menu
-	 * so languages appear inside the desktop nav and mobile burger (not only
-	 * as tiny flags in #header_meta).
+	 * Append compact flag + code language entries to the primary Avia menu.
+	 * Meta-bar WPML flags are hidden; languages live in the main nav / burger.
 	 */
 	public static function append_lang_items_to_menu( $items, $args ) {
 		if ( is_admin() || ! is_string( $items ) ) {
@@ -1652,15 +1668,31 @@ final class Cindemir_SEO_Fixes {
 		$path    = ( ! $path || '/' === $path ) ? '/' : user_trailingslashit( $path );
 		$base    = 'https://cindemirlaw.com' . ( '/' === $path ? '/' : $path );
 		$langs   = array(
-			'en'      => array( 'label' => 'English', 'url' => self::language_target_url( 'en', $base ) ),
-			'zh-hans' => array( 'label' => '中文', 'url' => self::language_target_url( 'zh-hans', $base ) ),
-			'ru'      => array( 'label' => 'Русский', 'url' => self::language_target_url( 'ru', $base ) ),
+			'en'      => array(
+				'label' => 'EN',
+				'url'   => self::language_target_url( 'en', $base ),
+				'flag'  => 'https://cindemirlaw.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png',
+			),
+			'zh-hans' => array(
+				'label' => '中文',
+				'url'   => self::language_target_url( 'zh-hans', $base ),
+				'flag'  => 'https://cindemirlaw.com/wp-content/uploads/flags/china-flag-xs.png',
+			),
+			'ru'      => array(
+				'label' => 'RU',
+				'url'   => self::language_target_url( 'ru', $base ),
+				'flag'  => 'https://cindemirlaw.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/ru.png',
+			),
 		);
-		$html = '';
+		$html  = '';
+		$first = true;
 		foreach ( $langs as $code => $info ) {
 			$active = ( $current === $code || ( 'zh' === $current && 'zh-hans' === $code ) ) ? ' avia_current_lang current-menu-item' : '';
-			$html  .= '<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-top-level cindemir-lang-item language_' . esc_attr( $code ) . $active . '">'
+			$extra  = $first ? ' cindemir-lang-first' : '';
+			$first  = false;
+			$html  .= '<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-top-level cindemir-lang-item language_' . esc_attr( $code ) . $extra . $active . '">'
 				. '<a href="' . esc_attr( $info['url'] ) . '" hreflang="' . esc_attr( $code ) . '">'
+				. '<img class="cindemir-lang-flag" src="' . esc_attr( $info['flag'] ) . '" alt="" width="18" height="12" loading="lazy" decoding="async" />'
 				. '<span class="avia-menu-text">' . esc_html( $info['label'] ) . '</span>'
 				. '</a></li>';
 		}
