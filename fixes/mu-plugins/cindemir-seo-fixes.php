@@ -549,6 +549,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.2.1' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
+			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.0' ),
 		);
 
 		foreach ( $files as $name => $spec ) {
@@ -610,6 +611,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
+			'cindemir-services-page.php'     => 10000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {

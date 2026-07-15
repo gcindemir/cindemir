@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.7
+ * Version: 1.3.8
  * Author: Cindemir Law Office
  */
 
@@ -883,6 +883,7 @@ final class Cindemir_Contact_Fixes {
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
+			'cindemir-services-page.php'     => 10000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
