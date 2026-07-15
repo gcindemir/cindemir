@@ -5,3 +5,8 @@ backups/wget-cindemirlaw.com-*.log
 
 # SSH deploy key (never commit)
 fixes/.ssh/
+
+# Live site backups (may contain DB/secrets)
+fixes/backups/cindemirlaw-*/
+fixes/backups/*.sql
+fixes/backups/*-FULL.tar.gz

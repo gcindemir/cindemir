@@ -1589,7 +1589,8 @@ final class Cindemir_SEO_Fixes {
 		if ( false === stripos( $html, 'avia_ajax_form' ) ) {
 			return $html;
 		}
-		$script = self::contact_form_fallback_script_tag();
+		$original = $html;
+		$script   = self::contact_form_fallback_script_tag();
 		// Drop any prior copy (inline or Debloat data-URI) so only one handler remains.
 		$html = preg_replace(
 			'#<script\b[^>]*(?:id=["\']cindemir-contact-form-fallback-js["\']|cindemir-contact-form-fallback)[^>]*>[\s\S]*?</script>#i',
@@ -1597,10 +1598,11 @@ final class Cindemir_SEO_Fixes {
 			$html
 		);
 		if ( null === $html ) {
-			return '';
+			$html = $original;
 		}
 		if ( false !== stripos( $html, '</body>' ) ) {
-			return (string) preg_replace( '#</body>#i', $script . "\n</body>", $html, 1 );
+			$next = preg_replace( '#</body>#i', $script . "\n</body>", $html, 1 );
+			return is_string( $next ) ? $next : ( $html . $script );
 		}
 		return $html . $script;
 	}

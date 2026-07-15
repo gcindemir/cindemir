@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Services Page Redesign
  * Description: Replaces the cluttered Enfold Services page with a clearer, multilingual layout.
- * Version: 1.0.3
+ * Version: 1.0.4
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -18,7 +18,7 @@ define( 'CINDEMIR_SERVICES_PAGE_LOADED', true );
 
 final class Cindemir_Services_Page {
 
-	const VERSION = '1.0.3';
+	const VERSION = '1.0.4';
 
 	/** WordPress page IDs: EN services, RU WPML, ZH WPML, RU slug nashiyurist. */
 	private static $page_ids = array( 18, 2638, 2637, 56 );
@@ -61,6 +61,7 @@ final class Cindemir_Services_Page {
 	}
 
 	public static function rewrite_html( $html ) {
+		$original = is_string( $html ) ? $html : '';
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
@@ -69,23 +70,33 @@ final class Cindemir_Services_Page {
 			return $html;
 		}
 
-		// Enfold Avia keeps most Services content as siblings after a short <main>.
-		// Prefer replacing the full #main inner HTML so old builder markup is removed.
 		$markup = self::render();
-		// Inject only — do not regex-replace the whole #main body (PCRE backtrack → null → blank page).
-		// Escape $ / \ in markup so preg_replace does not treat them as backrefs.
-		$count = 0;
-		$new   = preg_replace(
-			'#(<div\b[^>]*\bid=(["\'])main\2[^>]*>)#i',
-			'${1}' . addcslashes( $markup, '\\$' ),
-			$html,
-			1,
-			$count
-		);
-		if ( null === $new || $count < 1 ) {
-			return $html;
+		if ( ! is_string( $markup ) || '' === $markup ) {
+			return $original;
+		}
+
+		// Avoid preg_replace + nested output buffers inside an ob callback (both blanked /services/).
+		$new = self::inject_after_main_open( $html, $markup );
+		if ( ! is_string( $new ) || '' === $new ) {
+			return $original;
 		}
 		return $new;
+	}
+
+	/** String inject after `#main` open tag — no PCRE, safe inside ob callbacks. */
+	private static function inject_after_main_open( $html, $markup ) {
+		$pos = stripos( $html, 'id="main"' );
+		if ( false === $pos ) {
+			$pos = stripos( $html, "id='main'" );
+		}
+		if ( false === $pos ) {
+			return $html;
+		}
+		$gt = strpos( $html, '>', $pos );
+		if ( false === $gt ) {
+			return $html;
+		}
+		return substr( $html, 0, $gt + 1 ) . $markup . substr( $html, $gt + 1 );
 	}
 
 	private static function lang() {
@@ -583,79 +594,66 @@ final class Cindemir_Services_Page {
 		);
 	}
 
+	/**
+	 * Build redesign HTML as a string.
+	 * Must NOT use nested ob_start() — rewrite_html runs inside an output-buffer
+	 * callback; nested buffering blanks /services/ (HTTP 200, 0 bytes).
+	 */
 	private static function render() {
 		$c        = self::copy();
 		$img      = esc_url( self::$hero_image );
 		$services = $c['services'];
 
-		ob_start();
-		?>
-<div class="cindemir-services" data-cindemir-services="1">
-	<section class="cindemir-services__hero" aria-label="<?php echo esc_attr( $c['headline'] ); ?>">
-		<div class="cindemir-services__hero-media" role="img" aria-label="Istanbul" style="--cindemir-hero:url('<?php echo $img; ?>')"></div>
-		<div class="cindemir-services__hero-shade"></div>
-		<div class="cindemir-services__hero-inner">
-			<p class="cindemir-services__brand"><?php echo esc_html( $c['brand'] ); ?></p>
-			<h1 class="cindemir-services__title"><?php echo esc_html( $c['headline'] ); ?></h1>
-			<p class="cindemir-services__lead"><?php echo esc_html( $c['lead'] ); ?></p>
-			<p class="cindemir-services__cta-wrap">
-				<a class="cindemir-services__cta" href="<?php echo esc_url( $c['cta_url'] ); ?>"><?php echo esc_html( $c['cta'] ); ?></a>
-			</p>
-		</div>
-	</section>
+		$nav = '';
+		foreach ( $services as $svc ) {
+			$nav .= '<li><a href="#svc-' . esc_attr( $svc['id'] ) . '">' . esc_html( $svc['title'] ) . '</a></li>';
+		}
 
-	<section class="cindemir-services__index" aria-labelledby="cindemir-services-index-title">
-		<div class="cindemir-services__wrap">
-			<h2 id="cindemir-services-index-title" class="cindemir-services__h2"><?php echo esc_html( $c['index'] ); ?></h2>
-			<p class="cindemir-services__hint"><?php echo esc_html( $c['index_hint'] ); ?></p>
-			<nav class="cindemir-services__nav" aria-label="<?php echo esc_attr( $c['index'] ); ?>">
-				<ol>
-					<?php foreach ( $services as $svc ) : ?>
-						<li><a href="#svc-<?php echo esc_attr( $svc['id'] ); ?>"><?php echo esc_html( $svc['title'] ); ?></a></li>
-					<?php endforeach; ?>
-				</ol>
-			</nav>
-		</div>
-	</section>
+		$items = '';
+		foreach ( $services as $i => $svc ) {
+			$points = '';
+			if ( ! empty( $svc['points'] ) ) {
+				$points = '<ul class="cindemir-services__points">';
+				foreach ( $svc['points'] as $point ) {
+					$points .= '<li>' . esc_html( $point ) . '</li>';
+				}
+				$points .= '</ul>';
+			}
+			$more = '';
+			if ( ! empty( $svc['link'] ) ) {
+				$more = '<p class="cindemir-services__more"><a href="' . esc_url( $svc['link'] ) . '">' . esc_html( $svc['title'] ) . ' →</a></p>';
+			}
+			$items .= '<section class="cindemir-services__item" id="svc-' . esc_attr( $svc['id'] ) . '" style="--i:' . (int) $i . '">'
+				. '<div class="cindemir-services__wrap">'
+				. '<p class="cindemir-services__kicker">' . esc_html( $c['detail'] ) . '</p>'
+				. '<h2 class="cindemir-services__h2">' . esc_html( $svc['title'] ) . '</h2>'
+				. '<p class="cindemir-services__text">' . esc_html( $svc['text'] ) . '</p>'
+				. $points
+				. $more
+				. '</div></section>';
+		}
 
-	<div class="cindemir-services__list">
-		<?php foreach ( $services as $i => $svc ) : ?>
-			<section class="cindemir-services__item" id="svc-<?php echo esc_attr( $svc['id'] ); ?>" style="--i:<?php echo (int) $i; ?>">
-				<div class="cindemir-services__wrap">
-					<p class="cindemir-services__kicker"><?php echo esc_html( $c['detail'] ); ?></p>
-					<h2 class="cindemir-services__h2"><?php echo esc_html( $svc['title'] ); ?></h2>
-					<p class="cindemir-services__text"><?php echo esc_html( $svc['text'] ); ?></p>
-					<?php if ( ! empty( $svc['points'] ) ) : ?>
-						<ul class="cindemir-services__points">
-							<?php foreach ( $svc['points'] as $point ) : ?>
-								<li><?php echo esc_html( $point ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					<?php endif; ?>
-					<?php if ( ! empty( $svc['link'] ) ) : ?>
-						<p class="cindemir-services__more">
-							<a href="<?php echo esc_url( $svc['link'] ); ?>"><?php echo esc_html( $svc['title'] ); ?> →</a>
-						</p>
-					<?php endif; ?>
-				</div>
-			</section>
-		<?php endforeach; ?>
-	</div>
-</div>
-<script>
-(function(){
-	var root=document.querySelector('.cindemir-services');
-	if(!root) return;
-	root.classList.add('is-ready');
-	if(!('IntersectionObserver' in window)) return;
-	var io=new IntersectionObserver(function(entries){
-		entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target);} });
-	},{threshold:0.16});
-	root.querySelectorAll('.cindemir-services__item,.cindemir-services__index').forEach(function(el){ io.observe(el); });
-})();
-</script>
-		<?php
-		return (string) ob_get_clean();
+		$script = '<script>(function(){var root=document.querySelector(".cindemir-services");if(!root)return;root.classList.add("is-ready");if(!("IntersectionObserver" in window))return;var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add("is-in");io.unobserve(e.target);}});},{threshold:0.16});root.querySelectorAll(".cindemir-services__item,.cindemir-services__index").forEach(function(el){io.observe(el);});})();</script>';
+
+		return '<div class="cindemir-services" data-cindemir-services="1">'
+			. '<section class="cindemir-services__hero" aria-label="' . esc_attr( $c['headline'] ) . '">'
+			. '<div class="cindemir-services__hero-media" role="img" aria-label="Istanbul" style="--cindemir-hero:url(\'' . $img . '\')"></div>'
+			. '<div class="cindemir-services__hero-shade"></div>'
+			. '<div class="cindemir-services__hero-inner">'
+			. '<p class="cindemir-services__brand">' . esc_html( $c['brand'] ) . '</p>'
+			. '<h1 class="cindemir-services__title">' . esc_html( $c['headline'] ) . '</h1>'
+			. '<p class="cindemir-services__lead">' . esc_html( $c['lead'] ) . '</p>'
+			. '<p class="cindemir-services__cta-wrap"><a class="cindemir-services__cta" href="' . esc_url( $c['cta_url'] ) . '">' . esc_html( $c['cta'] ) . '</a></p>'
+			. '</div></section>'
+			. '<section class="cindemir-services__index" aria-labelledby="cindemir-services-index-title">'
+			. '<div class="cindemir-services__wrap">'
+			. '<h2 id="cindemir-services-index-title" class="cindemir-services__h2">' . esc_html( $c['index'] ) . '</h2>'
+			. '<p class="cindemir-services__hint">' . esc_html( $c['index_hint'] ) . '</p>'
+			. '<nav class="cindemir-services__nav" aria-label="' . esc_attr( $c['index'] ) . '"><ol>' . $nav . '</ol></nav>'
+			. '</div></section>'
+			. '<div class="cindemir-services__list">' . $items . '</div>'
+			. '</div>'
+			. $script;
 	}
 
 	private static function css() {
