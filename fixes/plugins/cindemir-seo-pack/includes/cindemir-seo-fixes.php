@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.25
+ * Version: 1.9.26
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.25';
+	const VERSION = '1.9.26';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -964,7 +964,9 @@ final class Cindemir_SEO_Fixes {
 				|| ( false !== strpos( $hay, 'googlesitekit' ) && false !== strpos( $hay, 'signin' ) )
 				|| false !== strpos( $hay, 'AW-1027764587' )
 				|| false !== strpos( $hay, 'googleads.g.doubleclick.net' )
-				|| false !== strpos( $hay, 'pagead/viewthroughconversion' ) ) {
+				|| false !== strpos( $hay, 'pagead/viewthroughconversion' )
+				|| false !== strpos( $hay, 'GTM-T6PQ95' )
+				|| ( false !== strpos( $hay, 'googletagmanager.com/gtm.js' ) ) ) {
 				wp_dequeue_script( $handle );
 				wp_deregister_script( $handle );
 			}
@@ -979,7 +981,9 @@ final class Cindemir_SEO_Fixes {
 		if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
 			|| false !== strpos( $hay, 'gsi/client' )
 			|| false !== strpos( $hay, 'AW-1027764587' )
-			|| false !== strpos( $hay, 'googleads.g.doubleclick.net' ) ) {
+			|| false !== strpos( $hay, 'googleads.g.doubleclick.net' )
+			|| false !== strpos( $hay, 'GTM-T6PQ95' )
+			|| false !== strpos( $hay, 'googletagmanager.com/gtm.js' ) ) {
 			return '';
 		}
 		return $tag;
@@ -1021,7 +1025,9 @@ final class Cindemir_SEO_Fixes {
 		// Drop broken relativedns prefetch remnants and Ads conversion scripts that
 		// set third-party cookies / deprecated APIs (crush Best Practices score).
 		$html = preg_replace( '#<link[^>]+href=[\"\']https?://cindemirlaw\.com/+www\.[^\"\']+[\"\'][^>]*>#i', '', $html );
-		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion)[^>]*>.*?</script>#is', '', $html );
+		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion|GTM-T6PQ95|googletagmanager\.com/gtm\.js)[^>]*>.*?</script>#is', '', $html );
+		$html = preg_replace( '#\(function\(w,d,s,l,i\)\{[\s\S]*?GTM-T6PQ95[\s\S]*?\}\)\(window,document,\'script\',\'dataLayer\',\'GTM-T6PQ95\'\);#', '', $html );
+		$html = preg_replace( '#<noscript>\s*<iframe[^>]+googletagmanager\.com/ns\.html\?id=GTM-T6PQ95[^>]*>[\s\S]*?</iframe>\s*</noscript>#i', '', $html );
 		if ( null === $html ) {
 			return '';
 		}
