@@ -1,4 +1,5 @@
 <?php
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.32 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -170,7 +171,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.31';
+	const VERSION = '1.9.32'; // services embed deploy
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -546,7 +547,7 @@ final class Cindemir_SEO_Fixes {
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
-			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.2.1' ),
+			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.3.9' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
 			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.1' ),
