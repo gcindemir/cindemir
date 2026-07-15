@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.21
+ * Version: 1.9.22
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +170,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.21';
+	const VERSION = '1.9.22';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -254,6 +254,10 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
+		add_action( 'wp_head', array( __CLASS__, 'pagespeed_head_hints' ), 1 );
+		add_action( 'wp_head', array( __CLASS__, 'pagespeed_a11y_styles' ), 52 );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pagespeed_dequeue_heavy' ), 100 );
+		add_filter( 'script_loader_tag', array( __CLASS__, 'pagespeed_filter_script_tag' ), 20, 3 );
 		add_action( 'wp_head', array( __CLASS__, 'language_switcher_boot_script' ), 0 );
 		// Early head script with data-nowprocket so Delay JS cannot defer lang stamping.
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_script' ), 2 );
@@ -875,6 +879,204 @@ final class Cindemir_SEO_Fixes {
 		exit;
 	}
 
+	/**
+	 * Early resource hints: preconnect fonts + preload homepage LCP hero WebP.
+	 */
+	public static function pagespeed_head_hints() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
+		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+		echo '<link rel="dns-prefetch" href="//www.googletagmanager.com">' . "\n";
+		if ( is_front_page() || is_page( 15 ) ) {
+			$hero = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.webp';
+			echo '<link rel="preload" as="image" href="' . esc_url( $hero ) . '" type="image/webp" fetchpriority="high">' . "\n";
+		}
+		echo '<style id="cindemir-font-display">@font-face{font-display:swap!important}'
+			. '.avia-font-entypo-fontello,.av-icon-char{font-display:swap}'
+			. '</style>' . "\n";
+	}
+
+	/** Contrast, link underline, and sticky-safe a11y polish for PageSpeed. */
+	public static function pagespeed_a11y_styles() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<style id="cindemir-pagespeed-a11y">'
+			. ':root{'
+			. '--enfold-socket-color-bg:#286060!important;'
+			. '--enfold-socket-color-border:#286060!important;'
+			. '--enfold-main-color-secondary:#286060!important'
+			. '}'
+			/* Teal #409090 on white fails WCAG; use darker brand teal. */
+			. '#top #header .av-main-nav > li > a,'
+			. '#top #header .av-main-nav > li > a .avia-menu-text,'
+			. '#top #header .av-main-nav > li.cindemir-lang-item .avia-menu-text{'
+			. 'color:#286060!important}'
+			. '#top #header .av-main-nav > li.current-menu-item > a,'
+			. '#top #header .av-main-nav > li.current_page_item > a,'
+			. '#top #header .av-main-nav > li.avia_current_lang > a .avia-menu-text{'
+			. 'color:#1f4f4f!important}'
+			/* White text on teal socket / cards needs darker teal for 4.5:1. */
+			. '#socket,.html_stretched #socket,.container_wrap#socket{'
+			. 'background-color:#286060!important;color:#ffffff!important}'
+			. '#socket .copyright,#socket a,#socket .cindemir-footer-meta,'
+			. '#socket .cindemir-footer-meta a,#cindemir-baro-verification-bar a{'
+			. 'color:#ffffff!important}'
+			. '.avia_textblock a{text-decoration:underline!important;text-underline-offset:2px;'
+			. 'color:#1f4f4f!important}'
+			. '.avia-section.alternate_color{background-color:#286060!important}'
+			. '.avia-section.alternate_color .avia_textblock,'
+			. '.avia-section.alternate_color .avia_textblock h3,'
+			. '.avia-section.alternate_color .avia_textblock p,'
+			. '.avia-section.alternate_color .avia_textblock a{color:#ffffff!important}'
+			. '</style>' . "\n";
+	}
+
+	/** Drop unused Google Identity Services on the public front-end (~98KB + console errors). */
+	public static function pagespeed_dequeue_heavy() {
+		if ( is_admin() ) {
+			return;
+		}
+		global $wp_scripts;
+		if ( ! ( $wp_scripts instanceof WP_Scripts ) ) {
+			return;
+		}
+		foreach ( (array) $wp_scripts->registered as $handle => $obj ) {
+			$src = isset( $obj->src ) ? (string) $obj->src : '';
+			if ( false !== strpos( $src, 'accounts.google.com/gsi' )
+				|| false !== strpos( $src, 'gsi/client' )
+				|| false !== strpos( $handle, 'google-one-tap' )
+				|| false !== strpos( $handle, 'googlesitekit-signin' ) ) {
+				wp_dequeue_script( $handle );
+				wp_deregister_script( $handle );
+			}
+		}
+	}
+
+	public static function pagespeed_filter_script_tag( $tag, $handle, $src ) {
+		if ( is_admin() ) {
+			return $tag;
+		}
+		$hay = (string) $src . (string) $handle . (string) $tag;
+		if ( false !== strpos( $hay, 'accounts.google.com/gsi' ) || false !== strpos( $hay, 'gsi/client' ) ) {
+			return '';
+		}
+		return $tag;
+	}
+
+	/**
+	 * HTML rewrite pass for PageSpeed: drop GSI, fix menu ARIA, descriptive CTAs, WebP backgrounds.
+	 */
+	private static function pagespeed_rewrite_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		// Strip Google Identity Services client (unused on public pages; triggers console errors).
+		$html = preg_replace(
+			'#<script\b[^>]*(?:accounts\.google\.com/gsi/client|gsi/client)[^>]*>\s*</script>#i',
+			'',
+			$html
+		);
+		if ( null === $html ) {
+			return '';
+		}
+		// Avia marks the main nav as role="menu" (application menu) which conflicts with <li> children.
+		$html = preg_replace(
+			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*)\srole=[\"\']menu[\"\']#i',
+			'$1',
+			$html,
+			1
+		);
+		$html = preg_replace(
+			'#(<ul\b[^>]*\bid=[\"\']avia-menu[\"\'][^>]*)\srole=[\"\']menu[\"\']#i',
+			'$1',
+			$html
+		);
+		// Also strip role=menu when it appears before id.
+		$html = preg_replace(
+			'#(<ul\b[^>]*)\srole=[\"\']menu[\"\']([^>]*\bid=[\"\']avia-menu[\"\'])#i',
+			'$1$2',
+			$html
+		);
+
+		// Prefer WebP for known large backgrounds / images when files exist on disk / CDN path.
+		$webp_map = array(
+			'/wp-content/uploads/2020/10/540664430.jpg'     => '/wp-content/uploads/2020/10/540664430.webp',
+			'/wp-content/uploads/2020/06/5295681199059.jpg' => '/wp-content/uploads/2020/06/5295681199059.webp',
+		);
+		foreach ( $webp_map as $jpg => $webp ) {
+			$html = str_replace(
+				array(
+					'https://cindemirlaw.com' . $jpg,
+					'http://cindemirlaw.com' . $jpg,
+					$jpg,
+				),
+				array(
+					'https://cindemirlaw.com' . $webp,
+					'https://cindemirlaw.com' . $webp,
+					$webp,
+				),
+				$html
+			);
+		}
+
+		// Darken low-contrast Enfold teal (#409090 ≈ 3.74:1 with white) to WCAG-safe #286060.
+		$html = str_replace(
+			array(
+				'background-color:#409090',
+				'background:#409090',
+				'--enfold-socket-color-bg:#409090',
+				'--enfold-socket-color-border:#409090',
+				'--enfold-main-color-secondary:#409090',
+				'color:#409090',
+			),
+			array(
+				'background-color:#286060',
+				'background:#286060',
+				'--enfold-socket-color-bg:#286060',
+				'--enfold-socket-color-border:#286060',
+				'--enfold-main-color-secondary:#286060',
+				'color:#286060',
+			),
+			$html
+		);
+
+		// Descriptive CTA labels (SEO link-text audit flags generic "Read More").
+		$cta_map = array(
+			'/about-us/'            => 'About Our Law Office',
+			'/services/#debt'       => 'Debt Collection Services',
+			'/services/#due'        => 'Due Diligence Services',
+			'/services/#energy'     => 'Energy Law Services',
+			'/services/#corporate'  => 'Corporate and Commercial Law',
+			'/services/#escrow'     => 'Escrow Services',
+			'/services/#real'       => 'Real Estate Law Services',
+		);
+		foreach ( $cta_map as $path => $label ) {
+			$html = preg_replace_callback(
+				'#(<a\b[^>]*href=[\"\']https?://cindemirlaw\.com' . preg_quote( $path, '#' ) . '[\"\'][^>]*>)(.*?)(</a>)#is',
+				static function ( $m ) use ( $label ) {
+					$open = $m[1];
+					$inner = $m[2];
+					if ( ! preg_match( '/read\s*more/i', wp_strip_all_tags( $inner ) ) && ! preg_match( '/aria-label=[\"\']Read More[\"\']/i', $open ) ) {
+						return $m[0];
+					}
+					$open = preg_replace( '/aria-label=[\"\'][^\"\']*[\"\']/i', 'aria-label="' . esc_attr( $label ) . '"', $open, 1 );
+					if ( null === $open || ! preg_match( '/aria-label=/i', $open ) ) {
+						$open = preg_replace( '/<a\b/i', '<a aria-label="' . esc_attr( $label ) . '"', $m[1], 1 );
+					}
+					$inner = preg_replace( '/>\s*Read More\s*</i', '>' . esc_html( $label ) . '<', $inner );
+					$inner = preg_replace( '/\bRead More\b/i', esc_html( $label ), $inner );
+					return $open . $inner . $m[3];
+				},
+				$html
+			);
+		}
+
+		return $html;
+	}
+
 	public static function version_marker() {
 		echo "\n<!-- cindemir-seo-fixes " . esc_html( self::VERSION ) . " -->\n";
 	}
@@ -1111,6 +1313,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_menu_label_html( $html );
 		// Language switcher must point at TARGET language, not the current one.
 		$html = self::fix_language_switcher_html( $html );
+		$html = self::pagespeed_rewrite_html( $html );
 		return $html;
 	}
 
