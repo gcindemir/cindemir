@@ -67,6 +67,24 @@ Not: `.av.tr` üzerinde birçok EN aynası var (`/en/deportation-law-in-turkey/`
 
 **Hafta 1 minimum:** en az **5** contextual live link (şirket, boşanma, sınır dışı, alacak, adli sicil).
 
+### E. Uygulama durumu (16 Jul 2026) — DONE
+
+Live on `cindemir.av.tr` via plugin **Cindemir P0 Crosslinks** (`fixes/wp-plugin/cindemir-p0-crosslinks/`) + post_content append where classic content renders:
+
+| Kaynak | Live hedef |
+|---|---|
+| `/anonim-sirket-kurmak-…/` | company for foreigners |
+| `/sinirdisi-kararinin-iptali/` | deportation |
+| `/en/deportation-law-in-turkey/` | deportation |
+| `/en/consensual-divorce-in-turkey-uncontested-divorce/` | uncontested divorce |
+| `/en/debt-recovery-in-turkey/` | debt recovery |
+| `/en/to-obtain-criminal-record-certificate-in-turkey/` | criminal record |
+| `/hizmetlerimiz/` | 5× P0 list |
+| `/en/services/` | 5× P0 list |
+| `/hakkimizda/` | `/about-us/` |
+
+Elementor sayfalarında `post_content` görünmediği için plugin `the_content` filter (prio 25) ile ekleniyor; marker ile çift link engelleniyor.
+
 ---
 
 ## 2) Directory / profil güncelleme — checklist metinleri
