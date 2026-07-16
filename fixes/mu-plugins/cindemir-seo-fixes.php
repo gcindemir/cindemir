@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.53';
+	const VERSION = '1.9.54';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -203,7 +203,7 @@ final class Cindemir_SEO_Fixes {
 		'white-5-copy' => 'Cindemir Law Office',
 		'white3-copy' => 'Cindemir Law Office',
 		'footlaw_banner' => 'Cindemir Law Office legal services banner',
-		'540664430' => 'Istanbul skyline representing Cindemir Law Office',
+		'540664430' => 'Cindemir Law Office legal team in Istanbul',
 		'Gokhan_Cindemir_AttorneyAtLaw' => 'Gökhan Cindemir, Attorney at Law',
 		'Hakan_Cindemir_AttorneyatLaw' => 'Dr. Hakan Cindemir, Attorney at Law',
 		'2e20a321-6694-44e0-ae3e' => 'Legal scales and gavel artwork',
@@ -263,6 +263,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
+		add_action( 'wp_head', array( __CLASS__, 'homepage_hero_styles' ), 51 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_head_hints' ), 1 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_a11y_styles' ), 52 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pagespeed_dequeue_heavy' ), 100 );
@@ -1570,8 +1571,46 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_language_switcher_html( $html );
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
+		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
 		return $html;
+	}
+
+	/**
+	 * Mobile homepage: put the legal team photo in a real image band so faces
+	 * are not cropped away by background-size:cover + top-left positioning.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function polish_homepage_hero_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$is_home = ( function_exists( 'is_front_page' ) && is_front_page() )
+			|| false !== strpos( $html, 'post-entry-15' )
+			|| (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
+		if ( ! $is_home ) {
+			return $html;
+		}
+		if ( false !== strpos( $html, 'cindemir-mobile-hero-photo' ) ) {
+			return $html;
+		}
+		if ( false === stripos( $html, 'av_section_1' ) ) {
+			return $html;
+		}
+		$src  = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg';
+		$band = '<div class="cindemir-mobile-hero-photo">'
+			. '<img src="' . esc_url( $src ) . '" alt="Cindemir Law Office legal team in Istanbul" '
+			. 'width="800" height="533" decoding="async" fetchpriority="high" />'
+			. '</div>';
+		$next = preg_replace(
+			'#(<div id=[\'"]av_section_1[\'"][^>]*>\s*<div class="av-section-color-overlay-wrap">)#i',
+			'$1' . $band,
+			$html,
+			1
+		);
+		return is_string( $next ) ? $next : $html;
 	}
 
 	/**
@@ -1849,6 +1888,82 @@ JS;
 		// Keep a stable Latin brand in the header so RU/ZH labels do not inflate
 		// the logo row and shove the menu/banner around.
 		return 'Cindemir Law Office';
+	}
+
+	/**
+	 * Friendlier homepage entrance — especially mobile, where the team photo
+	 * was cropped out of the hero background and the mobile-only photo column collapsed to 1px.
+	 */
+	public static function homepage_hero_styles() {
+		if ( is_admin() ) {
+			return;
+		}
+		if ( ! ( is_front_page() || is_home() ) ) {
+			return;
+		}
+		echo '<style id="cindemir-home-hero">'
+			. '.cindemir-mobile-hero-photo{display:none}'
+			. '@media only screen and (max-width:767px){'
+			. 'body.home #av_section_1,'
+			. 'body.home #av_section_1.avia-section{'
+			. 'background-image:none!important;background-color:#1f4f4f!important;'
+			. 'background-attachment:scroll!important;min-height:0!important;'
+			. 'padding-top:0!important;padding-bottom:0!important}'
+			. 'body.home #av_section_1 .av-parallax,'
+			. 'body.home #av_section_1 .av-section-color-overlay{display:none!important}'
+			. 'body.home #av_section_1 .av-section-color-overlay-wrap{'
+			. 'display:flex!important;flex-direction:column!important}'
+			. 'body.home .cindemir-mobile-hero-photo{'
+			. 'display:block!important;width:100%;order:-1;line-height:0;margin:0;padding:0}'
+			. 'body.home .cindemir-mobile-hero-photo img{'
+			. 'display:block;width:100%;height:auto;max-height:48vh;'
+			. 'object-fit:cover;object-position:center 30%}'
+			. 'body.home #av_section_1 .container{'
+			. 'background:#1f4f4f!important;color:#fff!important;'
+			. 'padding:1.35rem 1.15rem 1.85rem!important;width:100%!important;max-width:100%!important}'
+			. 'body.home #av_section_1 .av-special-heading-tag,'
+			. 'body.home #av_section_1 .avia_textblock,'
+			. 'body.home #av_section_1 .avia_textblock p,'
+			. 'body.home #av_section_1 .avia_textblock strong,'
+			. 'body.home #av_section_1 .avia_textblock a{color:#fff!important}'
+			. 'body.home #av_section_1 .avia_textblock a{'
+			. 'text-decoration:underline!important;text-underline-offset:2px;text-decoration-thickness:1px}'
+			/* First viewport: headline + short lead + CTA — not a wall of paragraphs. */
+			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(n+3){display:none!important}'
+			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(2){'
+			. 'display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;'
+			. 'overflow:hidden;max-height:7em}'
+			. 'body.home #av_section_1 .flex_column.av_one_fifth{display:none!important}'
+			. 'body.home #av_section_1 .flex_column.av_three_fifth{'
+			. 'width:100%!important;margin:0!important;left:auto!important;right:auto!important}'
+			. 'body.home #av_section_1 .avia-button{'
+			. 'background:#fff!important;color:#1f4f4f!important;border-color:#fff!important}'
+			. 'body.home #av_section_1 .avia-button .avia_iconbox_title{color:#1f4f4f!important}'
+			. 'body.home #av_section_1 .hr-inner,'
+			. 'body.home #av_section_1 .special-heading-inner-border{border-color:rgba(255,255,255,.35)!important}'
+			/* Mobile Welcome block: empty bg-image column was collapsing to 1px. */
+			. '#av_section_2 .flex_column_table{'
+			. 'display:flex!important;flex-direction:column!important}'
+			. '#av_section_2 .flex_column.av-kb0bnfzj-6b756727d2887e26a4cf2233375d0c98{'
+			. 'display:block!important;width:100%!important;min-height:220px!important;'
+			. 'height:48vw!important;max-height:280px!important;order:-1!important;'
+			. 'background-size:cover!important;background-position:center 28%!important;'
+			. 'background-repeat:no-repeat!important;margin:0 0 1rem!important}'
+			. '#av_section_2 .flex_column.av-kb0bmzrq-e6911c2abcf32f33876fb4dfa882da5a{'
+			. 'width:100%!important;padding:0 4%!important}'
+			. '@media (prefers-reduced-motion:no-preference){'
+			. '@keyframes cindemirHeroIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
+			. 'body.home .cindemir-mobile-hero-photo img{animation:cindemirHeroIn .65s ease-out both}'
+			. 'body.home #av_section_1 .av-special-heading{animation:cindemirHeroIn .65s .1s ease-out both}'
+			. 'body.home #av_section_1 .avia_textblock{animation:cindemirHeroIn .65s .18s ease-out both}'
+			. 'body.home #av_section_1 .avia-button-wrap{animation:cindemirHeroIn .65s .26s ease-out both}'
+			. '}'
+			. '}'
+			. '@media only screen and (min-width:768px){'
+			. 'body.home #av_section_1.avia-section{'
+			. 'background-position:50% 42%!important}'
+			. '}'
+			. '</style>' . "\n";
 	}
 
 	public static function header_brand_styles() {

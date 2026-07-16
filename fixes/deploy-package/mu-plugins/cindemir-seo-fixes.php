@@ -1,8 +1,10 @@
 <?php
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.53 + SERVICES_BLANK_FIX_20260715 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.28
+ * Version: 1.9.53
+ * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
 
@@ -170,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.30';
+	const VERSION = '1.9.54';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -201,7 +203,7 @@ final class Cindemir_SEO_Fixes {
 		'white-5-copy' => 'Cindemir Law Office',
 		'white3-copy' => 'Cindemir Law Office',
 		'footlaw_banner' => 'Cindemir Law Office legal services banner',
-		'540664430' => 'Istanbul skyline representing Cindemir Law Office',
+		'540664430' => 'Cindemir Law Office legal team in Istanbul',
 		'Gokhan_Cindemir_AttorneyAtLaw' => 'Gökhan Cindemir, Attorney at Law',
 		'Hakan_Cindemir_AttorneyatLaw' => 'Dr. Hakan Cindemir, Attorney at Law',
 		'2e20a321-6694-44e0-ae3e' => 'Legal scales and gavel artwork',
@@ -226,6 +228,13 @@ final class Cindemir_SEO_Fixes {
 		56   => 'Юридические услуги в Турции: корпоративное, миграционное, семейное и уголовное право для иностранных клиентов в Стамбуле.',
 		3874 => "Cindemir Law Office'in tarihçesi: Osmanlı mahkemelerinden günümüze uzanan hukuki geçmişi İstanbul üzerinden anlatılır.",
 	);
+
+	/** Neutral SEO titles (TBB-safe). */
+	private static $page_titles = array(
+		15 => 'Law Firms in Istanbul - Cindemir Law Office',
+		16 => 'About Cindemir Law Office in Istanbul',
+	);
+
 
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_self_upgrade_from_github' ), 0 );
@@ -254,6 +263,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
+		add_action( 'wp_head', array( __CLASS__, 'homepage_hero_styles' ), 51 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_head_hints' ), 1 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_a11y_styles' ), 52 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pagespeed_dequeue_heavy' ), 100 );
@@ -294,6 +304,15 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
 		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
+		add_filter( 'wpseo_title', array( __CLASS__, 'filter_page_title' ), 20 );
+		add_filter( 'wpseo_opengraph_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
+		add_filter( 'wpseo_opengraph_desc', array( __CLASS__, 'filter_page_og_desc' ), 20 );
+		add_filter( 'wpseo_twitter_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
+		add_filter( 'wpseo_twitter_description', array( __CLASS__, 'filter_page_og_desc' ), 20 );
+		add_filter( 'robots_txt', array( __CLASS__, 'filter_robots_txt' ), 99, 2 );
+		add_action( 'init', array( __CLASS__, 'maybe_rewrite_static_robots' ), 23 );
+		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_utility_from_sitemap' ), 10 );
+		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 22 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
 		add_filter( 'get_canonical_url', array( __CLASS__, 'filter_canonical_url' ), 20 );
 		add_filter( 'wpml_hreflangs', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
@@ -546,9 +565,10 @@ final class Cindemir_SEO_Fixes {
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
 		$files  = array(
-			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.2.1' ),
+			'cindemir-contact-fixes.php'     => array( 'min' => 20000, 'ver' => '1.3.9' ),
 			'cindemir-expose-yoast-meta.php' => array( 'min' => 2000, 'ver' => '1.2' ),
 			'cindemir-purge-cache.php'       => array( 'min' => 500, 'ver' => '1.0' ),
+			'cindemir-services-page.php'     => array( 'min' => 10000, 'ver' => '1.0.2' ),
 		);
 
 		foreach ( $files as $name => $spec ) {
@@ -604,34 +624,61 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+		$marker = 'SERVICES_BLANK_FIX_20260715';
+		$bases  = array(
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+		);
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
+			'cindemir-services-page.php'     => 10000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
-			$response = wp_remote_get(
-				$base . $name,
-				array(
-					'timeout' => 60,
-					'headers' => array( 'User-Agent' => 'CindemirPull/' . self::VERSION ),
-				)
-			);
-			if ( is_wp_error( $response ) ) {
-				$out[ $name ] = array( 'ok' => false, 'error' => $response->get_error_message() );
+			$body = '';
+			$src  = '';
+			foreach ( $bases as $base ) {
+				$response = wp_remote_get(
+					$base . $name . '?v=' . rawurlencode( $marker ),
+					array(
+						'timeout' => 60,
+						'headers' => array(
+							'User-Agent'    => 'CindemirPull/' . self::VERSION,
+							'Cache-Control' => 'no-cache',
+						),
+					)
+				);
+				if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+					continue;
+				}
+				$tmp = (string) wp_remote_retrieve_body( $response );
+				if ( strlen( $tmp ) < $min ) {
+					continue;
+				}
+				if ( in_array( $name, array( 'cindemir-contact-fixes.php', 'cindemir-services-page.php', 'cindemir-purge-cache.php', 'cindemir-seo-fixes.php' ), true )
+					&& false === strpos( $tmp, $marker ) ) {
+					continue;
+				}
+				$body = $tmp;
+				$src  = $base;
+				break;
+			}
+			if ( '' === $body ) {
+				$out[ $name ] = array( 'ok' => false, 'error' => 'no-fresh-source' );
 				continue;
 			}
-			$body  = (string) wp_remote_retrieve_body( $response );
-			$bytes = strlen( $body );
-			if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) || $bytes < $min ) {
-				$out[ $name ] = array( 'ok' => false, 'bytes' => $bytes );
-				continue;
+			$dest = trailingslashit( WPMU_PLUGIN_DIR ) . $name;
+			file_put_contents( $dest, $body );
+			if ( function_exists( 'opcache_invalidate' ) ) {
+				@opcache_invalidate( $dest, true );
 			}
-			file_put_contents( trailingslashit( WPMU_PLUGIN_DIR ) . $name, $body );
-			$out[ $name ] = array( 'ok' => true, 'bytes' => $bytes );
+			$out[ $name ] = array( 'ok' => true, 'bytes' => strlen( $body ), 'src' => $src );
 		}
 		delete_option( 'cindemir_seo_fixes_version' );
 		wp_cache_flush();
@@ -1514,6 +1561,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_hreflang_html( $html );
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
+		$html = self::apply_title_overrides_html( $html );
+		$html = self::fix_og_tags_html( $html );
 		$html = self::normalize_robots_meta( $html );
 		// Final pass after other rewriters — keep menu/site links on active lang.
 		$html = self::stamp_lang_on_internal_hrefs( $html );
@@ -1522,8 +1571,46 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_language_switcher_html( $html );
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
+		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
 		return $html;
+	}
+
+	/**
+	 * Mobile homepage: put the legal team photo in a real image band so faces
+	 * are not cropped away by background-size:cover + top-left positioning.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function polish_homepage_hero_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$is_home = ( function_exists( 'is_front_page' ) && is_front_page() )
+			|| false !== strpos( $html, 'post-entry-15' )
+			|| (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
+		if ( ! $is_home ) {
+			return $html;
+		}
+		if ( false !== strpos( $html, 'cindemir-mobile-hero-photo' ) ) {
+			return $html;
+		}
+		if ( false === stripos( $html, 'av_section_1' ) ) {
+			return $html;
+		}
+		$src  = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg';
+		$band = '<div class="cindemir-mobile-hero-photo">'
+			. '<img src="' . esc_url( $src ) . '" alt="Cindemir Law Office legal team in Istanbul" '
+			. 'width="800" height="533" decoding="async" fetchpriority="high" />'
+			. '</div>';
+		$next = preg_replace(
+			'#(<div id=[\'"]av_section_1[\'"][^>]*>\s*<div class="av-section-color-overlay-wrap">)#i',
+			'$1' . $band,
+			$html,
+			1
+		);
+		return is_string( $next ) ? $next : $html;
 	}
 
 	/**
@@ -1541,7 +1628,8 @@ final class Cindemir_SEO_Fixes {
 		if ( false === stripos( $html, 'avia_ajax_form' ) ) {
 			return $html;
 		}
-		$script = self::contact_form_fallback_script_tag();
+		$original = $html;
+		$script   = self::contact_form_fallback_script_tag();
 		// Drop any prior copy (inline or Debloat data-URI) so only one handler remains.
 		$html = preg_replace(
 			'#<script\b[^>]*(?:id=["\']cindemir-contact-form-fallback-js["\']|cindemir-contact-form-fallback)[^>]*>[\s\S]*?</script>#i',
@@ -1549,10 +1637,11 @@ final class Cindemir_SEO_Fixes {
 			$html
 		);
 		if ( null === $html ) {
-			return '';
+			$html = $original;
 		}
 		if ( false !== stripos( $html, '</body>' ) ) {
-			return (string) preg_replace( '#</body>#i', $script . "\n</body>", $html, 1 );
+			$next = preg_replace( '#</body>#i', $script . "\n</body>", $html, 1 );
+			return is_string( $next ) ? $next : ( $html . $script );
 		}
 		return $html . $script;
 	}
@@ -1799,6 +1888,82 @@ JS;
 		// Keep a stable Latin brand in the header so RU/ZH labels do not inflate
 		// the logo row and shove the menu/banner around.
 		return 'Cindemir Law Office';
+	}
+
+	/**
+	 * Friendlier homepage entrance — especially mobile, where the team photo
+	 * was cropped out of the hero background and the mobile-only photo column collapsed to 1px.
+	 */
+	public static function homepage_hero_styles() {
+		if ( is_admin() ) {
+			return;
+		}
+		if ( ! ( is_front_page() || is_home() ) ) {
+			return;
+		}
+		echo '<style id="cindemir-home-hero">'
+			. '.cindemir-mobile-hero-photo{display:none}'
+			. '@media only screen and (max-width:767px){'
+			. 'body.home #av_section_1,'
+			. 'body.home #av_section_1.avia-section{'
+			. 'background-image:none!important;background-color:#1f4f4f!important;'
+			. 'background-attachment:scroll!important;min-height:0!important;'
+			. 'padding-top:0!important;padding-bottom:0!important}'
+			. 'body.home #av_section_1 .av-parallax,'
+			. 'body.home #av_section_1 .av-section-color-overlay{display:none!important}'
+			. 'body.home #av_section_1 .av-section-color-overlay-wrap{'
+			. 'display:flex!important;flex-direction:column!important}'
+			. 'body.home .cindemir-mobile-hero-photo{'
+			. 'display:block!important;width:100%;order:-1;line-height:0;margin:0;padding:0}'
+			. 'body.home .cindemir-mobile-hero-photo img{'
+			. 'display:block;width:100%;height:auto;max-height:48vh;'
+			. 'object-fit:cover;object-position:center 30%}'
+			. 'body.home #av_section_1 .container{'
+			. 'background:#1f4f4f!important;color:#fff!important;'
+			. 'padding:1.35rem 1.15rem 1.85rem!important;width:100%!important;max-width:100%!important}'
+			. 'body.home #av_section_1 .av-special-heading-tag,'
+			. 'body.home #av_section_1 .avia_textblock,'
+			. 'body.home #av_section_1 .avia_textblock p,'
+			. 'body.home #av_section_1 .avia_textblock strong,'
+			. 'body.home #av_section_1 .avia_textblock a{color:#fff!important}'
+			. 'body.home #av_section_1 .avia_textblock a{'
+			. 'text-decoration:underline!important;text-underline-offset:2px;text-decoration-thickness:1px}'
+			/* First viewport: headline + short lead + CTA — not a wall of paragraphs. */
+			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(n+3){display:none!important}'
+			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(2){'
+			. 'display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;'
+			. 'overflow:hidden;max-height:7em}'
+			. 'body.home #av_section_1 .flex_column.av_one_fifth{display:none!important}'
+			. 'body.home #av_section_1 .flex_column.av_three_fifth{'
+			. 'width:100%!important;margin:0!important;left:auto!important;right:auto!important}'
+			. 'body.home #av_section_1 .avia-button{'
+			. 'background:#fff!important;color:#1f4f4f!important;border-color:#fff!important}'
+			. 'body.home #av_section_1 .avia-button .avia_iconbox_title{color:#1f4f4f!important}'
+			. 'body.home #av_section_1 .hr-inner,'
+			. 'body.home #av_section_1 .special-heading-inner-border{border-color:rgba(255,255,255,.35)!important}'
+			/* Mobile Welcome block: empty bg-image column was collapsing to 1px. */
+			. '#av_section_2 .flex_column_table{'
+			. 'display:flex!important;flex-direction:column!important}'
+			. '#av_section_2 .flex_column.av-kb0bnfzj-6b756727d2887e26a4cf2233375d0c98{'
+			. 'display:block!important;width:100%!important;min-height:220px!important;'
+			. 'height:48vw!important;max-height:280px!important;order:-1!important;'
+			. 'background-size:cover!important;background-position:center 28%!important;'
+			. 'background-repeat:no-repeat!important;margin:0 0 1rem!important}'
+			. '#av_section_2 .flex_column.av-kb0bmzrq-e6911c2abcf32f33876fb4dfa882da5a{'
+			. 'width:100%!important;padding:0 4%!important}'
+			. '@media (prefers-reduced-motion:no-preference){'
+			. '@keyframes cindemirHeroIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
+			. 'body.home .cindemir-mobile-hero-photo img{animation:cindemirHeroIn .65s ease-out both}'
+			. 'body.home #av_section_1 .av-special-heading{animation:cindemirHeroIn .65s .1s ease-out both}'
+			. 'body.home #av_section_1 .avia_textblock{animation:cindemirHeroIn .65s .18s ease-out both}'
+			. 'body.home #av_section_1 .avia-button-wrap{animation:cindemirHeroIn .65s .26s ease-out both}'
+			. '}'
+			. '}'
+			. '@media only screen and (min-width:768px){'
+			. 'body.home #av_section_1.avia-section{'
+			. 'background-position:50% 42%!important}'
+			. '}'
+			. '</style>' . "\n";
 	}
 
 	public static function header_brand_styles() {
@@ -2834,6 +2999,164 @@ JS;
 		);
 	}
 
+
+	public static function filter_page_title( $title ) {
+		$id = self::current_page_id_for_seo();
+		if ( $id && isset( self::$page_titles[ $id ] ) ) {
+			return self::$page_titles[ $id ];
+		}
+		return $title;
+	}
+
+	public static function filter_page_og_title( $title ) {
+		$id = self::current_page_id_for_seo();
+		if ( $id && isset( self::$page_titles[ $id ] ) ) {
+			return self::$page_titles[ $id ];
+		}
+		$seo = self::filter_page_title( $title );
+		return ( is_string( $seo ) && '' !== trim( $seo ) ) ? $seo : $title;
+	}
+
+	public static function filter_page_og_desc( $desc ) {
+		$id = self::current_page_id_for_seo();
+		if ( $id && isset( self::$page_metadesc[ $id ] ) ) {
+			return self::$page_metadesc[ $id ];
+		}
+		$meta = $id ? get_post_meta( $id, '_yoast_wpseo_metadesc', true ) : '';
+		if ( is_string( $meta ) && '' !== trim( $meta ) ) {
+			return $meta;
+		}
+		return $desc;
+	}
+
+
+	/** Overwrite physical /robots.txt if present (Bluehost static file bypasses robots_txt filter). */
+	public static function maybe_rewrite_static_robots() {
+		if ( get_option( 'cindemir_robots_txt_v1935' ) ) {
+			return;
+		}
+		$path = trailingslashit( ABSPATH ) . 'robots.txt';
+		$body = "User-agent: *\nAllow: /\n\n"
+			. "User-agent: OAI-SearchBot\nAllow: /\n\n"
+			. "User-agent: GPTBot\nAllow: /\n\n"
+			. "User-agent: ChatGPT-User\nAllow: /\n\n"
+			. "User-agent: AhrefsBot\nAllow: /\n\n"
+			. "User-agent: Yandex\nAllow: /\n\n"
+			. "Sitemap: https://cindemirlaw.com/sitemap_index.xml\n";
+		if ( file_exists( $path ) ) {
+			if ( ! @unlink( $path ) ) {
+				@file_put_contents( $path, $body );
+			}
+		}
+		update_option( 'cindemir_robots_txt_v1935', 1, false );
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+	}
+
+	public static function filter_robots_txt( $output, $public ) {
+		$sitemap = 'Sitemap: https://cindemirlaw.com/sitemap_index.xml';
+		$output  = preg_replace( '/^Sitemap:\s*.+$/mi', '', (string) $output );
+		return trim( $output ) . "\n\n" . $sitemap . "\n";
+	}
+
+	public static function exclude_utility_from_sitemap( $ids ) {
+		if ( ! is_array( $ids ) ) {
+			$ids = array();
+		}
+		foreach ( array( 'antimanual-assistant', 'embed-list', 'press' ) as $slug ) {
+			$page = get_page_by_path( $slug );
+			if ( $page ) {
+				$ids[] = (int) $page->ID;
+			}
+		}
+		return array_values( array_unique( array_map( 'intval', $ids ) ) );
+	}
+
+	public static function apply_title_overrides_once() {
+		if ( get_option( 'cindemir_seo_titles_v1934_applied' ) ) {
+			return;
+		}
+		foreach ( self::$page_titles as $id => $title ) {
+			if ( get_post( $id ) ) {
+				update_post_meta( (int) $id, '_yoast_wpseo_title', $title );
+			}
+		}
+		update_option( 'cindemir_seo_titles_v1934_applied', 1, false );
+	}
+
+	private static function current_page_id_for_seo() {
+		if ( function_exists( 'is_front_page' ) && is_front_page() ) {
+			$front = (int) get_option( 'page_on_front' );
+			if ( $front ) {
+				return $front;
+			}
+		}
+		return function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+	}
+
+	private static function apply_title_overrides_html( $html ) {
+		$id = self::current_page_id_for_seo();
+		if ( ! $id || ! isset( self::$page_titles[ $id ] ) ) {
+			return $html;
+		}
+		$title = esc_html( self::$page_titles[ $id ] );
+		return preg_replace( '/<title>.*?<\/title>/is', '<title>' . $title . '</title>', $html, 1 );
+	}
+
+	private static function fix_og_tags_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$title = '';
+		if ( preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
+			$title = trim( wp_strip_all_tags( html_entity_decode( $tm[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) );
+		}
+		$desc = '';
+		if ( preg_match( '/<meta\s+name=(["\'])description\1[^>]*content=(["\'])(.*?)\2/is', $html, $dm ) ) {
+			$desc = html_entity_decode( $dm[3], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		} elseif ( preg_match( '/<meta\s+content=(["\'])(.*?)\1[^>]*name=(["\'])description\3/is', $html, $dm ) ) {
+			$desc = html_entity_decode( $dm[2], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		}
+		$id = self::current_page_id_for_seo();
+		if ( $id && isset( self::$page_titles[ $id ] ) ) {
+			$title = self::$page_titles[ $id ];
+		}
+		if ( $id && isset( self::$page_metadesc[ $id ] ) ) {
+			$desc = self::$page_metadesc[ $id ];
+		}
+		if ( '' === $title && '' === $desc ) {
+			return $html;
+		}
+		if ( '' !== $title ) {
+			$et = esc_attr( $title );
+			$html = self::upsert_meta_tag( $html, 'property', 'og:title', $et );
+			$html = self::upsert_meta_tag( $html, 'name', 'twitter:title', $et );
+		}
+		if ( '' !== $desc ) {
+			$ed = esc_attr( $desc );
+			$html = self::upsert_meta_tag( $html, 'property', 'og:description', $ed );
+			$html = self::upsert_meta_tag( $html, 'name', 'twitter:description', $ed );
+		}
+		return $html;
+	}
+
+	private static function upsert_meta_tag( $html, $attr, $key, $content ) {
+		$pattern = '/<meta\s+' . $attr . '=(["\'])' . preg_quote( $key, '/' ) . '\1[^>]*>/i';
+		$tag     = '<meta ' . $attr . '="' . esc_attr( $key ) . '" content="' . $content . '" />';
+		if ( preg_match( $pattern, $html ) ) {
+			return preg_replace( $pattern, $tag, $html, 1 );
+		}
+		$pattern2 = '/<meta\s+content=(["\'])[^"\']*\1[^>]*' . $attr . '=(["\'])' . preg_quote( $key, '/' ) . '\2[^>]*>/i';
+		if ( preg_match( $pattern2, $html ) ) {
+			return preg_replace( $pattern2, $tag, $html, 1 );
+		}
+		if ( preg_match( '/<\/head>/i', $html ) ) {
+			return preg_replace( '/<\/head>/i', $tag . "\n</head>", $html, 1 );
+		}
+		return $html;
+	}
+
 	private static function path() {
 		$uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		return self::normalize_path( $uri );
@@ -2858,6 +3181,65 @@ JS;
 		}
 		return '';
 	}
+
+	public static function boot_services_emergency() {
+		add_action( 'init', array( __CLASS__, 'install_services_plugin_from_jsdelivr' ), 0 );
+		add_action( 'wp_head', array( __CLASS__, 'undo_broken_services_hide_css' ), 99 );
+	}
+
+	/** If Services redesign hide-CSS is active without markup, restore visibility. */
+	public static function undo_broken_services_hide_css() {
+		if ( ! function_exists( 'is_page' ) || ! is_page( array( 18, 2638, 2637, 56 ) ) ) {
+			return;
+		}
+		echo '<style id="cindemir-services-undo">#top.page-id-18 #main > *,#top.page-id-2638 #main > *,#top.page-id-2637 #main > *,#top.page-id-56 #main > *{display:revert!important}</style>';
+	}
+
+	/** Write/overwrite services mu-plugin from jsDelivr (avoids Bluehost raw.githubusercontent staleness). */
+	public static function install_services_plugin_from_jsdelivr() {
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return;
+		}
+		$dest = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-services-page.php';
+		$need = true;
+		if ( file_exists( $dest ) && filesize( $dest ) > 10000 ) {
+			$local = file_get_contents( $dest );
+			if ( is_string( $local ) && false !== strpos( $local, 'SERVICES_BLANK_FIX_20260715' ) && false !== strpos( $local, "VERSION = '1.0.3'" ) ) {
+				$need = false;
+			}
+		}
+		if ( ! $need ) {
+			return;
+		}
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$urls   = array(
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/cindemir-services-page.php?v=SERVICES_BLANK_FIX_20260715',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/cindemir-services-page.php',
+		);
+		$body = '';
+		foreach ( $urls as $url ) {
+			$response = wp_remote_get( $url, array( 'timeout' => 45, 'headers' => array( 'User-Agent' => 'CindemirServicesInstall/' . self::VERSION, 'Cache-Control' => 'no-cache' ) ) );
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				continue;
+			}
+			$tmp = (string) wp_remote_retrieve_body( $response );
+			if ( strlen( $tmp ) < 10000 || false === strpos( $tmp, 'Cindemir_Services_Page' ) || false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) {
+				continue;
+			}
+			$body = $tmp;
+			break;
+		}
+		if ( '' === $body ) {
+			return;
+		}
+		file_put_contents( $dest, $body );
+		if ( function_exists( 'opcache_invalidate' ) ) {
+			@opcache_invalidate( $dest, true );
+		}
+	}
+
+
 }
 
 Cindemir_SEO_Fixes::boot();
+Cindemir_SEO_Fixes::boot_services_emergency();
