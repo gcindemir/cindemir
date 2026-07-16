@@ -1,34 +1,86 @@
 {
   "posted_links": [
+    "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond",
+    "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law",
     "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework",
+    "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey",
+    "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure",
+    "https://cindemirlaw.com/intentional-injury-resulting-in-death-under-turkish-criminal-law",
+    "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters",
+    "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul",
+    "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179",
     "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
-    "https://cindemirlaw.com/tourism-law-in-turkey"
+    "https://cindemirlaw.com/tourism-law-in-turkey",
+    "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey",
+    "https://cindemirlaw.com/turkish-companies-before-the-court-of-justice-of-the-european-union"
   ],
   "last_results": [
     {
-      "title": "CISG in Turkey: International Sale of Goods Disputes and Legal Framework",
-      "link": "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework/",
+      "title": "Turkey Asset Repatriation 2026: Legal Framework for Bringing Foreign Assets to Turkey",
+      "link": "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey/",
       "ok": true,
-      "status": "clicked_publish"
+      "status": "ok"
     },
     {
-      "title": "Ottoman Title Deeds in Türkiye: Inheritance, Registration and Land Search",
-      "link": "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search/",
+      "title": "Airport Detention in Turkey: Legal Risks for Foreign Travellers and How to Respond",
+      "link": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
       "ok": true,
-      "status": "clicked_publish"
+      "status": "ok"
     },
     {
-      "title": "Tourism Law in Turkey",
-      "link": "https://cindemirlaw.com/tourism-law-in-turkey/",
+      "title": "Child Abduction and Retention Under Turkish Law",
+      "link": "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law/",
       "ok": true,
-      "status": "clicked_publish"
+      "status": "ok"
+    },
+    {
+      "title": "Enforcement of Promissory Notes, Bills of Exchange and Cheques in Turkey",
+      "link": "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Legal Opinion and Expert Opinion in Turkey: Why the Distinction Matters",
+      "link": "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "How to Apply to the European Court of Human Rights (ECHR) – Legal Conditions and Procedure",
+      "link": "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Legal Rights of Foreign Nationals in Police Custody in Istanbul",
+      "link": "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Intentional Injury Resulting in Death under Turkish Criminal Law",
+      "link": "https://cindemirlaw.com/intentional-injury-resulting-in-death-under-turkish-criminal-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Turkish companies before the Court of Justice of the European Union",
+      "link": "https://cindemirlaw.com/turkish-companies-before-the-court-of-justice-of-the-european-union/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Legal Status of Late-Registered Turkish Citizens Concerning Military Service Obligations under Law No. 7179",
+      "link": "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
+      "ok": true,
+      "status": "ok"
     }
   ],
-  "remaining": 192,
-  "updated": "2026-07-16T21:00:58Z",
+  "remaining": 182,
+  "updated": "2026-07-16T21:10:12Z",
   "last": {
-    "title": "Tourism Law in Turkey",
-    "link": "https://cindemirlaw.com/tourism-law-in-turkey/",
-    "status": "clicked_publish"
+    "title": "Legal Status of Late-Registered Turkish Citizens Concerning Military Service Obligations under Law No. 7179",
+    "link": "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
+    "status": "ok"
   }
 }
