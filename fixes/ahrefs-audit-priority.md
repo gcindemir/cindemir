@@ -1,0 +1,101 @@
+# Ahrefs Site Audit — Priority Digest
+
+## Errors
+
+- **Error-Page_referenced_for_more_than_one_language_in_hreflang_a7d7.csv** (8)
+  - https://cindemirlaw.com/services/
+  - https://cindemirlaw.com/about-us/
+  - https://cindemirlaw.com/
+  - https://cindemirlaw.com/team/
+  - https://cindemirlaw.com/articles/
+- **Error-Canonical_points_to_redirect-links_ba38.csv** (4)
+- **Error-Canonical_points_to_redirect_a381.csv** (4)
+  - https://cindemirlaw.com/obtaining-an-e-devlet-password-in-turkey-through-a-power-of-attorney/?lang=ru
+  - https://cindemirlaw.com/cindemir-law-2/?lang=ru
+  - https://cindemirlaw.com/pig-butchering-cryptocurrency-scam-key-risks-and-legal-considerations-for-investors-in-turkey/?lang=ru
+  - https://cindemirlaw.com/eu-ai-act-compliance-for-non-eu-companies-legal-requirements-under-the-destination-principle/?lang=ru
+- **Error-Noindex_page_in_sitemap_e229.csv** (2)
+  - https://cindemirlaw.com/antimanual-assistant/
+  - https://cindemirlaw.com/embed-list/
+- **Error-Noindex_page_in_sitemap_ebf2.csv** (2)
+  - https://cindemirlaw.com/antimanual-assistant/
+  - https://cindemirlaw.com/embed-list/
+- **Error-indexable-Orphan_page__has_no_incoming_internal_links__d7d8.csv** (2)
+  - https://cindemirlaw.com/our-videos/
+  - https://cindemirlaw.com/appointment/
+- **Error-indexable-Page_has_links_to_broken_page-links_e2b9.csv** (2)
+- **Error-indexable-Page_has_links_to_broken_page_c4b9.csv** (2)
+  - https://cindemirlaw.com/%D0%BA%D0%B0%D0%BA-%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C-%D1%81%D0%BF%D1%80%D0%B0%D0%B2%D0%BA%D1%83-%D0%BE-%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D0%B8-%D1%81%D1%83%D0%B4%D0%B8%D0%BC%D0%BE/?lang=ru
+  - https://cindemirlaw.com/%D0%BA%D0%B0%D0%BA-%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C-%D1%81%D1%83%D0%B4%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C-%D0%B2-%D1%82%D1%83%D1%80%D1%86%D0%B8%D0%B8/?lang=ru
+
+## Warnings
+
+- **Warning-indexable-Page_has_links_to_redirect-links_76e5.csv** (484)
+- **Warning-Image_redirects-links_3bb2.csv** (282)
+- **Warning-Page_has_redirected_image-links_1fc9.csv** (282)
+- **Warning-Page_has_redirected_image_c58f.csv** (282)
+  - https://cindemirlaw.com/services/
+  - https://cindemirlaw.com/about-us/
+  - https://cindemirlaw.com/
+- **Warning-indexable-Page_has_links_to_redirect_5e28.csv** (272)
+  - https://cindemirlaw.com/services/
+  - https://cindemirlaw.com/about-us/
+  - https://cindemirlaw.com/
+- **Warning-3XX_redirect-links_2b4c.csv** (240)
+- **Warning-indexable-Redirected_page_has_no_incoming_internal_links-links_9d65.csv** (208)
+- **Warning-3XX_redirect_51cc.csv** (53)
+  - https://www.cindemirlaw.com/
+  - https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-2/
+  - https://cindemirlaw.com/cindemir-law-2/
+- **Warning-indexable-Redirected_page_has_no_incoming_internal_links_f308.csv** (44)
+  - https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd81fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf-3/?lang=ru
+  - https://cindemirlaw.com/%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D1%8F%D0%B7%D1%8B%D1%87%D0%BD%D1%8B%D0%B9-%D1%8E%D1%80%D0%B8%D1%81%D1%82-%D0%B2-%D1%82%D1%83%D1%80%D1%86%D0%B8%D0%B8-%D1%8E%D1%80%D0%B8%D0%B4%D0%B8%D1%87/?lang=ru
+  - https://cindemirlaw.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B0-%D0%B8-%D0%BE%D0%B1%D1%8F%D0%B7%D0%B0%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8/?lang=ru
+- **Warning-Noindex_page_b5db.csv** (6)
+  - https://cindemirlaw.com/tag/injury/
+  - https://cindemirlaw.com/tag/damage/
+  - https://cindemirlaw.com/tag/turkish/
+- **Warning-HTML_file_size_too_large_f779.csv** (1)
+  - https://cindemirlaw.com/articles/
+- **Warning-Image_redirects_696e.csv** (1)
+  - https://www.istanbulbarosu.org.tr/_next/image?url=%2Fimages%2Fbaro_logo.png&w=128&q=75
+- **Warning-Nofollow_page_58fa.csv** (1)
+  - https://cindemirlaw.com/the-structure-of-board-of-directors-according-to-turkish-commercial-code/
+- **Warning-Orphan_page__has_no_incoming_internal_links__3c90.csv** (1)
+  - https://cindemirlaw.com/antimanual-assistant/
+
+## Notices (counts only)
+
+- Notice-indexable-Page_has_nofollow_and_dofollow_incoming_internal_links-links_3548.csv: 2605
+- Notice-External_4XX-links_3bf7.csv: 286
+- Notice-External_3XX_redirect-links_ce0d.csv: 282
+- Notice-Pages_to_submit_to_IndexNow_496b.csv: 272
+- Notice-indexable-Title_tag_changed_dddb.csv: 105
+- Notice-indexable-Meta_description_changed_fbcb.csv: 47
+- Notice-Indexable_page_not_in_sitemap_0a5b.csv: 44
+- Notice-X-default_hreflang_annotation_missing_d707.csv: 44
+- Notice-Redirected_page_has_no_incoming_internal_links-links_2232.csv: 31
+- Notice-Page_has_links_to_redirect-links_ebc3.csv: 30
+- Notice-indexable-Page_has_nofollow_and_dofollow_incoming_internal_links_f9e0.csv: 15
+- Notice-indexable-Page_has_nofollow_outgoing_internal_links-links_6200.csv: 15
+- Notice-Page_has_links_to_redirect_4b36.csv: 10
+- Notice-indexable-Multiple_H1_tags_a391.csv: 8
+- Notice-indexable-Page_has_only_one_dofollow_incoming_internal_link-links_a688.csv: 8
+- Notice-indexable-Page_has_only_one_dofollow_incoming_internal_link_5a65.csv: 8
+- Notice-Indexable_page_became_non-indexable_98b3.csv: 6
+- Notice-Noindex_follow_page_23cc.csv: 6
+- Notice-Page_has_only_one_dofollow_incoming_internal_link-links_af16.csv: 5
+- Notice-Page_has_only_one_dofollow_incoming_internal_link_2e4e.csv: 5
+- Notice-Structured_data_has_schema.org_validation_error_05ac.csv: 5
+- Notice-Canonical_URL_changed_a22c.csv: 4
+- Notice-Meta_description_too_short_94ba.csv: 4
+- Notice-Redirected_page_has_no_incoming_internal_links_0b06.csv: 4
+- Notice-indexable-H1_tag_changed_e3ab.csv: 4
+- Notice-External_4XX_0c3b.csv: 3
+- Notice-HTTP_to_HTTPS_redirect_fe93.csv: 2
+- Notice-No._of_URLs_in_sitemap_decreased_7370.csv: 2
+- Notice-External_3XX_redirect_c48e.csv: 1
+- Notice-Page_in_multiple_sitemaps_416c.csv: 1
+- Notice-Redirect_chain_686f.csv: 1
+- Notice-indexable-Page_has_nofollow_outgoing_internal_links_aacc.csv: 1
+- Notice-indexable-Pages_have_high_AI_content_levels_4f0f.csv: 1
