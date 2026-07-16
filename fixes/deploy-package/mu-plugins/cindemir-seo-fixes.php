@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.54';
+	const VERSION = '1.9.55';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -1589,14 +1589,29 @@ final class Cindemir_SEO_Fixes {
 		}
 		$is_home = ( function_exists( 'is_front_page' ) && is_front_page() )
 			|| false !== strpos( $html, 'post-entry-15' )
-			|| (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
+			|| false !== strpos( $html, 'page-id-15' )
+			|| (bool) preg_match( '/<body[^>]*\bclass=(["\'])[^"\']*\bhome\b/i', $html );
 		if ( ! $is_home ) {
 			return $html;
 		}
-		if ( false !== strpos( $html, 'cindemir-mobile-hero-photo' ) ) {
+		if ( false !== strpos( $html, 'class="cindemir-mobile-hero-photo"' ) || false !== strpos( $html, "class='cindemir-mobile-hero-photo'" ) ) {
 			return $html;
 		}
-		if ( false === stripos( $html, 'av_section_1' ) ) {
+		$needle = 'id=\'av_section_1\'';
+		$pos    = strpos( $html, $needle );
+		if ( false === $pos ) {
+			$needle = 'id="av_section_1"';
+			$pos    = strpos( $html, $needle );
+		}
+		if ( false === $pos ) {
+			return $html;
+		}
+		$wrap = strpos( $html, 'av-section-color-overlay-wrap', $pos );
+		if ( false === $wrap ) {
+			return $html;
+		}
+		$gt = strpos( $html, '>', $wrap );
+		if ( false === $gt ) {
 			return $html;
 		}
 		$src  = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg';
@@ -1604,13 +1619,7 @@ final class Cindemir_SEO_Fixes {
 			. '<img src="' . esc_url( $src ) . '" alt="Cindemir Law Office legal team in Istanbul" '
 			. 'width="800" height="533" decoding="async" fetchpriority="high" />'
 			. '</div>';
-		$next = preg_replace(
-			'#(<div id=[\'"]av_section_1[\'"][^>]*>\s*<div class="av-section-color-overlay-wrap">)#i',
-			'$1' . $band,
-			$html,
-			1
-		);
-		return is_string( $next ) ? $next : $html;
+		return substr( $html, 0, $gt + 1 ) . $band . substr( $html, $gt + 1 );
 	}
 
 	/**
@@ -1901,6 +1910,7 @@ JS;
 		if ( ! ( is_front_page() || is_home() ) ) {
 			return;
 		}
+		$photo = esc_url( 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg' );
 		echo '<style id="cindemir-home-hero">'
 			. '.cindemir-mobile-hero-photo{display:none}'
 			. '@media only screen and (max-width:767px){'
@@ -1913,6 +1923,10 @@ JS;
 			. 'body.home #av_section_1 .av-section-color-overlay{display:none!important}'
 			. 'body.home #av_section_1 .av-section-color-overlay-wrap{'
 			. 'display:flex!important;flex-direction:column!important}'
+			/* CSS fallback band if HTML inject is skipped by a page cache generation path. */
+			. 'body.home #av_section_1 .av-section-color-overlay-wrap:not(:has(.cindemir-mobile-hero-photo))::before{'
+			. 'content:"";display:block;width:100%;height:min(48vh,320px);order:-1;'
+			. 'background:url(' . $photo . ') center 30%/cover no-repeat}'
 			. 'body.home .cindemir-mobile-hero-photo{'
 			. 'display:block!important;width:100%;order:-1;line-height:0;margin:0;padding:0}'
 			. 'body.home .cindemir-mobile-hero-photo img{'
@@ -1928,7 +1942,6 @@ JS;
 			. 'body.home #av_section_1 .avia_textblock a{color:#fff!important}'
 			. 'body.home #av_section_1 .avia_textblock a{'
 			. 'text-decoration:underline!important;text-underline-offset:2px;text-decoration-thickness:1px}'
-			/* First viewport: headline + short lead + CTA — not a wall of paragraphs. */
 			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(n+3){display:none!important}'
 			. 'body.home #av_section_1 .avia_textblock p:nth-of-type(2){'
 			. 'display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;'
@@ -1941,7 +1954,6 @@ JS;
 			. 'body.home #av_section_1 .avia-button .avia_iconbox_title{color:#1f4f4f!important}'
 			. 'body.home #av_section_1 .hr-inner,'
 			. 'body.home #av_section_1 .special-heading-inner-border{border-color:rgba(255,255,255,.35)!important}'
-			/* Mobile Welcome block: empty bg-image column was collapsing to 1px. */
 			. '#av_section_2 .flex_column_table{'
 			. 'display:flex!important;flex-direction:column!important}'
 			. '#av_section_2 .flex_column.av-kb0bnfzj-6b756727d2887e26a4cf2233375d0c98{'
@@ -1953,15 +1965,15 @@ JS;
 			. 'width:100%!important;padding:0 4%!important}'
 			. '@media (prefers-reduced-motion:no-preference){'
 			. '@keyframes cindemirHeroIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
-			. 'body.home .cindemir-mobile-hero-photo img{animation:cindemirHeroIn .65s ease-out both}'
+			. 'body.home .cindemir-mobile-hero-photo img,'
+			. 'body.home #av_section_1 .av-section-color-overlay-wrap::before{animation:cindemirHeroIn .65s ease-out both}'
 			. 'body.home #av_section_1 .av-special-heading{animation:cindemirHeroIn .65s .1s ease-out both}'
 			. 'body.home #av_section_1 .avia_textblock{animation:cindemirHeroIn .65s .18s ease-out both}'
 			. 'body.home #av_section_1 .avia-button-wrap{animation:cindemirHeroIn .65s .26s ease-out both}'
 			. '}'
 			. '}'
 			. '@media only screen and (min-width:768px){'
-			. 'body.home #av_section_1.avia-section{'
-			. 'background-position:50% 42%!important}'
+			. 'body.home #av_section_1.avia-section{background-position:50% 42%!important}'
 			. '}'
 			. '</style>' . "\n";
 	}

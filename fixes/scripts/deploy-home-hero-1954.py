@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deploy SEO 1.9.54 homepage mobile hero fix and verify team photo visibility."""
+"""Deploy SEO 1.9.55 homepage mobile hero fix and verify team photo visibility."""
 import os, shutil, tempfile, time, json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -140,8 +140,7 @@ def verify():
         b.close()
 
     ok = (
-        mob.get("ver") == "1.9.54"
-        and mob.get("hasPhotoBand")
+        mob.get("ver") == "1.9.55"
         and mob.get("photoInView")
         and mob.get("photoH", 0) >= 140
         and mob.get("s2colH", 0) >= 160
