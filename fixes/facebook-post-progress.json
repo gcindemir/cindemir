@@ -282,81 +282,125 @@
     }
   ],
   "remaining": 17,
-  "updated": "2026-07-17T06:39:42Z",
+  "updated": "2026-07-17T06:50:05Z",
   "last": {
     "title": "Training",
     "link": "https://cindemirlaw.com/training/",
     "status": "ok"
   },
   "posted_quality_links": [
+    "https://cindemirlaw.com/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye",
+    "https://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law",
     "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond",
     "https://cindemirlaw.com/basic-principles-of-turkish-labor-law",
     "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law",
     "https://cindemirlaw.com/cindemir-law",
     "https://cindemirlaw.com/cindemir-law-3",
     "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework",
+    "https://cindemirlaw.com/crypto-asset-fraud-common-schemes-legal-analysis-what-victims-should-do",
+    "https://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective",
+    "https://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law",
     "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey",
+    "https://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law",
     "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure",
+    "https://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process",
     "https://cindemirlaw.com/intentional-injury-resulting-in-death-under-turkish-criminal-law",
     "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters",
     "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul",
+    "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179",
     "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
+    "https://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens",
     "https://cindemirlaw.com/the-scope-of-turkish-labor-law",
     "https://cindemirlaw.com/the-structure-of-board-of-directors-according-to-turkish-commercial-code",
+    "https://cindemirlaw.com/title-deeds-in-turkey-a-legal-and-historical-overview",
     "https://cindemirlaw.com/tort-law-in-turkey",
     "https://cindemirlaw.com/tourism-law-in-turkey",
+    "https://cindemirlaw.com/turk-hukukunda-kripto-varliklarin-duzenlenmesi",
     "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey",
-    "https://cindemirlaw.com/turkish-inheritance-law"
+    "https://cindemirlaw.com/turkey-crypto-crimes-legal-landscape-enforcement-and-investor-protection",
+    "https://cindemirlaw.com/turkish-companies-before-the-court-of-justice-of-the-european-union",
+    "https://cindemirlaw.com/turkish-inheritance-law",
+    "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit"
   ],
   "last_quality": {
-    "title": "Intentional Injury Resulting in Death under Turkish Criminal Law",
-    "link": "https://cindemirlaw.com/intentional-injury-resulting-in-death-under-turkish-criminal-law/",
+    "title": "Crypto Asset Fraud in Turkey: Legal Perspective",
+    "link": "https://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective/",
     "status": "ok",
     "summary_len": 147
   },
   "last_quality_results": [
     {
-      "title": "Inheritance Law of Turkey",
-      "link": "https://cindemirlaw.com/turkish-inheritance-law/",
+      "title": "Legal Status of Late-Registered Turkish Citizens Concerning Military Service Obligations under Law No. 7179",
+      "link": "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "Turkish Employment Law",
-      "link": "https://cindemirlaw.com/the-scope-of-turkish-labor-law/",
+      "title": "Understanding SPK’s Introduction Guide for Information Systems Independent Audit",
+      "link": "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "Basic Principles of Turkish Labor Law",
-      "link": "https://cindemirlaw.com/basic-principles-of-turkish-labor-law/",
+      "title": "Turkey Crypto Crimes: Legal Landscape, Enforcement, and Investor Protection",
+      "link": "https://cindemirlaw.com/turkey-crypto-crimes-legal-landscape-enforcement-and-investor-protection/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "Enforcement of Foreign Judgments in Turkey",
-      "link": "https://cindemirlaw.com/tort-law-in-turkey/",
+      "title": "Inheritance Investigation in Turkey: Guiding International Heirs Through a Complex Process",
+      "link": "https://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "The Structure of Board of Directors According to Turkish Commercial Code",
-      "link": "https://cindemirlaw.com/the-structure-of-board-of-directors-according-to-turkish-commercial-code/",
+      "title": "Financial Rights of Daughters under Turkish Social Security Law",
+      "link": "https://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "Cindemir Law",
-      "link": "https://cindemirlaw.com/cindemir-law-3/",
+      "title": "Survivor Pension for Spouses of Deceased Turkish Citizens",
+      "link": "https://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens/",
       "ok": true,
       "status": "ok"
     },
     {
-      "title": "Cindemir Law Office – Lawyer Istanbul",
-      "link": "https://cindemirlaw.com/cindemir-law/",
+      "title": "Title Deeds in Turkey: A Legal and Historical Overview",
+      "link": "https://cindemirlaw.com/title-deeds-in-turkey-a-legal-and-historical-overview/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Crypto Market Manipulation and Its Legal Implications Under Turkish Law",
+      "link": "https://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "A Practical Overview of Crypto Asset Service Providers and Platforms in Türkiye",
+      "link": "https://cindemirlaw.com/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Crypto Asset Fraud: Common Schemes, Legal Analysis & What Victims Should Do",
+      "link": "https://cindemirlaw.com/crypto-asset-fraud-common-schemes-legal-analysis-what-victims-should-do/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Airport Customs Seizures and Smuggling Offences under Turkish Law",
+      "link": "https://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Regulation of Crypto Assets Under Turkish Law",
+      "link": "https://cindemirlaw.com/turk-hukukunda-kripto-varliklarin-duzenlenmesi/",
       "ok": true,
       "status": "ok"
     }
   ],
-  "quality_remaining": 188
+  "quality_remaining": 164
 }
