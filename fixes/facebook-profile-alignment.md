@@ -2,7 +2,7 @@
 
 **Sayfa:** [Cindemir Hukuk Bürosu / Cindemir Law Office](https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/)  
 **Site:** https://cindemirlaw.com  
-**Durum (17 Jul 2026):** Telefon, e-posta ve website doğru; intro kısa/eski, tam adres yok, P0 rehberler yok, eski duplicate FB URL sitede hâlâ geçiyor.
+**Durum (17 Jul 2026):** ✅ Biyografi güncellendi (P0 alanlar + cindemirlaw.com). Telefon, e-posta, website doğru. ⏳ Tam adres, CTA düğmesi ve sabitlenmiş P0 gönderisi manuel tamamlanacak.
 
 ---
 
