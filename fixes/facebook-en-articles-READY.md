@@ -2,12 +2,16 @@
 
 Total: **195** English articles from cindemirlaw.com
 
-Suggested post format:
+Suggested post format (Facebook link preview):
 ```
 {title}
 
-Read more: {article_url}
+{summary excerpt from meta description}
+
+https://cindemirlaw.com/article-slug/
 ```
+
+**Daily limit:** 5 posts/day with clickable link (run `bash fixes/scripts/facebook-post-daily.sh`).
 
 ## Recent articles
 

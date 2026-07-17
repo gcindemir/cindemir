@@ -46,7 +46,7 @@ def build_post_text(art: dict) -> str:
     if summary and summary.lower() not in title.lower():
         parts.append("")
         parts.append(summary)
-    parts.extend(["", f"Read more: {link}"])
+    parts.extend(["", link])
     return "\n".join(parts)
 
 

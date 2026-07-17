@@ -282,7 +282,7 @@
     }
   ],
   "remaining": 17,
-  "updated": "2026-07-17T06:50:05Z",
+  "updated": "2026-07-17T06:58:44Z",
   "last": {
     "title": "Training",
     "link": "https://cindemirlaw.com/training/",
@@ -301,13 +301,17 @@
     "https://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective",
     "https://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law",
     "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey",
+    "https://cindemirlaw.com/eu-legal-representative-services-for-ai-companies-outside-the-european-union",
+    "https://cindemirlaw.com/eu-representative-services-for-non-eu-companies-under-the-gdpr",
     "https://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law",
     "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure",
+    "https://cindemirlaw.com/humanitarian-residence-permit-in-turkey-legal-insights-by-cindemir-law-office",
     "https://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process",
     "https://cindemirlaw.com/intentional-injury-resulting-in-death-under-turkish-criminal-law",
     "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters",
     "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul",
     "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179",
+    "https://cindemirlaw.com/ottoman-archival-documents-and-their-role-in-legal-and-historical-investigations",
     "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
     "https://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens",
     "https://cindemirlaw.com/the-scope-of-turkish-labor-law",
@@ -323,84 +327,62 @@
     "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit"
   ],
   "last_quality": {
-    "title": "Crypto Asset Fraud in Turkey: Legal Perspective",
-    "link": "https://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective/",
-    "status": "ok",
-    "summary_len": 147
+    "title": "Airport Detention in Turkey: Legal Risks for Foreign Travellers and How to Respond",
+    "link": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
+    "status": "ok_with_link_preview",
+    "summary_len": 123,
+    "date": "2026-07-17"
   },
   "last_quality_results": [
     {
-      "title": "Legal Status of Late-Registered Turkish Citizens Concerning Military Service Obligations under Law No. 7179",
-      "link": "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
+      "title": "CISG in Turkey: International Sale of Goods Disputes and Legal Framework",
+      "link": "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework/",
       "ok": true,
-      "status": "ok"
+      "status": "ok_with_link_preview"
     },
     {
-      "title": "Understanding SPK’s Introduction Guide for Information Systems Independent Audit",
-      "link": "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit/",
+      "title": "Ottoman Title Deeds in Türkiye: Inheritance, Registration and Land Search",
+      "link": "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search/",
       "ok": true,
-      "status": "ok"
+      "status": "ok_with_link_preview"
     },
     {
-      "title": "Turkey Crypto Crimes: Legal Landscape, Enforcement, and Investor Protection",
-      "link": "https://cindemirlaw.com/turkey-crypto-crimes-legal-landscape-enforcement-and-investor-protection/",
+      "title": "Tourism Law in Turkey",
+      "link": "https://cindemirlaw.com/tourism-law-in-turkey/",
       "ok": true,
-      "status": "ok"
+      "status": "ok_with_link_preview"
     },
     {
-      "title": "Inheritance Investigation in Turkey: Guiding International Heirs Through a Complex Process",
-      "link": "https://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process/",
+      "title": "Turkey Asset Repatriation 2026: Legal Framework for Bringing Foreign Assets to Turkey",
+      "link": "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey/",
       "ok": true,
-      "status": "ok"
+      "status": "ok_with_link_preview"
     },
     {
-      "title": "Financial Rights of Daughters under Turkish Social Security Law",
-      "link": "https://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law/",
+      "title": "Airport Detention in Turkey: Legal Risks for Foreign Travellers and How to Respond",
+      "link": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
       "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Survivor Pension for Spouses of Deceased Turkish Citizens",
-      "link": "https://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Title Deeds in Turkey: A Legal and Historical Overview",
-      "link": "https://cindemirlaw.com/title-deeds-in-turkey-a-legal-and-historical-overview/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Crypto Market Manipulation and Its Legal Implications Under Turkish Law",
-      "link": "https://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "A Practical Overview of Crypto Asset Service Providers and Platforms in Türkiye",
-      "link": "https://cindemirlaw.com/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Crypto Asset Fraud: Common Schemes, Legal Analysis & What Victims Should Do",
-      "link": "https://cindemirlaw.com/crypto-asset-fraud-common-schemes-legal-analysis-what-victims-should-do/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Airport Customs Seizures and Smuggling Offences under Turkish Law",
-      "link": "https://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
-      "ok": true,
-      "status": "ok"
-    },
-    {
-      "title": "Regulation of Crypto Assets Under Turkish Law",
-      "link": "https://cindemirlaw.com/turk-hukukunda-kripto-varliklarin-duzenlenmesi/",
-      "ok": true,
-      "status": "ok"
+      "status": "ok_with_link_preview"
     }
   ],
-  "quality_remaining": 164
+  "quality_remaining": 190,
+  "daily": {
+    "2026-07-17": {
+      "count": 5,
+      "links": [
+        "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond",
+        "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework",
+        "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
+        "https://cindemirlaw.com/tourism-law-in-turkey",
+        "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey"
+      ]
+    }
+  },
+  "posted_with_link_preview": [
+    "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond",
+    "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework",
+    "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
+    "https://cindemirlaw.com/tourism-law-in-turkey",
+    "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey"
+  ]
 }
