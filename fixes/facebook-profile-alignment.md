@@ -2,7 +2,15 @@
 
 **Sayfa:** [Cindemir Hukuk Bürosu / Cindemir Law Office](https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/)  
 **Site:** https://cindemirlaw.com  
-**Durum (17 Jul 2026):** ✅ Biyografi güncellendi (P0 alanlar + cindemirlaw.com). Telefon, e-posta, website doğru. ⏳ Tam adres, CTA düğmesi ve sabitlenmiş P0 gönderisi manuel tamamlanacak.
+**Durum (17 Jul 2026):** ✅ Tamamlandı (yalnızca Cindemir Law Office sayfası — kişisel profile dokunulmadı).
+
+| Alan | Durum |
+|---|---|
+| Biyografi | ✅ P0 alanlar + `https://cindemirlaw.com` |
+| WhatsApp | ✅ `+90 532 568 06 47` (İletişim bilgileri) |
+| Adres | ✅ Maltepe, Istanbul, 34840 |
+| Telefon / e-posta / site | ✅ |
+| P0 hub gönderisi | ✅ Yayında |
 
 ---
 
