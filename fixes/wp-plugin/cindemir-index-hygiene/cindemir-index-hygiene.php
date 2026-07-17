@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Index Hygiene
  * Description: Ahrefs cleanup: noindex, hreflang, switcher, canonical, baro links, Our Videos orphan, P0 hub links, lang-query href cleanup, safe cluster redirects.
- * Version: 2.2.0
+ * Version: 2.2.1
  * Author: Cindemir Law Office
  */
 
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class Cindemir_Index_Hygiene {
-	const VERSION = '2.2.0';
+	const VERSION = '2.2.1';
 
 	const NOINDEX_SLUGS = array(
 		'appointment',
@@ -51,6 +51,9 @@ final class Cindemir_Index_Hygiene {
 		'http://www.barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
 		'http://barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
 		'https://barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
+		// Canonical Facebook page (replace legacy page id in footer/widgets).
+		'https://www.facebook.com/Cindemir-Hukuk-Brosu-Cindemir-Law-Office-336218871992/' => 'https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/',
+		'http://www.facebook.com/Cindemir-Hukuk-Brosu-Cindemir-Law-Office-336218871992/' => 'https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/',
 	);
 
 	public static function init() {
