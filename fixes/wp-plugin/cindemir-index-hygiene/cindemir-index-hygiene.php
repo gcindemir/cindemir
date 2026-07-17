@@ -529,10 +529,20 @@ final class Cindemir_Index_Hygiene {
 					'href="' . $from . '"',
 					"href='" . $from . "'",
 					'href="' . esc_url($from) . '"',
+					'content="' . $from . '"',
+					"content='" . $from . "'",
 				),
-				'href="' . esc_url($to) . '"',
+				array(
+					'href="' . esc_url($to) . '"',
+					"href='" . esc_url($to) . "'",
+					'href="' . esc_url($to) . '"',
+					'content="' . esc_url($to) . '"',
+					"content='" . esc_url($to) . "'",
+				),
 				$html
 			);
+			// Bare URL occurrences (Yoast og meta, JSON-LD, etc.).
+			$html = str_replace($from, esc_url($to), $html);
 		}
 		// Catch encoded ampersands variants for attorney search leftovers.
 		$html = preg_replace(
