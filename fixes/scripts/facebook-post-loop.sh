@@ -5,6 +5,7 @@ export DISPLAY=:1
 export PATH="$HOME/.local/bin:$PATH"
 export FB_BATCH="${FB_BATCH:-15}"
 export FB_DELAY="${FB_DELAY:-16}"
+export FB_MODE="${FB_MODE:-repost}"
 LOGDIR=/workspace/fixes
 ROUND=0
 MAX_ROUNDS="${MAX_ROUNDS:-20}"
@@ -15,10 +16,10 @@ while (( ROUND < MAX_ROUNDS )); do
 import json
 from pathlib import Path
 p = Path("/workspace/fixes/facebook-post-progress.json")
-arts = json.loads(Path("/workspace/fixes/facebook-en-articles-clean.json").read_text())
+arts = json.loads(Path("/workspace/fixes/facebook-en-articles-enriched.json").read_text())
 posted = set()
 if p.exists():
-    posted = {x.rstrip("/") for x in json.loads(p.read_text()).get("posted_links", [])}
+    posted = {x.rstrip("/") for x in json.loads(p.read_text()).get("posted_quality_links", [])}
 pending = [a for a in arts if a["link"].rstrip("/") not in posted]
 print(len(pending))
 PY

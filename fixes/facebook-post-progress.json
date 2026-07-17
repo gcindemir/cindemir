@@ -282,10 +282,70 @@
     }
   ],
   "remaining": 17,
-  "updated": "2026-07-17T06:07:40Z",
+  "updated": "2026-07-17T06:31:29Z",
   "last": {
     "title": "Training",
     "link": "https://cindemirlaw.com/training/",
     "status": "ok"
-  }
+  },
+  "posted_quality_links": [
+    "https://cindemirlaw.com/basic-principles-of-turkish-labor-law",
+    "https://cindemirlaw.com/cindemir-law",
+    "https://cindemirlaw.com/cindemir-law-3",
+    "https://cindemirlaw.com/the-scope-of-turkish-labor-law",
+    "https://cindemirlaw.com/the-structure-of-board-of-directors-according-to-turkish-commercial-code",
+    "https://cindemirlaw.com/tort-law-in-turkey",
+    "https://cindemirlaw.com/turkish-inheritance-law"
+  ],
+  "last_quality": {
+    "title": "Cindemir Law Office – Lawyer Istanbul",
+    "link": "https://cindemirlaw.com/cindemir-law/",
+    "status": "ok",
+    "summary_len": 153
+  },
+  "last_quality_results": [
+    {
+      "title": "Inheritance Law of Turkey",
+      "link": "https://cindemirlaw.com/turkish-inheritance-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Turkish Employment Law",
+      "link": "https://cindemirlaw.com/the-scope-of-turkish-labor-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Basic Principles of Turkish Labor Law",
+      "link": "https://cindemirlaw.com/basic-principles-of-turkish-labor-law/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Enforcement of Foreign Judgments in Turkey",
+      "link": "https://cindemirlaw.com/tort-law-in-turkey/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "The Structure of Board of Directors According to Turkish Commercial Code",
+      "link": "https://cindemirlaw.com/the-structure-of-board-of-directors-according-to-turkish-commercial-code/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Cindemir Law",
+      "link": "https://cindemirlaw.com/cindemir-law-3/",
+      "ok": true,
+      "status": "ok"
+    },
+    {
+      "title": "Cindemir Law Office – Lawyer Istanbul",
+      "link": "https://cindemirlaw.com/cindemir-law/",
+      "ok": true,
+      "status": "ok"
+    }
+  ],
+  "quality_remaining": 188
 }
