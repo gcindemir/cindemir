@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.64 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.65 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.64
+ * Version: 1.9.65
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,11 +172,11 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.64';
+	const VERSION = '1.9.65';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
-	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718e';
-	const TEAM_PHOTO_CACHE_VER = '20260718e';
+	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
+	const TEAM_PHOTO_CACHE_VER = '20260718f';
 
 	/** Deploy freshness marker for pull-plugins. */
 	const DEPLOY_MARKER = 'TEAM_PHOTO_SYNC_20260718B';
@@ -272,6 +272,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
 		add_action( 'wp_head', array( __CLASS__, 'header_brand_styles' ), 50 );
 		add_action( 'wp_head', array( __CLASS__, 'homepage_hero_styles' ), 51 );
+		add_action( 'wp_head', array( __CLASS__, 'team_photo_background_fix' ), 52 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_head_hints' ), 1 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_a11y_styles' ), 52 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pagespeed_dequeue_heavy' ), 100 );
@@ -514,9 +515,9 @@ final class Cindemir_SEO_Fixes {
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/team-2026/',
 		);
 		$files  = array(
-			'5295681199059.jpg'           => 90000,
-			'5295681199059.webp'          => 40000,
-			'5295681199059.jpg.webp'      => 40000,
+			'5295681199059.jpg'           => 40000,
+			'5295681199059.webp'          => 20000,
+			'5295681199059.jpg.webp'      => 20000,
 			'5295681199059-300x135.jpg'   => 3000,
 			'5295681199059-300x135.webp'  => 2000,
 			'5295681199059-705x318.jpg'   => 8000,
@@ -2068,7 +2069,18 @@ JS;
 	 * Friendlier homepage entrance. Applies through Enfold's burger breakpoint (989px)
 	 * so phones AND tablets see the team photo; desktop also gets a cleaner crop/copy.
 	 */
-	public static function homepage_hero_styles() {
+		/** Keep Enfold team-photo background columns from exploding with non-landscape assets. */
+	public static function team_photo_background_fix() {
+		echo '<style id="cindemir-team-photo-bg">'
+			. '.flex_column.av-kb0bnfzj-6b756727d2887e26a4cf2233375d0c98,'
+			. '.flex_column[style*="5295681199059"],'
+			. '.avia-section .flex_column[class*="av-"][style*="529568"]{'
+			. 'background-size:cover!important;background-position:center center!important;'
+			. 'background-repeat:no-repeat!important}'
+			. '</style>\n';
+	}
+
+public static function homepage_hero_styles() {
 		if ( is_admin() ) {
 			return;
 		}
