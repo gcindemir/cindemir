@@ -20,7 +20,7 @@ Inspired by **cindemirlaw.com** (Enfold teal brand).
 
 | Asset | File / URL |
 |---|---|
-| **Cover** | `fixes/assets/fb-cover-cindemir.png` — Istanbul skyline + “CINDEMIR LAW OFFICE · Since 1892” |
+| **Cover** | `fixes/assets/fb-cover-cindemir.png` — Istanbul skyline + “CINDEMIR LAW OFFICE · Istanbul · Turkish & International Law” (no founding-year claim) |
 | **Profile** | Site logo: `https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg` |
 | **Hero reference** | `https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg` |
 
@@ -50,12 +50,14 @@ WhatsApp: +90 532 568 06 47
 
 **CTA:** WhatsApp → `+90 532 568 06 47` (or Contact → `https://cindemirlaw.com/contacts/`)
 
-## Content cadence
+## Content cadence (calendar)
 
 - **5 English posts / day** from `cindemirlaw.com` articles  
+- Times (Istanbul): **10:00 · 12:30 · 15:00 · 17:30 · 20:00**
 - Format: 2–4 sentence summary + single canonical URL (no `?lang=`)  
-- Calendar: `fixes/facebook-content-calendar.json`  
-- Publish script: `fixes/scripts/fb-publish-day.py --day N`
+- Full calendar: `fixes/facebook-content-calendar.json` (~41 days / ~205 posts after day 1)
+- **Schedule all queued:** `python3 fixes/scripts/fb-schedule-posts.py`
+- Rebuild from sitemap: `python3 fixes/scripts/fb-list-articles.py && python3 fixes/scripts/fb-build-calendar.py`
 
 ## Post template
 
