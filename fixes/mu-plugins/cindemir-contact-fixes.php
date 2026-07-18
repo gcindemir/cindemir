@@ -948,7 +948,7 @@ final class Cindemir_Contact_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$marker = 'TEAM_PHOTO_SYNC_20260718A';
+		$marker = 'TEAM_PHOTO_SYNC_20260718B';
 		$bases  = array(
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',

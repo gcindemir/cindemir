@@ -52,7 +52,7 @@ add_action(
 		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
 			return;
 		}
-		$done_key = 'cindemir_team_photo_fix_20260718a';
+		$done_key = 'cindemir_team_photo_fix_20260718b';
 		if ( get_option( $done_key ) ) {
 			// Still allow one-shot cache purge flag path below once.
 		} else {
@@ -72,7 +72,7 @@ add_action(
 			foreach ( $files as $name => $min ) {
 				$body = '';
 				foreach ( $bases as $base ) {
-					$url      = $base . $name . '?v=TEAM_PHOTO_SYNC_20260718A';
+					$url      = $base . $name . '?v=TEAM_PHOTO_SYNC_20260718B';
 					$response = wp_remote_get(
 						$url,
 						array(
@@ -87,7 +87,7 @@ add_action(
 						continue;
 					}
 					$tmp = (string) wp_remote_retrieve_body( $response );
-					if ( strlen( $tmp ) < $min || ( false === strpos( $tmp, 'TEAM_PHOTO_SYNC_20260718A' ) && false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) ) {
+					if ( strlen( $tmp ) < $min || ( false === strpos( $tmp, 'TEAM_PHOTO_SYNC_20260718B' ) && false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) ) {
 						continue;
 					}
 					$body = $tmp;

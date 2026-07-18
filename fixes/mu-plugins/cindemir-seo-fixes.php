@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.60 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.61 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.60
+ * Version: 1.9.61
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,14 +172,14 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.60';
+	const VERSION = '1.9.61';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
-	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718a';
-	const TEAM_PHOTO_CACHE_VER = '20260718a';
+	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718b';
+	const TEAM_PHOTO_CACHE_VER = '20260718b';
 
 	/** Deploy freshness marker for pull-plugins. */
-	const DEPLOY_MARKER = 'TEAM_PHOTO_SYNC_20260718A';
+	const DEPLOY_MARKER = 'TEAM_PHOTO_SYNC_20260718B';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -764,7 +764,7 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$marker = 'TEAM_PHOTO_SYNC_20260718A';
+		$marker = 'TEAM_PHOTO_SYNC_20260718B';
 		$bases  = array(
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
