@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.65 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.66 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.65
+ * Version: 1.9.66
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,14 +172,14 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.65';
+	const VERSION = '1.9.66';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
 	const TEAM_PHOTO_CACHE_VER = '20260718f';
 
 	/** Deploy freshness marker for pull-plugins. */
-	const DEPLOY_MARKER = 'TEAM_PHOTO_SYNC_20260718B';
+	const DEPLOY_MARKER = 'ELENA_ZARA_RU_BIO_20260718';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -267,6 +267,10 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'fix_headings' ), 12 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_content_hrefs' ), 25 );
 		add_filter( 'the_content', array( __CLASS__, 'rewrite_legacy_media_in_content' ), 15 );
+		add_filter( 'the_content', array( __CLASS__, 'append_elena_zara_ru_bio' ), 30 );
+		add_action( 'wp_head', array( __CLASS__, 'elena_zara_bio_styles' ), 53 );
+		add_filter( 'wpseo_meta_author', array( __CLASS__, 'filter_ru_meta_author' ), 20 );
+		add_filter( 'wpseo_schema_graph', array( __CLASS__, 'filter_ru_schema_graph' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'footer_meta_styles' ), 51 );
 		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
@@ -765,7 +769,7 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$marker = 'TEAM_PHOTO_SYNC_20260718B';
+		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$bases  = array(
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
@@ -1497,6 +1501,183 @@ final class Cindemir_SEO_Fixes {
 		return $html;
 	}
 
+
+	/** True on Russian single blog posts (WPML ?lang=ru / ICL). */
+	private static function is_ru_single_post() {
+		if ( ! is_singular( 'post' ) ) {
+			return false;
+		}
+		$lang = self::front_lang();
+		if ( 'ru' === $lang ) {
+			return true;
+		}
+		// Fallback: body/html already rendered with ru locale markers during buffer.
+		return false;
+	}
+
+	/** Short author bio shown at the end of Russian articles. */
+	public static function elena_zara_bio_html() {
+		$photo = 'https://cindemirlaw.com/wp-content/uploads/2014/11/portrait-5-copy-240x300.jpg';
+		$team  = 'https://cindemirlaw.com/team/?lang=ru';
+		$mail  = 'mailto:elena.zara@cindemir.av.tr';
+		$bio   = 'Ав. Елена Зара — адвокат Стамбульской коллегии адвокатов. Окончила Современную гуманитарную академию (международное право) и юридический факультет Стамбульского университета Айдын. Владеет русским, турецким и английским языками. С 2014 года консультирует по правовым вопросам Турции, России и стран СНГ.';
+		return '<aside class="cindemir-elena-bio" aria-label="Об авторе">'
+			. '<div class="cindemir-elena-bio__media">'
+			. '<img src="' . esc_url( $photo ) . '" alt="Ав. Елена Зара" width="120" height="150" loading="lazy" decoding="async" />'
+			. '</div>'
+			. '<div class="cindemir-elena-bio__body">'
+			. '<p class="cindemir-elena-bio__name">Ав. Елена Зара</p>'
+			. '<p class="cindemir-elena-bio__role">Адвокат · Стамбульская коллегия адвокатов</p>'
+			. '<p class="cindemir-elena-bio__text">' . esc_html( $bio ) . '</p>'
+			. '<p class="cindemir-elena-bio__links">'
+			. '<a href="' . esc_url( $team ) . '">Команда бюро</a>'
+			. ' · '
+			. '<a href="' . esc_attr( $mail ) . '">elena.zara@cindemir.av.tr</a>'
+			. '</p>'
+			. '</div>'
+			. '</aside>';
+	}
+
+	public static function append_elena_zara_ru_bio( $content ) {
+		if ( is_admin() || ! self::is_ru_single_post() || ! in_the_loop() || ! is_main_query() ) {
+			return $content;
+		}
+		if ( ! is_string( $content ) || '' === $content ) {
+			return $content;
+		}
+		if ( false !== strpos( $content, 'cindemir-elena-bio' ) ) {
+			return $content;
+		}
+		return $content . self::elena_zara_bio_html();
+	}
+
+	public static function elena_zara_bio_styles() {
+		if ( ! self::is_ru_single_post() ) {
+			return;
+		}
+		echo '<style id="cindemir-elena-bio-css">'
+			. '.cindemir-elena-bio{display:flex;gap:1.1rem;align-items:flex-start;margin:2.25rem 0 1.25rem;'
+			. 'padding:1.15rem 0 0;border-top:1px solid rgba(31,79,79,.22);max-width:720px}'
+			. '.cindemir-elena-bio__media{flex:0 0 auto}'
+			. '.cindemir-elena-bio__media img{display:block;width:96px;height:auto;object-fit:cover;'
+			. 'border-radius:2px;filter:grayscale(8%)}'
+			. '.cindemir-elena-bio__name{margin:0 0 .2rem;font-size:1.12rem;font-weight:700;color:#1f4f4f}'
+			. '.cindemir-elena-bio__role{margin:0 0 .55rem;font-size:.92rem;color:#444}'
+			. '.cindemir-elena-bio__text{margin:0 0 .65rem;font-size:.98rem;line-height:1.55;color:#222}'
+			. '.cindemir-elena-bio__links{margin:0;font-size:.92rem}'
+			. '.cindemir-elena-bio__links a{color:#1f4f4f;text-decoration:underline;text-underline-offset:2px}'
+			. '@media(max-width:640px){.cindemir-elena-bio{flex-direction:row;gap:.85rem}'
+			. '.cindemir-elena-bio__media img{width:72px}}'
+			. '</style>' . "\n";
+	}
+
+	public static function filter_ru_meta_author( $author ) {
+		if ( self::is_ru_single_post() ) {
+			return 'Av. Elena Zara';
+		}
+		return $author;
+	}
+
+	/** Replace Yoast schema Person "admin" with Elena Zara on RU posts. */
+	public static function filter_ru_schema_graph( $graph ) {
+		if ( ! self::is_ru_single_post() || ! is_array( $graph ) ) {
+			return $graph;
+		}
+		foreach ( $graph as $i => $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'Person', $types, true ) ) {
+				$name = isset( $node['name'] ) ? (string) $node['name'] : '';
+				if ( '' === $name || 0 === strcasecmp( $name, 'admin' ) ) {
+					$graph[ $i ]['name'] = 'Av. Elena Zara';
+					$graph[ $i ]['url']  = 'https://cindemirlaw.com/team/?lang=ru';
+					$graph[ $i ]['image'] = 'https://cindemirlaw.com/wp-content/uploads/2014/11/portrait-5-copy-240x300.jpg';
+					$graph[ $i ]['jobTitle'] = 'Attorney at Law';
+					$graph[ $i ]['worksFor'] = array(
+						'@type' => 'Organization',
+						'name'  => 'Cindemir Law Office',
+						'url'   => 'https://cindemirlaw.com/',
+					);
+				}
+			}
+		}
+		return $graph;
+	}
+
+	/** HTML-buffer fallbacks for RU author attribution + bio placement. */
+	private static function rewrite_ru_article_seo( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$is_ru = ( 'ru' === self::front_lang() )
+			|| false !== strpos( $html, 'og:locale" content="ru_RU"' )
+			|| false !== strpos( $html, "og:locale' content='ru_RU'" )
+			|| false !== strpos( $html, 'language_ru' );
+		$is_post = false !== strpos( $html, 'single-post' ) || false !== strpos( $html, 'post-template-default' );
+		if ( ! $is_ru || ! $is_post ) {
+			return $html;
+		}
+
+		// Author meta.
+		$html = preg_replace(
+			'/<meta\s+name=["\']author["\']\s+content=["\']admin["\']\s*\/?>/i',
+			'<meta name="author" content="Av. Elena Zara" />',
+			$html,
+			1
+		);
+		if ( false === stripos( $html, 'name="author"' ) ) {
+			$html = preg_replace(
+				'/(<meta\s+property=["\']og:locale["\'][^>]*>)/i',
+				'$1' . "\n" . '<meta name="author" content="Av. Elena Zara" />',
+				$html,
+				1
+			);
+		}
+
+		// Schema Person name in JSON-LD blobs.
+		$html = preg_replace(
+			'/"@type"\s*:\s*"Person"\s*,\s*"name"\s*:\s*"admin"/',
+			'"@type":"Person","name":"Av. Elena Zara"',
+			$html
+		);
+		$html = preg_replace(
+			'/"name"\s*:\s*"admin"\s*,\s*"url"\s*:\s*"https:\\\\\/\\\\\/cindemirlaw\.com\\\\\/\?lang=ru"/',
+			'"name":"Av. Elena Zara","url":"https:\\/\\/cindemirlaw.com\\/team\\/?lang=ru"',
+			$html
+		);
+
+		// Inject bio before closing post-entry article if the_content filter missed builder layouts.
+		if ( false === strpos( $html, 'cindemir-elena-bio' ) ) {
+			$bio = self::elena_zara_bio_html();
+			$replaced = preg_replace(
+				'#(</article>)#i',
+				$bio . '$1',
+				$html,
+				1,
+				$count
+			);
+			if ( is_string( $replaced ) && $count > 0 ) {
+				$html = $replaced;
+			} else {
+				$replaced = preg_replace(
+					'#(</div>\s*<!--\s*close post-entry|id=["\']after_section)#i',
+					$bio . '$1',
+					$html,
+					1,
+					$count2
+				);
+				if ( is_string( $replaced ) && ! empty( $count2 ) ) {
+					$html = $replaced;
+				}
+			}
+		}
+
+		return $html;
+	}
+
 	public static function version_marker() {
 		echo "\n<!-- cindemir-seo-fixes " . esc_html( self::VERSION ) . " -->\n";
 	}
@@ -1566,7 +1747,11 @@ final class Cindemir_SEO_Fixes {
 		$title = wp_strip_all_tags( get_the_title( $post ) );
 		$title = trim( preg_replace( '/\s*[-|–—]\s*Cindemir.*$/u', '', $title ) );
 		$base  = $desc ? $desc : $title;
-		$suffix = ' Overview of relevant Turkish law topics, procedures, and legal context for foreign individuals and companies.';
+		if ( 'ru' === self::front_lang() ) {
+			$suffix = ' Материал подготовлен Ав. Еленой Зара (Cindemir Law Office, Стамбул).';
+		} else {
+			$suffix = ' Overview of relevant Turkish law topics, procedures, and legal context for foreign individuals and companies.';
+		}
 		$out    = trim( $base . $suffix );
 		$olen   = function_exists( 'mb_strlen' ) ? mb_strlen( $out ) : strlen( $out );
 		if ( $olen > 160 ) {
@@ -1727,6 +1912,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_hreflang_html( $html );
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
+		$html = self::rewrite_ru_article_seo( $html );
 		$html = self::apply_title_overrides_html( $html );
 		$html = self::fix_og_tags_html( $html );
 		$html = self::normalize_robots_meta( $html );
@@ -3165,41 +3351,40 @@ public static function homepage_hero_styles() {
 				$raw = wp_strip_all_tags( $m[1] );
 				$raw = html_entity_decode( $raw, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 				$raw = preg_replace( '/\s+/', ' ', trim( $raw ) );
-				if ( function_exists( 'mb_strlen' ) ) {
-					$len = mb_strlen( $raw );
-				} else {
-					$len = strlen( $raw );
-				}
+				$is_ru = ( 'ru' === self::front_lang() );
+				$len   = function_exists( 'mb_strlen' ) ? mb_strlen( $raw ) : strlen( $raw );
 				if ( $len <= 60 ) {
 					return '<title>' . esc_html( $raw ) . '</title>';
 				}
-				$brand = 'Cindemir Law Office';
-				$base  = preg_replace( '/\s*[-|–—]\s*Cindemir Law Office\s*$/u', '', $raw );
+				$brand = $is_ru ? 'Cindemir' : 'Cindemir Law Office';
+				$base  = preg_replace( '/\s*[-|–—]\s*Cindemir(?: Law Office)?\s*$/u', '', $raw );
+				$base  = preg_replace( '/\s*\|\s*Cindemir(?: Law Office)?\s*$/u', '', $base );
 				$base  = trim( $base );
-				$max   = 55;
-				if ( function_exists( 'mb_strlen' ) && mb_strlen( $base ) > $max ) {
-					$cut = mb_substr( $base, 0, $max );
-					$pos = mb_strrpos( $cut, ' ' );
-					if ( false !== $pos ) {
-						$cut = mb_substr( $cut, 0, $pos );
+				// Leave more room for Cyrillic titles; brand is short.
+				$max   = $is_ru ? 50 : 55;
+				$blen  = function_exists( 'mb_strlen' ) ? mb_strlen( $base ) : strlen( $base );
+				if ( $blen > $max ) {
+					$cut = function_exists( 'mb_substr' ) ? mb_substr( $base, 0, $max ) : substr( $base, 0, $max );
+					$pos = function_exists( 'mb_strrpos' ) ? mb_strrpos( $cut, ' ' ) : strrpos( $cut, ' ' );
+					if ( false !== $pos && $pos > (int) ( $max * 0.55 ) ) {
+						$cut = function_exists( 'mb_substr' ) ? mb_substr( $cut, 0, $pos ) : substr( $cut, 0, $pos );
 					}
-					$base = $cut . '…';
-				} elseif ( strlen( $base ) > $max ) {
-					$cut = substr( $base, 0, $max );
-					$pos = strrpos( $cut, ' ' );
-					if ( false !== $pos ) {
-						$cut = substr( $cut, 0, $pos );
-					}
-					$base = $cut . '...';
+					$base = rtrim( $cut, ' :,—-–—' ) . '…';
 				}
-				$new = $base . ' - ' . $brand;
+				$sep = $is_ru ? ' | ' : ' - ';
+				$new = $base . $sep . $brand;
 				$new_len = function_exists( 'mb_strlen' ) ? mb_strlen( $new ) : strlen( $new );
 				if ( $new_len > 60 ) {
-					if ( function_exists( 'mb_substr' ) ) {
-						$new = mb_substr( $base, 0, 48 ) . '… | Cindemir';
-					} else {
-						$new = substr( $base, 0, 48 ) . '... | Cindemir';
+					$keep = 60 - ( function_exists( 'mb_strlen' ) ? mb_strlen( $sep . $brand ) : strlen( $sep . $brand ) ) - 1;
+					if ( $keep < 24 ) {
+						$keep = 24;
 					}
+					$cut = function_exists( 'mb_substr' ) ? mb_substr( $base, 0, $keep ) : substr( $base, 0, $keep );
+					$pos = function_exists( 'mb_strrpos' ) ? mb_strrpos( $cut, ' ' ) : strrpos( $cut, ' ' );
+					if ( false !== $pos && $pos > 16 ) {
+						$cut = function_exists( 'mb_substr' ) ? mb_substr( $cut, 0, $pos ) : substr( $cut, 0, $pos );
+					}
+					$new = rtrim( $cut, ' :,—-–—' ) . '…' . $sep . $brand;
 				}
 				return '<title>' . esc_html( $new ) . '</title>';
 			},

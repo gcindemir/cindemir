@@ -4,7 +4,7 @@
  * Description: Yoast REST expose + one-shot download of cindemir-seo-fixes.php v1.7.0 from GitHub when missing.
  * Author: Cindemir Law
  * Version: 1.3
- * SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B
+ * SERVICES_BLANK_FIX_20260715 + ELENA_ZARA_RU_BIO_20260718
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
