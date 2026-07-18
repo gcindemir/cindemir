@@ -3,7 +3,7 @@
  * Plugin Name: Cindemir Services Page Redesign
  * Description: Replaces the cluttered Enfold Services page with a clearer, multilingual layout.
  * Version: 1.0.4
- * SERVICES_BLANK_FIX_20260715
+ * SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A
  * Author: Cindemir Law Office
  */
 

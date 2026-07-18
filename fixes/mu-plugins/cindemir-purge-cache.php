@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Cache Purge + Services Blank Rescue
  * Description: Purges caches; emergency-disables broken Services rewrite; pulls fixed mu-plugins.
- * Version: 1.2
+ * Version: 1.3
  * SERVICES_BLANK_FIX_20260715
  */
 
@@ -52,7 +52,7 @@ add_action(
 		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
 			return;
 		}
-		$done_key = 'cindemir_services_blank_fix_20260715';
+		$done_key = 'cindemir_team_photo_fix_20260718a';
 		if ( get_option( $done_key ) ) {
 			// Still allow one-shot cache purge flag path below once.
 		} else {
@@ -64,6 +64,7 @@ add_action(
 			);
 			$bases  = array(
 				'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+				'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 				'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 			);
 
@@ -71,7 +72,7 @@ add_action(
 			foreach ( $files as $name => $min ) {
 				$body = '';
 				foreach ( $bases as $base ) {
-					$url      = $base . $name . '?v=SERVICES_BLANK_FIX_20260715';
+					$url      = $base . $name . '?v=TEAM_PHOTO_SYNC_20260718A';
 					$response = wp_remote_get(
 						$url,
 						array(
@@ -86,7 +87,7 @@ add_action(
 						continue;
 					}
 					$tmp = (string) wp_remote_retrieve_body( $response );
-					if ( strlen( $tmp ) < $min || false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) {
+					if ( strlen( $tmp ) < $min || ( false === strpos( $tmp, 'TEAM_PHOTO_SYNC_20260718A' ) && false === strpos( $tmp, 'SERVICES_BLANK_FIX_20260715' ) ) ) {
 						continue;
 					}
 					$body = $tmp;

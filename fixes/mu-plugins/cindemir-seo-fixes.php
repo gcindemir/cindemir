@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.57 + SERVICES_BLANK_FIX_20260715 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.57 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -177,6 +177,9 @@ final class Cindemir_SEO_Fixes {
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718a';
 	const TEAM_PHOTO_CACHE_VER = '20260718a';
+
+	/** Deploy freshness marker for pull-plugins. */
+	const DEPLOY_MARKER = 'TEAM_PHOTO_SYNC_20260718A';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -628,7 +631,7 @@ final class Cindemir_SEO_Fixes {
 		if ( get_transient( 'cindemir_seo_self_upgrade_lock' ) ) {
 			return;
 		}
-		set_transient( 'cindemir_seo_self_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
+		set_transient( 'cindemir_seo_self_upgrade_lock', 1, 2 * MINUTE_IN_SECONDS );
 
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$url    = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/cindemir-seo-fixes.php';
@@ -665,7 +668,7 @@ final class Cindemir_SEO_Fixes {
 		if ( ! defined( 'WPMU_PLUGIN_DIR' ) || get_transient( 'cindemir_sibling_upgrade_lock' ) ) {
 			return;
 		}
-		set_transient( 'cindemir_sibling_upgrade_lock', 1, 15 * MINUTE_IN_SECONDS );
+		set_transient( 'cindemir_sibling_upgrade_lock', 1, 2 * MINUTE_IN_SECONDS );
 
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$base   = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
@@ -761,13 +764,13 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$marker = 'SERVICES_BLANK_FIX_20260715';
+		$marker = 'TEAM_PHOTO_SYNC_20260718A';
 		$bases  = array(
-			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
-			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
-			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 40000,
