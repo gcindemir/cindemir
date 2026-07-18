@@ -173,6 +173,8 @@ final class Cindemir_SEO_Fixes {
 	);
 
 	const VERSION = '1.9.66';
+	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
+	const DEPLOY_COMMIT = '682665e';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
@@ -770,15 +772,19 @@ final class Cindemir_SEO_Fixes {
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
+		$commit = $request->get_param( 'commit' );
+		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
+			$commit = self::DEPLOY_COMMIT;
+		}
+		// Prefer raw GitHub + commit-pinned CDNs. Branch-tag jsDelivr is often stale.
 		$bases  = array(
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
-			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
-			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
-			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
-			'cindemir-seo-fixes.php'         => 148000,
+			'cindemir-seo-fixes.php'         => 155000,
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
@@ -790,12 +796,13 @@ final class Cindemir_SEO_Fixes {
 			$src  = '';
 			foreach ( $bases as $base ) {
 				$response = wp_remote_get(
-					$base . $name . '?v=' . rawurlencode( $marker ),
+					$base . $name . '?v=' . rawurlencode( $marker . '-' . self::VERSION ),
 					array(
-						'timeout' => 60,
+						'timeout' => 90,
 						'headers' => array(
 							'User-Agent'    => 'CindemirPull/' . self::VERSION,
 							'Cache-Control' => 'no-cache',
+							'Pragma'        => 'no-cache',
 						),
 					)
 				);
@@ -803,11 +810,13 @@ final class Cindemir_SEO_Fixes {
 					continue;
 				}
 				$tmp = (string) wp_remote_retrieve_body( $response );
-				if ( strlen( $tmp ) < $min ) {
+				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
-				if ( in_array( $name, array( 'cindemir-contact-fixes.php', 'cindemir-services-page.php', 'cindemir-purge-cache.php', 'cindemir-seo-fixes.php' ), true )
-					&& false === strpos( $tmp, $marker ) ) {
+				if ( false === strpos( $tmp, $marker ) ) {
+					continue;
+				}
+				if ( 'cindemir-seo-fixes.php' === $name && false === strpos( $tmp, 'Version: ' . self::VERSION ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -830,7 +839,16 @@ final class Cindemir_SEO_Fixes {
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
 		}
-		return new WP_REST_Response( array( 'ok' => true, 'version' => self::VERSION, 'files' => $out ), 200 );
+		return new WP_REST_Response(
+			array(
+				'ok'      => true,
+				'version' => self::VERSION,
+				'marker'  => $marker,
+				'commit'  => $commit,
+				'files'   => $out,
+			),
+			200
+		);
 	}
 
 	public static function filter_canonical_url( $url ) {

@@ -2,8 +2,9 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.16
+ * Version: 1.3.17
  * SERVICES_BLANK_FIX_20260715
+ * ELENA_ZARA_RU_BIO_20260718
  * Author: Cindemir Law Office
  */
 
@@ -949,15 +950,19 @@ final class Cindemir_Contact_Fixes {
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
+		$commit = $request->get_param( 'commit' );
+		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
+			// Known-good commit with Elena RU bio + SEO (1.9.66). Override via ?commit=.
+			$commit = '682665e';
+		}
 		$bases  = array(
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
-			'https://raw.githack.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
-			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
-			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
-			'cindemir-seo-fixes.php'         => 148000,
+			'cindemir-seo-fixes.php'         => 155000,
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
@@ -970,12 +975,13 @@ final class Cindemir_Contact_Fixes {
 			$src  = '';
 			foreach ( $bases as $base_url ) {
 				$response = wp_remote_get(
-					$base_url . $name . '?v=' . rawurlencode( $marker ),
+					$base_url . $name . '?v=' . rawurlencode( $marker . '-' . $commit ),
 					array(
-						'timeout' => 60,
+						'timeout' => 90,
 						'headers' => array(
-							'User-Agent'    => 'CindemirPull/1.3.12',
+							'User-Agent'    => 'CindemirPull/1.3.17',
 							'Cache-Control' => 'no-cache',
+							'Pragma'        => 'no-cache',
 						),
 					)
 				);
@@ -983,10 +989,13 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				$tmp = (string) wp_remote_retrieve_body( $response );
-				if ( strlen( $tmp ) < $min ) {
+				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
-				if ( false === strpos( $tmp, $marker ) && in_array( $name, array( 'cindemir-contact-fixes.php', 'cindemir-services-page.php', 'cindemir-purge-cache.php', 'cindemir-seo-fixes.php', 'cindemir-expose-yoast-meta.php' ), true ) ) {
+				if ( false === strpos( $tmp, $marker ) ) {
+					continue;
+				}
+				if ( 'cindemir-seo-fixes.php' === $name && false === strpos( $tmp, 'Version: 1.9.66' ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -1008,7 +1017,15 @@ final class Cindemir_Contact_Fixes {
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
 		}
-		return new WP_REST_Response( array( 'ok' => true, 'files' => $out ), 200 );
+		return new WP_REST_Response(
+			array(
+				'ok'     => true,
+				'marker' => $marker,
+				'commit' => $commit,
+				'files'  => $out,
+			),
+			200
+		);
 	}
 
 	/** One-shot Ahrefs cleanup: WPML contacts + press + meta + cache. */
