@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.67 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.68 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.67
+ * Version: 1.9.68
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.67';
+	const VERSION = '1.9.68';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '3fecd51';
 
@@ -272,7 +272,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'the_content', array( __CLASS__, 'append_elena_zara_ru_bio' ), 30 );
 		add_action( 'wp_head', array( __CLASS__, 'elena_zara_bio_styles' ), 53 );
 		add_filter( 'wpseo_meta_author', array( __CLASS__, 'filter_ru_meta_author' ), 20 );
-		add_filter( 'wpseo_schema_graph', array( __CLASS__, 'filter_ru_schema_graph' ), 20 );
+		add_filter( 'wpseo_schema_graph', array( __CLASS__, 'filter_schema_graph' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'footer_meta_styles' ), 51 );
 		add_action( 'wp_footer', array( __CLASS__, 'render_compact_footer_meta' ), 21 );
 		add_action( 'wp_footer', array( __CLASS__, 'version_marker' ), 99 );
@@ -819,7 +819,7 @@ final class Cindemir_SEO_Fixes {
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
-						|| false === strpos( $tmp, 'ELENA_ZARA_BAR_SAFE_20260718' ) ) ) {
+						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -1585,26 +1585,231 @@ final class Cindemir_SEO_Fixes {
 		return $author;
 	}
 
-	/** Replace Yoast schema Person "admin" with factual author name only. */
-	public static function filter_ru_schema_graph( $graph ) {
-		if ( ! self::is_ru_single_post() || ! is_array( $graph ) ) {
+	/**
+	 * Site-wide Yoast schema cleanup (bar-safe, factual).
+	 * - RU posts: author Person → Av. Elena Zara, /team/ URL, no Gravatar
+	 * - All posts: strip admin author leftovers / Gravatar on Person
+	 * - Organization: ensure logo
+	 * - Front: ensure WebSite
+	 * - Team / services pages: ensure WebPage + Organization publisher link
+	 */
+	public static function filter_schema_graph( $graph ) {
+		if ( ! is_array( $graph ) ) {
 			return $graph;
 		}
 		foreach ( $graph as $i => $node ) {
-			if ( ! is_array( $node ) ) {
-				continue;
+			$graph[ $i ] = self::normalize_schema_node( $node );
+		}
+		$graph = self::ensure_organization_in_graph( $graph );
+		if ( function_exists( 'is_front_page' ) && is_front_page() ) {
+			$graph = self::ensure_website_in_graph( $graph );
+		}
+		if ( self::is_team_or_services_page() ) {
+			$graph = self::ensure_webpage_in_graph( $graph );
+		}
+		return $graph;
+	}
+
+	/** @return bool */
+	private static function is_team_or_services_page() {
+		if ( ! function_exists( 'is_page' ) ) {
+			return false;
+		}
+		// EN/RU/ZH team + services page IDs used elsewhere in this plugin.
+		return is_page( array( 19, 2427, 18, 2638, 2637, 56 ) );
+	}
+
+	/**
+	 * Recursively normalize schema nodes (Person / Organization / Article author).
+	 *
+	 * @param mixed $node Schema node.
+	 * @return mixed
+	 */
+	private static function normalize_schema_node( $node ) {
+		if ( ! is_array( $node ) ) {
+			return $node;
+		}
+		$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+		$types = is_array( $type ) ? $type : array( $type );
+
+		if ( in_array( 'Person', $types, true ) ) {
+			$node = self::normalize_person_schema( $node );
+		}
+		if ( in_array( 'Organization', $types, true ) ) {
+			$node = self::normalize_organization_schema( $node );
+		}
+		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) ) {
+			if ( isset( $node['author'] ) ) {
+				$node['author'] = self::normalize_schema_node( $node['author'] );
 			}
-			$type = isset( $node['@type'] ) ? $node['@type'] : '';
-			$types = is_array( $type ) ? $type : array( $type );
-			if ( in_array( 'Person', $types, true ) ) {
-				$name = isset( $node['name'] ) ? (string) $node['name'] : '';
-				if ( '' === $name || 0 === strcasecmp( $name, 'admin' ) ) {
-					$graph[ $i ]['name'] = 'Av. Elena Zara';
-					// Drop promotional Person enrichments if present.
-					unset( $graph[ $i ]['image'], $graph[ $i ]['jobTitle'], $graph[ $i ]['worksFor'] );
+			if ( isset( $node['publisher'] ) && is_array( $node['publisher'] ) ) {
+				$node['publisher'] = self::normalize_organization_schema( $node['publisher'] );
+			}
+		}
+
+		foreach ( $node as $k => $v ) {
+			if ( '@graph' === $k && is_array( $v ) ) {
+				foreach ( $v as $gi => $gn ) {
+					$node[ $k ][ $gi ] = self::normalize_schema_node( $gn );
+				}
+			} elseif ( is_array( $v ) && isset( $v['@type'] ) ) {
+				$node[ $k ] = self::normalize_schema_node( $v );
+			}
+		}
+		return $node;
+	}
+
+	/**
+	 * @param array $person Person node.
+	 * @return array
+	 */
+	private static function normalize_person_schema( $person ) {
+		$name = isset( $person['name'] ) ? (string) $person['name'] : '';
+		// Buffer pass may run when query flags are odd; also key off front lang + single-post body class via is_singular.
+		$is_ru_post = self::is_ru_single_post()
+			|| ( function_exists( 'is_singular' ) && is_singular( 'post' ) && 'ru' === self::front_lang() );
+		if ( $is_ru_post && ( '' === $name || 0 === strcasecmp( $name, 'admin' ) || 0 === strcasecmp( $name, 'Av. Elena Zara' ) ) ) {
+			$person['name'] = 'Av. Elena Zara';
+			$lang_q = ( 'ru' === self::front_lang() ) ? '?lang=ru' : '';
+			$person['url']  = 'https://cindemirlaw.com/team/' . $lang_q;
+			// Identity only — no promotional Person enrichments / wrong Gravatar.
+			unset( $person['image'], $person['jobTitle'], $person['worksFor'] );
+			$person['sameAs'] = array( 'https://cindemirlaw.com/team/' . $lang_q );
+		} elseif ( '' === $name || 0 === strcasecmp( $name, 'admin' ) ) {
+			// Non-RU (or unknown): attribute to the firm, not the WP "admin" user.
+			$person['@type'] = 'Organization';
+			$person['name']  = 'Cindemir Law Office';
+			$person['url']   = 'https://cindemirlaw.com/';
+			unset( $person['image'], $person['jobTitle'], $person['worksFor'], $person['sameAs'] );
+		} else {
+			// Drop Gravatar leftovers on any Person node.
+			if ( isset( $person['image'] ) ) {
+				$img = $person['image'];
+				$img_url = '';
+				if ( is_string( $img ) ) {
+					$img_url = $img;
+				} elseif ( is_array( $img ) && isset( $img['url'] ) ) {
+					$img_url = (string) $img['url'];
+				}
+				if ( false !== stripos( $img_url, 'gravatar.com' ) ) {
+					unset( $person['image'] );
 				}
 			}
 		}
+		return $person;
+	}
+
+	/**
+	 * @param array $org Organization node.
+	 * @return array
+	 */
+	private static function normalize_organization_schema( $org ) {
+		if ( empty( $org['name'] ) ) {
+			$org['name'] = 'Cindemir Law Office';
+		}
+		if ( empty( $org['url'] ) ) {
+			$org['url'] = 'https://cindemirlaw.com/';
+		}
+		if ( empty( $org['logo'] ) ) {
+			$org['logo'] = array(
+				'@type' => 'ImageObject',
+				'url'   => self::HEADER_LOGO,
+			);
+		}
+		return $org;
+	}
+
+	/**
+	 * @param array $graph Schema graph pieces.
+	 * @return array
+	 */
+	private static function ensure_organization_in_graph( $graph ) {
+		$has_org = false;
+		foreach ( $graph as $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'Organization', $types, true ) ) {
+				$has_org = true;
+				break;
+			}
+		}
+		if ( $has_org ) {
+			return $graph;
+		}
+		if ( ! ( function_exists( 'is_front_page' ) && is_front_page() ) && ! self::is_team_or_services_page() ) {
+			return $graph;
+		}
+		$graph[] = self::normalize_organization_schema(
+			array(
+				'@type' => 'Organization',
+				'@id'   => 'https://cindemirlaw.com/#organization',
+				'name'  => 'Cindemir Law Office',
+				'url'   => 'https://cindemirlaw.com/',
+			)
+		);
+		return $graph;
+	}
+
+	/**
+	 * @param array $graph Schema graph pieces.
+	 * @return array
+	 */
+	private static function ensure_website_in_graph( $graph ) {
+		foreach ( $graph as $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'WebSite', $types, true ) ) {
+				return $graph;
+			}
+		}
+		$graph[] = array(
+			'@type'     => 'WebSite',
+			'@id'       => 'https://cindemirlaw.com/#website',
+			'url'       => 'https://cindemirlaw.com/',
+			'name'      => 'Cindemir Law Office',
+			'publisher' => array(
+				'@id' => 'https://cindemirlaw.com/#organization',
+			),
+			'inLanguage' => array( 'en', 'ru', 'zh-Hans' ),
+		);
+		return $graph;
+	}
+
+	/**
+	 * @param array $graph Schema graph pieces.
+	 * @return array
+	 */
+	private static function ensure_webpage_in_graph( $graph ) {
+		foreach ( $graph as $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'WebPage', $types, true ) ) {
+				return $graph;
+			}
+		}
+		$url = function_exists( 'get_permalink' ) ? get_permalink() : '';
+		if ( ! is_string( $url ) || '' === $url ) {
+			return $graph;
+		}
+		$title = function_exists( 'wp_get_document_title' ) ? wp_get_document_title() : get_the_title();
+		$graph[] = array(
+			'@type'     => 'WebPage',
+			'@id'       => trailingslashit( $url ) . '#webpage',
+			'url'       => $url,
+			'name'      => is_string( $title ) ? wp_strip_all_tags( $title ) : '',
+			'isPartOf'  => array( '@id' => 'https://cindemirlaw.com/#website' ),
+			'about'     => array( '@id' => 'https://cindemirlaw.com/#organization' ),
+			'publisher' => array( '@id' => 'https://cindemirlaw.com/#organization' ),
+		);
 		return $graph;
 	}
 
@@ -1638,18 +1843,6 @@ final class Cindemir_SEO_Fixes {
 			);
 		}
 
-		// Schema Person name in JSON-LD blobs.
-		$html = preg_replace(
-			'/"@type"\s*:\s*"Person"\s*,\s*"name"\s*:\s*"admin"/',
-			'"@type":"Person","name":"Av. Elena Zara"',
-			$html
-		);
-		$html = preg_replace(
-			'/"name"\s*:\s*"admin"\s*,\s*"url"\s*:\s*"https:\\\\\/\\\\\/cindemirlaw\.com\\\\\/\?lang=ru"/',
-			'"name":"Av. Elena Zara","url":"https:\\/\\/cindemirlaw.com\\/?lang=ru"',
-			$html
-		);
-
 		// Inject bio before closing post-entry article if the_content filter missed builder layouts.
 		if ( false === strpos( $html, 'cindemir-elena-bio' ) ) {
 			$bio = self::elena_zara_bio_html();
@@ -1677,6 +1870,60 @@ final class Cindemir_SEO_Fixes {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Final JSON-LD pass in the HTML buffer (covers nested Article.author Person
+	 * that Yoast emits outside the flat @graph pieces).
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function rewrite_jsonld_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'application/ld+json' ) ) {
+			return $html;
+		}
+		return preg_replace_callback(
+			'#(<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>)(.*?)(</script>)#is',
+			static function ( $m ) {
+				$raw = trim( $m[2] );
+				if ( '' === $raw ) {
+					return $m[0];
+				}
+				$data = json_decode( $raw, true );
+				if ( null === $data && JSON_ERROR_NONE !== json_last_error() ) {
+					return $m[0];
+				}
+				$fixed = Cindemir_SEO_Fixes::normalize_schema_data_public( $data );
+				$json  = wp_json_encode( $fixed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+				if ( ! is_string( $json ) || '' === $json ) {
+					return $m[0];
+				}
+				return $m[1] . $json . $m[3];
+			},
+			$html
+		);
+	}
+
+	/**
+	 * Public wrapper for JSON-LD normalize used by buffer callback.
+	 *
+	 * @param mixed $data Decoded JSON-LD.
+	 * @return mixed
+	 */
+	public static function normalize_schema_data_public( $data ) {
+		if ( is_array( $data ) ) {
+			// Root list of Yoast script payloads (graph + Article/Organization).
+			$is_list = array_keys( $data ) === range( 0, count( $data ) - 1 );
+			if ( $is_list ) {
+				foreach ( $data as $i => $item ) {
+					$data[ $i ] = self::normalize_schema_node( $item );
+				}
+				return $data;
+			}
+			return self::normalize_schema_node( $data );
+		}
+		return $data;
 	}
 
 	public static function version_marker() {
@@ -1915,6 +2162,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
 		$html = self::rewrite_ru_article_seo( $html );
+		$html = self::rewrite_jsonld_html( $html );
 		$html = self::apply_title_overrides_html( $html );
 		$html = self::fix_og_tags_html( $html );
 		$html = self::normalize_robots_meta( $html );

@@ -998,8 +998,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.67' )
-						|| false === strpos( $tmp, 'ELENA_ZARA_BAR_SAFE_20260718' ) ) ) {
+					&& ( false === strpos( $tmp, 'Version: 1.9.68' )
+						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
