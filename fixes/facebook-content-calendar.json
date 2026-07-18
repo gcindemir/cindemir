@@ -1,0 +1,128 @@
+{
+  "page": "Cindemir Hukuk Bürosu / Cindemir Law Office",
+  "page_id": "100066585793269",
+  "source": "https://cindemirlaw.com",
+  "cadence": "5 posts per day",
+  "language": "en",
+  "brand": {
+    "primary": "#336666",
+    "secondary": "#286060",
+    "accent": "#8bba34",
+    "cover": "fixes/assets/fb-cover-cindemir.png",
+    "logo": "https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg",
+    "bio": "Cindemir Law Office — Istanbul. Turkish & international counsel for foreign clients: company formation, deportation, divorce, debt recovery, criminal record. EN / RU.\nhttps://cindemirlaw.com"
+  },
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-07-18",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d1-1",
+          "title": "Opening a Company in Turkey for Foreigners",
+          "url": "https://cindemirlaw.com/opening-a-company-in-turkey-for-foreigners/",
+          "summary": "Foreign investors can form a Turkish company, but the process has clear legal steps: company type, capital, MERSİS registration, tax office and bank account. Our English guide walks through the essentials for non-residents.\n\nRead the full guide:\nhttps://cindemirlaw.com/opening-a-company-in-turkey-for-foreigners/"
+        },
+        {
+          "id": "d1-2",
+          "title": "Deportation Law In Turkey",
+          "url": "https://cindemirlaw.com/deportation-law-in-turkey/",
+          "summary": "Deportation decisions in Türkiye follow the Law on Foreigners and International Protection. Foreign nationals have procedural rights — including objection and stay of execution in many cases. Know the grounds and timelines.\n\nFull article:\nhttps://cindemirlaw.com/deportation-law-in-turkey/"
+        },
+        {
+          "id": "d1-3",
+          "title": "Debt Collection in Turkey",
+          "url": "https://cindemirlaw.com/debt-recovery-in-turkey/",
+          "summary": "Recovering a debt in Türkiye may involve enforcement offices, mandatory mediation and court action. Foreign creditors should also plan for power of attorney and security deposit rules.\n\nPractical overview:\nhttps://cindemirlaw.com/debt-recovery-in-turkey/"
+        },
+        {
+          "id": "d1-4",
+          "title": "Consensual Divorce in Turkey",
+          "url": "https://cindemirlaw.com/consensual-divorce-in-turkey-uncontested-divorce/",
+          "summary": "Uncontested (consensual) divorce in Türkiye is faster when spouses agree on custody, property and support in a settlement protocol. Useful for foreign spouses with ties to Turkish courts.\n\nGuide:\nhttps://cindemirlaw.com/consensual-divorce-in-turkey-uncontested-divorce/"
+        },
+        {
+          "id": "d1-5",
+          "title": "Criminal Record Certificate in Turkey",
+          "url": "https://cindemirlaw.com/getting-criminal-record-in-turkey/",
+          "summary": "A Turkish criminal record (police clearance) certificate is often required for visas, residence, citizenship or employment abroad. Here is how foreigners request and use it.\n\nStep-by-step:\nhttps://cindemirlaw.com/getting-criminal-record-in-turkey/"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-07-19",
+      "status": "queued",
+      "posts": [
+        {
+          "id": "d2-1",
+          "title": "Airport Detention in Turkey",
+          "url": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
+          "summary": "Passport control or customs issues at Istanbul airports can turn into detention for foreign travellers. Knowing your rights — and when to call counsel — matters in the first hours.\n\nRead more:\nhttps://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/"
+        },
+        {
+          "id": "d2-2",
+          "title": "Real Estate for Foreigners in Turkey",
+          "url": "https://cindemirlaw.com/sales-of-real-estate-to-foreigners-in-turkey/",
+          "summary": "Foreign buyers face military-zone restrictions, title deed checks and currency rules when purchasing property in Türkiye. A clear legal checklist reduces closing risk.\n\nArticle:\nhttps://cindemirlaw.com/sales-of-real-estate-to-foreigners-in-turkey/"
+        },
+        {
+          "id": "d2-3",
+          "title": "Turkish Citizenship Law (English)",
+          "url": "https://cindemirlaw.com/turkish-citizenship-law-in-english/",
+          "summary": "Turkish citizenship pathways — residence-based, marriage, investment and exceptional cases — are set out in Law No. 5901. An English overview for foreign applicants.\n\nRead:\nhttps://cindemirlaw.com/turkish-citizenship-law-in-english/"
+        },
+        {
+          "id": "d2-4",
+          "title": "Enforcing a Foreign Judgment in Turkey",
+          "url": "https://cindemirlaw.com/enforcement-of-a-foreign-decision-in-turkey/",
+          "summary": "A foreign court decision is not automatically enforceable in Türkiye. Recognition and enforcement (tenfiz) require a Turkish court application with specific documents.\n\nGuide:\nhttps://cindemirlaw.com/enforcement-of-a-foreign-decision-in-turkey/"
+        },
+        {
+          "id": "d2-5",
+          "title": "Airport Customs Seizures under Turkish Law",
+          "url": "https://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
+          "summary": "What begins as a routine customs check can become a formal seizure or smuggling investigation. Travellers should understand the legal thresholds and defence options.\n\nFull analysis:\nhttps://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2026-07-20",
+      "status": "queued",
+      "posts": [
+        {
+          "id": "d3-1",
+          "title": "How to Lift an Entry Ban to Turkey",
+          "url": "https://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/",
+          "summary": "An entry ban may follow deportation — or be issued by Migration Management without removal. Foreign nationals can apply to lift or shorten the ban under Turkish law.\n\nDetails:\nhttps://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/"
+        },
+        {
+          "id": "d3-2",
+          "title": "Inheritance Law of Turkey",
+          "url": "https://cindemirlaw.com/turkish-inheritance-law/",
+          "summary": "Turkish inheritance rules apply forced heirs, probate and cross-border estate issues. International families with assets in Türkiye need a clear legal map.\n\nOverview:\nhttps://cindemirlaw.com/turkish-inheritance-law/"
+        },
+        {
+          "id": "d3-3",
+          "title": "Humanitarian Residence Permit in Turkey",
+          "url": "https://cindemirlaw.com/humanitarian-residence-permit-in-turkey-legal-insights-by-cindemir-law-office/",
+          "summary": "Humanitarian residence permits (LFIP Arts. 46–47) protect foreign nationals in exceptional circumstances. Eligibility, documents and practice from Istanbul counsel.\n\nInsights:\nhttps://cindemirlaw.com/humanitarian-residence-permit-in-turkey-legal-insights-by-cindemir-law-office/"
+        },
+        {
+          "id": "d3-4",
+          "title": "Can Russians Establish a Company in Turkey?",
+          "url": "https://cindemirlaw.com/can-russian-establish-a-company-in-turkey/",
+          "summary": "Russian nationals can still form Turkish companies. Sanctions pressure makes structure, banking and nominee arrangements especially important — done lawfully.\n\nRead:\nhttps://cindemirlaw.com/can-russian-establish-a-company-in-turkey/"
+        },
+        {
+          "id": "d3-5",
+          "title": "Criminal Record Deletion for Foreign Nationals",
+          "url": "https://cindemirlaw.com/criminal-record-deletion-in-turkey-for-foreign-nationals/",
+          "summary": "A Turkish conviction can block visas, residence and jobs abroad. Foreign nationals may seek record deletion or sealing under statutory conditions.\n\nArticle:\nhttps://cindemirlaw.com/criminal-record-deletion-in-turkey-for-foreign-nationals/"
+        }
+      ]
+    }
+  ]
+}
