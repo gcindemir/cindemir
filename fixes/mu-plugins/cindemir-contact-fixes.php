@@ -953,7 +953,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit with Elena RU bio + SEO (1.9.66). Override via ?commit=.
-			$commit = '03319c8';
+			$commit = '09ea3da';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
