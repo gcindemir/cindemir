@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.70 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.71 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.70
+ * Version: 1.9.71
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.70';
+	const VERSION = '1.9.71';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = 'cdcc0e5';
 
@@ -1909,7 +1909,7 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'application/ld+json' ) ) {
 			return $html;
 		}
-		$html = preg_replace_callback(
+		$replaced = preg_replace_callback(
 			'#(<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>)(.*?)(</script>)#is',
 			static function ( $m ) {
 				$raw = trim( $m[2] );
@@ -1929,6 +1929,9 @@ final class Cindemir_SEO_Fixes {
 			},
 			$html
 		);
+		if ( is_string( $replaced ) ) {
+			$html = $replaced;
+		}
 		return self::append_missing_schema_script( $html );
 	}
 
@@ -1943,10 +1946,10 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
+		// Match body classes only — Enfold CSS contains ".single-post" on every page.
 		$is_home        = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
-		$is_single_post = (bool) preg_match( '/\bsingle-post\b/', $html );
-		// Any WP page (about, contact, articles, team, services, press, …).
-		$is_wp_page     = (bool) preg_match( '/\bpage-id-\d+\b/', $html ) && ! $is_single_post;
+		$is_single_post = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bsingle-post\b/i', $html );
+		$is_wp_page     = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bpage-id-\d+\b/i', $html ) && ! $is_single_post;
 		if ( ! $is_home && ! $is_wp_page ) {
 			return $html;
 		}
