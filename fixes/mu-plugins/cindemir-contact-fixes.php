@@ -957,7 +957,7 @@ final class Cindemir_Contact_Fixes {
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
-			'cindemir-seo-fixes.php'         => 40000,
+			'cindemir-seo-fixes.php'         => 148000,
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,

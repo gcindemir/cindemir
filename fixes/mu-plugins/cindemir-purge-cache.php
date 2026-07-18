@@ -60,7 +60,7 @@ add_action(
 			$files  = array(
 				'cindemir-contact-fixes.php' => 20000,
 				'cindemir-services-page.php' => 10000,
-				'cindemir-seo-fixes.php'     => 40000,
+				'cindemir-seo-fixes.php'     => 148000,
 			);
 			$bases  = array(
 				'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',

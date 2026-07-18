@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.59 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.60 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.59
+ * Version: 1.9.60
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.59';
+	const VERSION = '1.9.60';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718a';
@@ -773,7 +773,7 @@ final class Cindemir_SEO_Fixes {
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
-			'cindemir-seo-fixes.php'         => 40000,
+			'cindemir-seo-fixes.php'         => 148000,
 			'cindemir-contact-fixes.php'     => 20000,
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
