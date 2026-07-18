@@ -509,9 +509,9 @@ final class Cindemir_SEO_Fixes {
 
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
 		$bases  = array(
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/media/team-2026/',
 			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/team-2026/',
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/team-2026/',
-			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/media/team-2026/',
 		);
 		$files  = array(
 			'5295681199059.jpg'           => 20000,
