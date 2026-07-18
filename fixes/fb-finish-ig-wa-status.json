@@ -1,0 +1,50 @@
+{
+  "steps": [
+    {
+      "home_inbox": "/workspace/fixes/fb-finish-0-inbox.png",
+      "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE"
+    }
+  ],
+  "updated": "2026-07-18T09:59:59Z",
+  "instagram": {
+    "actions": [],
+    "click_err": "Locator.click: Timeout 3000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=re.compile(r\"Instagram\", re.IGNORECASE)).first\n",
+    "shot": "/workspace/fixes/fb-finish-1-ig.png",
+    "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE",
+    "body": "Gelen Kutusu Mesajlara yanıt ver, otomasyonları ayarla ve daha fazlasını yap. Otomasyonlar Mesajlaşma reklamı oluştur ​ Mesajlaşma istatistikleri ​ Müsaitlik durumu ​ Müsait Mesaj Ayarları ​ Tüm mesajlar Messenger Instagram Erişimi onayla Bağlantı kesildi WhatsApp Yeni Yeni Facebook yorumları Instagram yorumları Ara ​ Yönet Okunmamış Öncelik Reklam yanıtları Takip Nowshin Tabassum You should use Heading tag in your site and as a SEO Expert suggest adding a lot more text to your website 18 Şubat 2025 18.02.2025 Öncelik Ruslan Koichev Hello, I need to receive a certificate of no criminal record in Turkey, with apostille, that should be presented in Spain. Do you provide this service? 18 Haziran 2024 18.06.2024 Harry Chapkanov halo halo Birisi sohbet etti 15 Nisan 2024 15.04.2024 Md. Nayon Islam hi 10 Ocak 2023 10.01.2023 Lily Mantis Sen: Great i ll return you in the morning. Thanks 29 Temmuz 2021 29.07.2021 Shafiul Umam Sen: Yes i do 21 Ekim 2020 21.10.2020 Kavuma Faith Kavuma bir dosya eki gönderdi. 11 Ağustos 2020 11.08.2020 Elisabed Pirveli .... 2 Ağustos 2020 2.08.2020 Meta IA Mesaja Ulaşılamıyor 16 Temmuz 2020 16.07.2020 Husse Hindawi Hey. My Name is Husein Hindawi and i wan't to file an execution order for 4.000 euros from a Company in Istanbul. Can you put me in contact with One your Lawyers? I live in Sweden and had a business agreement with Josef from a Company calld Osse. I got all the contact information and recipt of transaction of 4.000 euros. Josef did not deliver the Clothes and did bot pay us Back. We are a Clothening Companyfrom Sweden and hope to have you as out lawers in the future, my business partner recomnded you, thats why i choose to write you. Thank you for reading. Kind regards 9 Mart 2016 9.03.2016 Carrie Ticson Carrie Ticson/Bahri Tuncel 5 Ocak 2016 5.01.2016 Nowshin Tabassum Bu konuşmayı ata Spam klasörüne taşı ​ Konuşmayı sil ​ Takip olarak işaretle ​ Okunmadı olarak işaretle ​ Bitti'ye taşı ​ 8.02.2025 16:51 hi Kişiselleştirilmiş bir mes",
+    "still_needs_approve": true,
+    "disconnected": true
+  },
+  "whatsapp": {
+    "actions": [
+      "Başla",
+      "text:WhatsApp Business",
+      "text:Bağla",
+      "text:Onayla"
+    ],
+    "shot1": "/workspace/fixes/fb-finish-2-wa.png",
+    "shot2": "/workspace/fixes/fb-finish-3-wa-after.png",
+    "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1",
+    "body": "Gelen Kutusu Mesajlara yanıt ver, otomasyonları ayarla ve daha fazlasını yap. Otomasyonlar Mesajlaşma reklamı oluştur ​ Mesajlaşma istatistikleri ​ Müsaitlik durumu ​ Müsait Mesaj Ayarları ​ Tüm mesajlar Messenger Instagram Erişimi onayla Bağlantı kesildi WhatsApp Yeni Yeni Facebook yorumları Instagram yorumları Ara ​ Yönet Okunmamış Öncelik Takip Gösterilecek mesaj yok Instagram Direct mesajları burada görünecek. Meta Business Suite Bağlantılar Ana Sayfa Ana Sayfa Bildirimler Bildirimler Reklam Yöneticisi Reklam Yöneticisi Gelen Kutusu Gelen Kutusu İçerik İçerik Bağlantılar İçerik üreticisi pazar yeri İçerik üreticisi pazar yeri Planlayıcı Planlayıcı Reklamlar Reklamlar İstatistikler İstatistikler Tüm Araçlar Tüm Araçlar Para Kazanma Para Kazanma Düzenle Oluştur Oluştur Ara Ara Bağlantılar Ayarlar Ayarlar Yardım Yardım",
+    "still_shows_basla": false
+  },
+  "phone": {
+    "actions": [
+      "gear"
+    ],
+    "shot1": "/workspace/fixes/fb-finish-4-phones.png",
+    "shot2": "/workspace/fixes/fb-finish-5-phone-menu.png",
+    "shot3": "/workspace/fixes/fb-finish-6-phone-detail.png",
+    "url": "https://business.facebook.com/latest/settings/business_users?business_id=1161971660662915&asset_id=1262355825974540",
+    "body": "Ayarlar cindemir_law_office İşletme portfolyosu İşletme bilgileri Kullanıcılar Grubu değiştir ​ Kişiler Ortaklar Sistem kullanıcıları Hesaplar Grubu değiştir ​ Sayfalar Reklam hesapları İşletme varlığı grupları Uygulamalar Instagram hesapları WhatsApp hesapları Threads hesapları Veri Kaynakları Grubu değiştir ​ Kataloglar Veri setleri ve pikseller Çevrimdışı olay setleri Özel dönüşümler Paylaşılan hedef kitleler İşletme kreatifi klasörleri İstekler Marka emniyeti ve uygunluğu Grubu değiştir ​ Domainler Yayıncı engelleme listeleri Entegrasyonlar Grubu değiştir ​ Bağlı uygulamalar Potansiyel Müşteri Bilgileri Erişimi Konuşma Yönlendirme Reklam MCP sunucusu Faturalar ve ödemeler Meta Verified Haber Sayfaları Ortaklık Reklamları Merkezi Güvenlik Merkezi Bildirimler Kurulum kılavuzu İşletme Varlıkları Yetkilendirme ve doğrulamalar Reklam hesabı ayarları Dil ayarları Daralt ​ Kişiler ​ Search ​ Filtreler Dışa Aktar Kişi davet et Ad İşletme portfolyosu erişimi ​ Son hareket ​ IG @cindemir_law_office Tam erişim Her şey 12 Tem 2026 Aktif Aktif Detaylar Daha Fazla ​ Gökhan Cindemir (sen) Tam erişim Her şey 18 Tem 2026 Aktif Aktif Detaylar Daha Fazla ​ Meta Business Suite cindemir_law_office Bağlantılar Ana Sayfa Ana Sayfa Bildirimler Bildirimler Reklam Yöneticisi Reklam Yöneticisi Gelen Kutusu Gelen Kutusu İçerik İçerik Bağlantılar İçerik üreticisi pazar yeri İçerik üreticisi pazar yeri Reklamlar Reklamlar İstatistikler İstatistikler Tüm Araçlar Tüm Araçlar Para Kazanma Para Kazanma Düzenle Oluştur Oluştur Ara Ara Bağlantılar Ayarlar Ayarlar Yardım Yardım",
+    "offline": true
+  },
+  "final": {
+    "shot": "/workspace/fixes/fb-finish-7-final.png",
+    "ig_approve_button": true,
+    "ig_disconnected": true,
+    "wa_basla": false,
+    "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE",
+    "snip": "Gelen Kutusu Mesajlara yanıt ver, otomasyonları ayarla ve daha fazlasını yap. Otomasyonlar Mesajlaşma reklamı oluştur ​ Mesajlaşma istatistikleri ​ Müsaitlik durumu ​ Müsait Mesaj Ayarları ​ Tüm mesajlar Messenger Instagram Erişimi onayla Bağlantı kesildi WhatsApp Yeni Yeni Facebook yorumları Instagram yorumları Ara ​ Yönet Okunmamış Öncelik Reklam yanıtları Takip Nowshin Tabassum You should use Heading tag in your site and as a SEO Expert suggest adding a lot more text to your website 18 Şubat 2025 18.02.2025 Öncelik Ruslan Koichev Hello, I need to receive a certificate of no criminal record in Turkey, with apostille, that should be presented in Spain. Do you provide this service? 18 Haziran 2024 18.06.2024 Harry Chapkanov halo halo Birisi sohbet etti 15 Nisan 2024 15.04.2024 Md. Nayon Islam hi 10 Ocak 2023 10.01.2023 Lily Mantis Sen: Great i ll return you in the morning. Thanks 29 Temmuz 2021 29.07.2021 Shafiul Umam Sen: Yes i do 21 Ekim 2020 21.10.2020 Kavuma Faith Kavuma bir dosya eki gönderdi. 11 Ağustos 2020 11.08.2020 Elisabed Pirveli .... 2 Ağustos 2020 2.08.2020 Meta IA Mesaja Ulaşılamıyor 16 Temmuz 2020 16.07.2020 Husse Hindawi Hey. My Name is Husein Hindawi and i wan't t"
+  }
+}
