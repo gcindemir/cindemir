@@ -174,7 +174,7 @@ final class Cindemir_SEO_Fixes {
 
 	const VERSION = '1.9.71';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = 'cdcc0e5';
+	const DEPLOY_COMMIT = '947b45c';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
