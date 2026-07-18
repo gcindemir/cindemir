@@ -998,7 +998,7 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.69' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.70' )
 						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
 					continue;
 				}

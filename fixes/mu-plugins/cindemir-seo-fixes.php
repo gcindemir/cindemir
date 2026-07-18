@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.68 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.70 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.68
+ * Version: 1.9.70
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.69';
+	const VERSION = '1.9.70';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '09ea3da';
 
@@ -1638,6 +1638,9 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( 'Organization', $types, true ) ) {
 			$node = self::normalize_organization_schema( $node );
 		}
+		if ( in_array( 'SiteNavigationElement', $types, true ) ) {
+			$node = self::normalize_nav_schema( $node );
+		}
 		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) ) {
 			if ( isset( $node['author'] ) ) {
 				$node['author'] = self::normalize_schema_node( $node['author'] );
@@ -1697,6 +1700,29 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 		return $person;
+	}
+
+	/**
+	 * Fix Yoast SiteNavigationElement junk (@id /#slug) and off-site press URL.
+	 *
+	 * @param array $nav Navigation node.
+	 * @return array
+	 */
+	private static function normalize_nav_schema( $nav ) {
+		$url = isset( $nav['url'] ) ? (string) $nav['url'] : '';
+		if ( $url && false !== strpos( $url, 'cindemir.av.tr' ) ) {
+			$lang = self::front_lang();
+			$nav['url'] = ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) )
+				? 'https://cindemirlaw.com/press/?lang=' . rawurlencode( $lang )
+				: 'https://cindemirlaw.com/press/';
+			$url = $nav['url'];
+		}
+		if ( $url ) {
+			$name = isset( $nav['name'] ) ? (string) $nav['name'] : 'item';
+			$slug = function_exists( 'sanitize_title' ) ? sanitize_title( $name ) : preg_replace( '/[^a-z0-9]+/i', '-', strtolower( $name ) );
+			$nav['@id'] = $url . '#nav-' . $slug;
+		}
+		return $nav;
 	}
 
 	/**
@@ -1917,10 +1943,11 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		$is_home     = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
-		$is_team     = (bool) preg_match( '/\bpage-id-(19|2427)\b/', $html );
-		$is_services = (bool) preg_match( '/\bpage-id-(18|2638|2637|56)\b/', $html );
-		if ( ! $is_home && ! $is_team && ! $is_services ) {
+		$is_home        = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
+		$is_single_post = (bool) preg_match( '/\bsingle-post\b/', $html );
+		// Any WP page (about, contact, articles, team, services, press, …).
+		$is_wp_page     = (bool) preg_match( '/\bpage-id-\d+\b/', $html ) && ! $is_single_post;
+		if ( ! $is_home && ! $is_wp_page ) {
 			return $html;
 		}
 
@@ -1929,7 +1956,7 @@ final class Cindemir_SEO_Fixes {
 		$has_org     = ( false !== stripos( $html, '"@type":"Organization"' ) || false !== stripos( $html, '"@type": "Organization"' ) );
 
 		$nodes = array();
-		if ( ( $is_home || $is_team || $is_services ) && ! $has_org ) {
+		if ( ( $is_home || $is_wp_page ) && ! $has_org ) {
 			$nodes[] = self::normalize_organization_schema(
 				array(
 					'@type' => 'Organization',
@@ -1949,7 +1976,7 @@ final class Cindemir_SEO_Fixes {
 				'inLanguage' => array( 'en', 'ru', 'zh-Hans' ),
 			);
 		}
-		if ( ( $is_team || $is_services ) && ! $has_webpage ) {
+		if ( $is_wp_page && ! $is_home && ! $has_webpage ) {
 			$canon = '';
 			if ( preg_match( '/<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']/i', $html, $cm ) ) {
 				$canon = $cm[1];
@@ -1963,7 +1990,7 @@ final class Cindemir_SEO_Fixes {
 			if ( $canon ) {
 				$nodes[] = array(
 					'@type'     => 'WebPage',
-					'@id'       => trailingslashit( $canon ) . '#webpage',
+					'@id'       => untrailingslashit( $canon ) . '/#webpage',
 					'url'       => $canon,
 					'name'      => $title,
 					'isPartOf'  => array( '@id' => 'https://cindemirlaw.com/#website' ),
