@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.66 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.67 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.66
+ * Version: 1.9.67
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.66';
+	const VERSION = '1.9.67';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '188fb88';
 
@@ -1533,26 +1533,19 @@ final class Cindemir_SEO_Fixes {
 		return false;
 	}
 
-	/** Short author bio shown at the end of Russian articles. */
+	/**
+	 * Bar-safe author byline on Russian articles (identity only).
+	 * No photo, email, education pitch, or consultancy solicitation.
+	 */
 	public static function elena_zara_bio_html() {
-		$photo = 'https://cindemirlaw.com/wp-content/uploads/2014/11/portrait-5-copy-240x300.jpg';
-		$team  = 'https://cindemirlaw.com/team/?lang=ru';
-		$mail  = 'mailto:elena.zara@cindemir.av.tr';
-		$bio   = 'Ав. Елена Зара — адвокат Стамбульской коллегии адвокатов. Окончила Современную гуманитарную академию (международное право) и юридический факультет Стамбульского университета Айдын. Владеет русским, турецким и английским языками. С 2014 года консультирует по правовым вопросам Турции, России и стран СНГ.';
-		return '<aside class="cindemir-elena-bio" aria-label="Об авторе">'
-			. '<div class="cindemir-elena-bio__media">'
-			. '<img src="' . esc_url( $photo ) . '" alt="Ав. Елена Зара" width="120" height="150" loading="lazy" decoding="async" />'
-			. '</div>'
-			. '<div class="cindemir-elena-bio__body">'
-			. '<p class="cindemir-elena-bio__name">Ав. Елена Зара</p>'
-			. '<p class="cindemir-elena-bio__role">Адвокат · Стамбульская коллегия адвокатов</p>'
-			. '<p class="cindemir-elena-bio__text">' . esc_html( $bio ) . '</p>'
-			. '<p class="cindemir-elena-bio__links">'
-			. '<a href="' . esc_url( $team ) . '">Команда бюро</a>'
+		$team = 'https://cindemirlaw.com/team/?lang=ru';
+		return '<aside class="cindemir-elena-bio" aria-label="Автор">'
+			. '<p class="cindemir-elena-bio__byline">'
+			. '<span class="cindemir-elena-bio__name">Ав. Елена Зара</span>'
+			. ' — адвокат Стамбульской коллегии адвокатов'
 			. ' · '
-			. '<a href="' . esc_attr( $mail ) . '">elena.zara@cindemir.av.tr</a>'
+			. '<a href="' . esc_url( $team ) . '">Команда бюро</a>'
 			. '</p>'
-			. '</div>'
 			. '</aside>';
 	}
 
@@ -1574,18 +1567,11 @@ final class Cindemir_SEO_Fixes {
 			return;
 		}
 		echo '<style id="cindemir-elena-bio-css">'
-			. '.cindemir-elena-bio{display:flex;gap:1.1rem;align-items:flex-start;margin:2.25rem 0 1.25rem;'
-			. 'padding:1.15rem 0 0;border-top:1px solid rgba(31,79,79,.22);max-width:720px}'
-			. '.cindemir-elena-bio__media{flex:0 0 auto}'
-			. '.cindemir-elena-bio__media img{display:block;width:96px;height:auto;object-fit:cover;'
-			. 'border-radius:2px;filter:grayscale(8%)}'
-			. '.cindemir-elena-bio__name{margin:0 0 .2rem;font-size:1.12rem;font-weight:700;color:#1f4f4f}'
-			. '.cindemir-elena-bio__role{margin:0 0 .55rem;font-size:.92rem;color:#444}'
-			. '.cindemir-elena-bio__text{margin:0 0 .65rem;font-size:.98rem;line-height:1.55;color:#222}'
-			. '.cindemir-elena-bio__links{margin:0;font-size:.92rem}'
-			. '.cindemir-elena-bio__links a{color:#1f4f4f;text-decoration:underline;text-underline-offset:2px}'
-			. '@media(max-width:640px){.cindemir-elena-bio{flex-direction:row;gap:.85rem}'
-			. '.cindemir-elena-bio__media img{width:72px}}'
+			. '.cindemir-elena-bio{margin:1.75rem 0 1rem;padding:0.85rem 0 0;'
+			. 'border-top:1px solid rgba(31,79,79,.18);max-width:40rem}'
+			. '.cindemir-elena-bio__byline{margin:0;font-size:.95rem;line-height:1.45;color:#333}'
+			. '.cindemir-elena-bio__name{font-weight:600;color:#1f4f4f}'
+			. '.cindemir-elena-bio__byline a{color:#1f4f4f;text-decoration:underline;text-underline-offset:2px}'
 			. '</style>' . "\n";
 	}
 
@@ -1596,7 +1582,7 @@ final class Cindemir_SEO_Fixes {
 		return $author;
 	}
 
-	/** Replace Yoast schema Person "admin" with Elena Zara on RU posts. */
+	/** Replace Yoast schema Person "admin" with factual author name only. */
 	public static function filter_ru_schema_graph( $graph ) {
 		if ( ! self::is_ru_single_post() || ! is_array( $graph ) ) {
 			return $graph;
@@ -1611,14 +1597,8 @@ final class Cindemir_SEO_Fixes {
 				$name = isset( $node['name'] ) ? (string) $node['name'] : '';
 				if ( '' === $name || 0 === strcasecmp( $name, 'admin' ) ) {
 					$graph[ $i ]['name'] = 'Av. Elena Zara';
-					$graph[ $i ]['url']  = 'https://cindemirlaw.com/team/?lang=ru';
-					$graph[ $i ]['image'] = 'https://cindemirlaw.com/wp-content/uploads/2014/11/portrait-5-copy-240x300.jpg';
-					$graph[ $i ]['jobTitle'] = 'Attorney at Law';
-					$graph[ $i ]['worksFor'] = array(
-						'@type' => 'Organization',
-						'name'  => 'Cindemir Law Office',
-						'url'   => 'https://cindemirlaw.com/',
-					);
+					// Drop promotional Person enrichments if present.
+					unset( $graph[ $i ]['image'], $graph[ $i ]['jobTitle'], $graph[ $i ]['worksFor'] );
 				}
 			}
 		}
@@ -1663,7 +1643,7 @@ final class Cindemir_SEO_Fixes {
 		);
 		$html = preg_replace(
 			'/"name"\s*:\s*"admin"\s*,\s*"url"\s*:\s*"https:\\\\\/\\\\\/cindemirlaw\.com\\\\\/\?lang=ru"/',
-			'"name":"Av. Elena Zara","url":"https:\\/\\/cindemirlaw.com\\/team\\/?lang=ru"',
+			'"name":"Av. Elena Zara","url":"https:\\/\\/cindemirlaw.com\\/?lang=ru"',
 			$html
 		);
 
@@ -1766,7 +1746,8 @@ final class Cindemir_SEO_Fixes {
 		$title = trim( preg_replace( '/\s*[-|–—]\s*Cindemir.*$/u', '', $title ) );
 		$base  = $desc ? $desc : $title;
 		if ( 'ru' === self::front_lang() ) {
-			$suffix = ' Материал подготовлен Ав. Еленой Зара (Cindemir Law Office, Стамбул).';
+			// Neutral topic padding only — no author/firm solicitation in SERP snippets.
+			$suffix = ' Краткий обзор норм и процедур турецкого права.';
 		} else {
 			$suffix = ' Overview of relevant Turkish law topics, procedures, and legal context for foreign individuals and companies.';
 		}

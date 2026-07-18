@@ -1,33 +1,35 @@
-# Elena Zara bio + RU article SEO (1.9.66)
+# Elena Zara author byline + RU article SEO (1.9.67)
 
 ## Goal
-- Add Av. Elena Zara short biography to Russian single articles
-- Fix RU SEO author attribution and overly truncated titles/descriptions
+- Attribute Russian articles to Av. Elena Zara in a bar-safe way
+- Fix RU SEO author meta/schema (`admin` → factual author name) and title truncation
 
 ## Scope
-- Applies when `is_singular('post')` and front language is `ru` (WPML/URL/cookie)
+- Applies when `is_singular('post')` and front language is `ru`
 - ~56 Russian posts via `/wp-json/wp/v2/posts?lang=ru`
 
-## Bio (RU)
-> Ав. Елена Зара — адвокат Стамбульской коллегии адвокатов. Окончила Современную гуманитарную академию (международное право) и юридический факультет Стамбульского университета Айдын. Владеет русским, турецким и английским языками. С 2014 года консультирует по правовым вопросам Турции, России и стран СНГ.
+## Author byline (RU) — identity only
+> Ав. Елена Зара — адвокат Стамбульской коллегии адвокатов · [Команда бюро](/team/?lang=ru)
+
+**Not included** (reklam yasağı / solicitation risk): photo, email/mailto, education pitch, “consultancy since …” language, SERP author promotion.
 
 ## SEO fixes
-1. `meta name="author"` → Elena Zara
-2. Schema.org `Person` nodes (author) → Elena Zara + `/team/` URL
-3. Title shortening keeps more of the article title (separator + brand)
-4. Meta description padded with Elena context when too short
+1. `meta name="author"` → `Av. Elena Zara` (factual attribution)
+2. Schema.org `Person` name → `Av. Elena Zara` only (no image / jobTitle / worksFor enrichment)
+3. Title shortening keeps more of the Cyrillic title
+4. Short meta descriptions padded with **neutral** Turkish-law topic text (no author/firm pitch)
 
 ## Deploy
 ```
-curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/self-upgrade?key=seo-pack-2026&source=github'
-# or
-curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/pull-plugins?key=seo-pack-2026&source=github'
-curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/purge-cache?key=seo-pack-2026'
+curl -sS -X POST 'https://cindemirlaw.com/wp-json/cindemir/v1/pull-plugins' \
+  -H 'Content-Type: application/json' \
+  -d '{"key":"seo-pack-2026"}'
 ```
 
 ## Verify
-- Sample RU article HTML contains `cindemir-author-bio` and `Ав. Елена Зара`
-- `<meta name="author" content="Elena Zara" />`
-- Schema Person name is Elena Zara
-- Title tag is not cut mid-word before `| Cindemir`
-- Version marker `1.9.66` / `ELENA_ZARA_RU_BIO_20260718`
+- Sample RU post has `cindemir-elena-bio__byline` and `Ав. Елена Зара`
+- No `mailto:elena.zara`, no portrait image in the byline block
+- No “консультирует” / education marketing sentence
+- `<meta name="author" content="Av. Elena Zara" />`
+- Schema Person name is Elena Zara without promotional Person fields
+- Version marker `1.9.67`

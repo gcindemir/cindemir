@@ -995,7 +995,9 @@ final class Cindemir_Contact_Fixes {
 				if ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
-				if ( 'cindemir-seo-fixes.php' === $name && false === strpos( $tmp, 'Version: 1.9.66' ) ) {
+				if ( 'cindemir-seo-fixes.php' === $name
+					&& false === strpos( $tmp, 'Version: 1.9.67' )
+					&& false === strpos( $tmp, 'Version: 1.9.66' ) ) {
 					continue;
 				}
 				$body = $tmp;
