@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.53 + SERVICES_BLANK_FIX_20260715 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.57 + SERVICES_BLANK_FIX_20260715 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.53
+ * Version: 1.9.57
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,11 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.56';
+	const VERSION = '1.9.57';
+
+	/** One-shot team photo refresh (remove departed colleague from group shot). */
+	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718a';
+	const TEAM_PHOTO_CACHE_VER = '20260718a';
 
 	const HEADER_LOGO = 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg';
 
@@ -242,6 +246,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_deploy_routes' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
+		add_action( 'init', array( __CLASS__, 'sync_updated_team_photo' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
 		add_action( 'send_headers', array( __CLASS__, 'persist_lang_cookie' ), 0 );
@@ -480,6 +485,106 @@ final class Cindemir_SEO_Fixes {
 		}
 	}
 
+	/**
+	 * Overwrite the group portrait so the departed colleague on the far left
+	 * is no longer shown. Source files live in the deploy branch under
+	 * fixes/media/team-2026/ and are pulled via jsDelivr / GitHub raw.
+	 */
+	public static function sync_updated_team_photo() {
+		if ( get_option( self::TEAM_PHOTO_SYNC_KEY ) ) {
+			return;
+		}
+		if ( get_transient( 'cindemir_team_photo_sync_lock' ) ) {
+			return;
+		}
+		set_transient( 'cindemir_team_photo_sync_lock', 1, 5 * MINUTE_IN_SECONDS );
+
+		$dir = WP_CONTENT_DIR . '/uploads/2020/06';
+		if ( ! is_dir( $dir ) && ! wp_mkdir_p( $dir ) ) {
+			return;
+		}
+
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$bases  = array(
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/team-2026/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/team-2026/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/media/team-2026/',
+		);
+		$files  = array(
+			'5295681199059.jpg'           => 20000,
+			'5295681199059.webp'          => 10000,
+			'5295681199059.jpg.webp'      => 10000,
+			'5295681199059-300x135.jpg'   => 3000,
+			'5295681199059-300x135.webp'  => 2000,
+			'5295681199059-705x318.jpg'   => 8000,
+			'5295681199059-705x318.webp'  => 5000,
+			'5295681199059-768x346.jpg'   => 8000,
+			'5295681199059-768x346.webp'  => 5000,
+		);
+
+		$ok = 0;
+		foreach ( $files as $name => $min ) {
+			$body = '';
+			foreach ( $bases as $base ) {
+				$response = wp_remote_get(
+					$base . rawurlencode( $name ) . '?v=' . rawurlencode( self::TEAM_PHOTO_CACHE_VER ),
+					array(
+						'timeout' => 60,
+						'headers' => array(
+							'User-Agent'    => 'CindemirTeamPhoto/' . self::VERSION,
+							'Cache-Control' => 'no-cache',
+						),
+					)
+				);
+				if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+					continue;
+				}
+				$tmp = (string) wp_remote_retrieve_body( $response );
+				if ( strlen( $tmp ) < $min ) {
+					continue;
+				}
+				// Reject HTML error pages from CDNs.
+				if ( 0 === strpos( ltrim( $tmp ), '<' ) ) {
+					continue;
+				}
+				$body = $tmp;
+				break;
+			}
+			if ( '' === $body ) {
+				continue;
+			}
+			$dest = trailingslashit( $dir ) . $name;
+			if ( false !== file_put_contents( $dest, $body ) ) {
+				$ok++;
+			}
+		}
+
+		// Require the main JPG + WebP before marking complete.
+		$main_jpg  = trailingslashit( $dir ) . '5295681199059.jpg';
+		$main_webp = trailingslashit( $dir ) . '5295681199059.webp';
+		if ( $ok < 2 || ! file_exists( $main_jpg ) || filesize( $main_jpg ) < 20000 || ! file_exists( $main_webp ) || filesize( $main_webp ) < 10000 ) {
+			return;
+		}
+
+		update_option( self::TEAM_PHOTO_SYNC_KEY, self::TEAM_PHOTO_CACHE_VER, false );
+		delete_option( 'cindemir_seo_fixes_version' );
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( function_exists( 'rocket_clean_files' ) ) {
+			rocket_clean_files(
+				array(
+					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg',
+					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.webp',
+					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg.webp',
+				)
+			);
+		}
+	}
+
 	public static function maybe_purge_caches_on_upgrade() {
 		$key  = 'cindemir_seo_fixes_version';
 		$prev = get_option( $key, '' );
@@ -612,6 +717,38 @@ final class Cindemir_SEO_Fixes {
 				'callback'            => array( __CLASS__, 'rest_pull_plugins' ),
 				'permission_callback' => '__return_true',
 			)
+		);
+		register_rest_route(
+			'cindemir/v1',
+			'/sync-team-photo',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_sync_team_photo' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_sync_team_photo( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		delete_option( self::TEAM_PHOTO_SYNC_KEY );
+		delete_transient( 'cindemir_team_photo_sync_lock' );
+		self::sync_updated_team_photo();
+		$dir  = WP_CONTENT_DIR . '/uploads/2020/06/';
+		$main = $dir . '5295681199059.jpg';
+		$webp = $dir . '5295681199059.webp';
+		return new WP_REST_Response(
+			array(
+				'ok'      => (bool) get_option( self::TEAM_PHOTO_SYNC_KEY ),
+				'version' => self::VERSION,
+				'flag'    => get_option( self::TEAM_PHOTO_SYNC_KEY ),
+				'jpg'     => file_exists( $main ) ? filesize( $main ) : 0,
+				'webp'    => file_exists( $webp ) ? filesize( $webp ) : 0,
+			),
+			200
 		);
 	}
 
@@ -1272,6 +1409,16 @@ final class Cindemir_SEO_Fixes {
 					'https://cindemirlaw.com' . $webp,
 					$webp,
 				),
+				$html
+			);
+		}
+
+		// Cache-bust the refreshed team portrait after the departed colleague was cropped out.
+		if ( get_option( self::TEAM_PHOTO_SYNC_KEY ) && false !== strpos( $html, '5295681199059' ) ) {
+			$ver = rawurlencode( self::TEAM_PHOTO_CACHE_VER );
+			$html = preg_replace(
+				'#(/wp-content/uploads/2020/06/5295681199059(?:-[0-9]+x[0-9]+)?\.(?:jpe?g|webp)(?:\.webp)?)(?![?#])#i',
+				'$1?v=' . $ver,
 				$html
 			);
 		}
