@@ -955,10 +955,12 @@ final class Cindemir_Contact_Fixes {
 			// Known-good commit with Elena RU bio + SEO (1.9.66). Override via ?commit=.
 			$commit = '3fecd51';
 		}
+		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
-			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $commit . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
@@ -996,8 +998,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& false === strpos( $tmp, 'Version: 1.9.67' )
-					&& false === strpos( $tmp, 'Version: 1.9.66' ) ) {
+					&& ( false === strpos( $tmp, 'Version: 1.9.67' )
+						|| false === strpos( $tmp, 'ELENA_ZARA_BAR_SAFE_20260718' ) ) ) {
 					continue;
 				}
 				$body = $tmp;

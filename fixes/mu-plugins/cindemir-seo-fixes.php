@@ -776,11 +776,12 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			$commit = self::DEPLOY_COMMIT;
 		}
-		// Prefer raw GitHub + commit-pinned CDNs. Branch-tag jsDelivr is often stale.
+		// Commit-pinned first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
-			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $commit . '/fixes/mu-plugins/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
@@ -816,7 +817,9 @@ final class Cindemir_SEO_Fixes {
 				if ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
-				if ( 'cindemir-seo-fixes.php' === $name && false === strpos( $tmp, 'Version: ' . self::VERSION ) ) {
+				if ( 'cindemir-seo-fixes.php' === $name
+					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
+						|| false === strpos( $tmp, 'ELENA_ZARA_BAR_SAFE_20260718' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
