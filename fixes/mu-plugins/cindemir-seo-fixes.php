@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.58 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.59 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718A */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.58
+ * Version: 1.9.59
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.58';
+	const VERSION = '1.9.59';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718a';
@@ -1416,38 +1416,28 @@ final class Cindemir_SEO_Fixes {
 			);
 		}
 
-		// Cache-bust team portrait URLs with plain str_replace (avoid PCRE on huge HTML).
+		// Cache-bust team portrait URLs (token swap avoids double ?v= and PCRE).
 		if ( get_option( self::TEAM_PHOTO_SYNC_KEY ) && false !== strpos( $html, '5295681199059' ) ) {
 			$ver = self::TEAM_PHOTO_CACHE_VER;
+			$html = str_replace( array( '?v=' . $ver . '?v=' . $ver, '?v=' . $ver . '.webp' ), array( '?v=' . $ver, '.webp?v=' . $ver ), $html );
 			foreach ( array(
-				'/wp-content/uploads/2020/06/5295681199059.jpg',
-				'/wp-content/uploads/2020/06/5295681199059.webp',
-				'/wp-content/uploads/2020/06/5295681199059.jpg.webp',
-				'/wp-content/uploads/2020/06/5295681199059-300x135.jpg',
-				'/wp-content/uploads/2020/06/5295681199059-300x135.webp',
-				'/wp-content/uploads/2020/06/5295681199059-705x318.jpg',
-				'/wp-content/uploads/2020/06/5295681199059-705x318.webp',
-				'/wp-content/uploads/2020/06/5295681199059-768x346.jpg',
-				'/wp-content/uploads/2020/06/5295681199059-768x346.webp',
-			) as $rel ) {
-				if ( false === strpos( $html, $rel ) ) {
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.webp',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg.webp',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-300x135.jpg',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-300x135.webp',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-705x318.jpg',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-705x318.webp',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-768x346.jpg',
+				'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059-768x346.webp',
+			) as $abs ) {
+				if ( false === strpos( $html, $abs ) ) {
 					continue;
 				}
-				$html = str_replace(
-					array(
-						'https://cindemirlaw.com' . $rel . '?v=' . $ver,
-						'https://cindemirlaw.com' . $rel,
-						$rel . '?v=' . $ver,
-						$rel,
-					),
-					array(
-						'https://cindemirlaw.com' . $rel . '?v=' . $ver,
-						'https://cindemirlaw.com' . $rel . '?v=' . $ver,
-						$rel . '?v=' . $ver,
-						$rel . '?v=' . $ver,
-					),
-					$html
-				);
+				$token = '%%CINDEMIR_TEAM_PHOTO_' . md5( $abs ) . '%%';
+				$html  = str_replace( $abs . '?v=' . $ver, $token, $html );
+				$html  = str_replace( $abs, $token, $html );
+				$html  = str_replace( $token, $abs . '?v=' . $ver, $html );
 			}
 		}
 
