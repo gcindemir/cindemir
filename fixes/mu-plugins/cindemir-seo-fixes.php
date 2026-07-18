@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.71 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.72 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.71
+ * Version: 1.9.72
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.71';
+	const VERSION = '1.9.72';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '947b45c';
 
@@ -1641,7 +1641,7 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( 'SiteNavigationElement', $types, true ) ) {
 			$node = self::normalize_nav_schema( $node );
 		}
-		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) ) {
+		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) || in_array( 'VideoObject', $types, true ) ) {
 			if ( isset( $node['author'] ) ) {
 				$node['author'] = self::normalize_schema_node( $node['author'] );
 			}
@@ -1736,7 +1736,15 @@ final class Cindemir_SEO_Fixes {
 		if ( empty( $org['url'] ) ) {
 			$org['url'] = 'https://cindemirlaw.com/';
 		}
-		if ( empty( $org['logo'] ) ) {
+		$logo_url = '';
+		if ( ! empty( $org['logo'] ) ) {
+			if ( is_string( $org['logo'] ) ) {
+				$logo_url = $org['logo'];
+			} elseif ( is_array( $org['logo'] ) && ! empty( $org['logo']['url'] ) ) {
+				$logo_url = (string) $org['logo']['url'];
+			}
+		}
+		if ( '' === $logo_url ) {
 			$org['logo'] = array(
 				'@type' => 'ImageObject',
 				'url'   => self::HEADER_LOGO,
@@ -1909,28 +1917,25 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'application/ld+json' ) ) {
 			return $html;
 		}
-		$replaced = preg_replace_callback(
-			'#(<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>)(.*?)(</script>)#is',
-			static function ( $m ) {
-				$raw = trim( $m[2] );
+		// Per-script replace avoids PCRE failures on huge pages / VideoObject transcripts.
+		if ( preg_match_all( '#<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is', $html, $matches, PREG_SET_ORDER ) ) {
+			foreach ( $matches as $m ) {
+				$raw = trim( $m[1] );
 				if ( '' === $raw ) {
-					return $m[0];
+					continue;
 				}
 				$data = json_decode( $raw, true );
 				if ( null === $data && JSON_ERROR_NONE !== json_last_error() ) {
-					return $m[0];
+					continue;
 				}
-				$fixed = Cindemir_SEO_Fixes::normalize_schema_data_public( $data );
+				$fixed = self::normalize_schema_data_public( $data );
 				$json  = wp_json_encode( $fixed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 				if ( ! is_string( $json ) || '' === $json ) {
-					return $m[0];
+					continue;
 				}
-				return $m[1] . $json . $m[3];
-			},
-			$html
-		);
-		if ( is_string( $replaced ) ) {
-			$html = $replaced;
+				$open = substr( $m[0], 0, strpos( $m[0], '>' ) + 1 );
+				$html = str_replace( $m[0], $open . $json . '</script>', $html );
+			}
 		}
 		return self::append_missing_schema_script( $html );
 	}
