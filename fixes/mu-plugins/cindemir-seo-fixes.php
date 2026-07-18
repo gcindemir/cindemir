@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.68';
+	const VERSION = '1.9.69';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '03319c8';
 
@@ -1883,7 +1883,7 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'application/ld+json' ) ) {
 			return $html;
 		}
-		return preg_replace_callback(
+		$html = preg_replace_callback(
 			'#(<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>)(.*?)(</script>)#is',
 			static function ( $m ) {
 				$raw = trim( $m[2] );
@@ -1903,6 +1903,91 @@ final class Cindemir_SEO_Fixes {
 			},
 			$html
 		);
+		return self::append_missing_schema_script( $html );
+	}
+
+	/**
+	 * Inject WebSite / WebPage / Organization when Yoast omitted them.
+	 * Detects page type from body classes (reliable in the HTML buffer).
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	private static function append_missing_schema_script( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$is_home     = (bool) preg_match( '/<body[^>]*\bclass="[^"]*\bhome\b/i', $html );
+		$is_team     = (bool) preg_match( '/\bpage-id-(19|2427)\b/', $html );
+		$is_services = (bool) preg_match( '/\bpage-id-(18|2638|2637|56)\b/', $html );
+		if ( ! $is_home && ! $is_team && ! $is_services ) {
+			return $html;
+		}
+
+		$has_website = ( false !== stripos( $html, '"@type":"WebSite"' ) || false !== stripos( $html, '"@type": "WebSite"' ) );
+		$has_webpage = ( false !== stripos( $html, '"@type":"WebPage"' ) || false !== stripos( $html, '"@type": "WebPage"' ) );
+		$has_org     = ( false !== stripos( $html, '"@type":"Organization"' ) || false !== stripos( $html, '"@type": "Organization"' ) );
+
+		$nodes = array();
+		if ( ( $is_home || $is_team || $is_services ) && ! $has_org ) {
+			$nodes[] = self::normalize_organization_schema(
+				array(
+					'@type' => 'Organization',
+					'@id'   => 'https://cindemirlaw.com/#organization',
+					'name'  => 'Cindemir Law Office',
+					'url'   => 'https://cindemirlaw.com/',
+				)
+			);
+		}
+		if ( $is_home && ! $has_website ) {
+			$nodes[] = array(
+				'@type'      => 'WebSite',
+				'@id'        => 'https://cindemirlaw.com/#website',
+				'url'        => 'https://cindemirlaw.com/',
+				'name'       => 'Cindemir Law Office',
+				'publisher'  => array( '@id' => 'https://cindemirlaw.com/#organization' ),
+				'inLanguage' => array( 'en', 'ru', 'zh-Hans' ),
+			);
+		}
+		if ( ( $is_team || $is_services ) && ! $has_webpage ) {
+			$canon = '';
+			if ( preg_match( '/<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']/i', $html, $cm ) ) {
+				$canon = $cm[1];
+			} elseif ( preg_match( '/<meta[^>]+property=["\']og:url["\'][^>]+content=["\']([^"\']+)["\']/i', $html, $om ) ) {
+				$canon = $om[1];
+			}
+			$title = '';
+			if ( preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
+				$title = wp_strip_all_tags( $tm[1] );
+			}
+			if ( $canon ) {
+				$nodes[] = array(
+					'@type'     => 'WebPage',
+					'@id'       => trailingslashit( $canon ) . '#webpage',
+					'url'       => $canon,
+					'name'      => $title,
+					'isPartOf'  => array( '@id' => 'https://cindemirlaw.com/#website' ),
+					'about'     => array( '@id' => 'https://cindemirlaw.com/#organization' ),
+					'publisher' => array( '@id' => 'https://cindemirlaw.com/#organization' ),
+				);
+			}
+		}
+		if ( ! $nodes ) {
+			return $html;
+		}
+		$payload = array(
+			'@context' => 'https://schema.org',
+			'@graph'   => $nodes,
+		);
+		$json = wp_json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! is_string( $json ) || '' === $json ) {
+			return $html;
+		}
+		$script = "\n<script type=\"application/ld+json\" id=\"cindemir-schema-fix\">" . $json . "</script>\n";
+		if ( false !== stripos( $html, '</head>' ) ) {
+			return preg_replace( '/<\/head>/i', $script . '</head>', $html, 1 );
+		}
+		return $html . $script;
 	}
 
 	/**
