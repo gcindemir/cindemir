@@ -18,7 +18,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path("/workspace")
-PROFILE = Path.home() / ".config/google-chrome"
+PROFILE = Path(os.environ["FB_PROFILE_DIR"]) if os.environ.get("FB_PROFILE_DIR") else Path.home() / ".config/google-chrome"
 ASSET = "336218871992"
 BIZ = "1161971660662915"
 COMPOSER = f"https://business.facebook.com/latest/composer/?asset_id={ASSET}&business_id={BIZ}"
@@ -368,6 +368,51 @@ def post_one(page, art: dict, shot_idx: int = 0) -> tuple[bool, str]:
         return False, str(e)
 
 
+def ensure_facebook_session(page, ctx) -> bool:
+    """Recover Business Suite access via facebook.com saved profile if needed."""
+    page.goto("https://www.facebook.com/", wait_until="domcontentloaded", timeout=120000)
+    page.wait_for_timeout(3000)
+    dismiss(page)
+    cookies = {c["name"]: c.get("value", "") for c in ctx.cookies("https://www.facebook.com")}
+    if not (cookies.get("c_user") and cookies.get("xs")):
+        for sel in [
+            page.get_by_role("button", name=re.compile(r"^Devam$", re.I)),
+            page.locator("div[role='button']:has-text('Devam')"),
+            page.locator("button:has-text('Devam')"),
+        ]:
+            try:
+                if sel.count():
+                    sel.first.click(timeout=3000)
+                    page.wait_for_timeout(5000)
+                    print("clicked Devam for session recover", flush=True)
+                    break
+            except Exception:
+                pass
+        for _ in range(60):
+            cookies = {c["name"]: c.get("value", "") for c in ctx.cookies("https://www.facebook.com")}
+            if cookies.get("c_user") and cookies.get("xs") and "two_factor" not in page.url:
+                break
+            page.wait_for_timeout(5000)
+            dismiss(page)
+
+    page.goto(f"https://business.facebook.com/latest/home?asset_id={ASSET}&business_id={BIZ}", timeout=120000)
+    page.wait_for_timeout(4000)
+    dismiss(page)
+    if "login" in page.url.lower():
+        try:
+            btn = page.get_by_role("button", name=re.compile(r"Facebook ile devam", re.I))
+            if btn.count():
+                btn.first.click(timeout=3000)
+                page.wait_for_timeout(6000)
+                dismiss(page)
+        except Exception:
+            pass
+    page.screenshot(path=str(SHOT / "fb-biz-warm.png"))
+    ok = "login" not in page.url.lower()
+    print("session_ok", ok, page.url[:140], flush=True)
+    return ok
+
+
 def select_batch(arts, progress):
     done = {x.rstrip("/") for x in progress.get("posted_with_link_preview", [])}
     # Fallback: also skip if already posted today with link
@@ -425,9 +470,13 @@ def main():
         print("nothing to post", flush=True)
         return 0
 
-    tmp = Path(tempfile.mkdtemp(prefix="fb-pub-"))
-    copy_profile(tmp)
-    print("profile", tmp, flush=True)
+    if os.environ.get("FB_PROFILE_DIR"):
+        tmp = Path(os.environ["FB_PROFILE_DIR"])
+        print("using existing profile", tmp, flush=True)
+    else:
+        tmp = Path(tempfile.mkdtemp(prefix="fb-pub-"))
+        copy_profile(tmp)
+        print("profile", tmp, flush=True)
 
     results = []
     with sync_playwright() as p:
@@ -443,10 +492,10 @@ def main():
         )
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
 
-        page.goto(f"https://business.facebook.com/latest/home?asset_id={ASSET}&business_id={BIZ}", timeout=120000)
-        page.wait_for_timeout(4000)
-        dismiss(page)
-        page.screenshot(path=str(SHOT / "fb-biz-warm.png"))
+        if not ensure_facebook_session(page, ctx):
+            print("FAIL session_not_ready", page.url, flush=True)
+            ctx.close()
+            return 1
         print("warm", page.url, flush=True)
 
         for idx, art in enumerate(batch, 1):

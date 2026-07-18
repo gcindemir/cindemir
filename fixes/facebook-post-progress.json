@@ -282,7 +282,7 @@
     }
   ],
   "remaining": 17,
-  "updated": "2026-07-17T06:58:44Z",
+  "updated": "2026-07-18T09:07:53Z",
   "last": {
     "title": "Training",
     "link": "https://cindemirlaw.com/training/",
@@ -327,45 +327,45 @@
     "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit"
   ],
   "last_quality": {
-    "title": "Airport Detention in Turkey: Legal Risks for Foreign Travellers and How to Respond",
-    "link": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
-    "status": "ok_with_link_preview",
-    "summary_len": 123,
-    "date": "2026-07-17"
+    "title": "Legal Rights of Foreign Nationals in Police Custody in Istanbul",
+    "link": "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul/",
+    "status": "clicked_publish",
+    "summary_len": 141,
+    "date": "2026-07-18"
   },
   "last_quality_results": [
     {
-      "title": "CISG in Turkey: International Sale of Goods Disputes and Legal Framework",
-      "link": "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework/",
+      "title": "Child Abduction and Retention Under Turkish Law",
+      "link": "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law/",
       "ok": true,
       "status": "ok_with_link_preview"
     },
     {
-      "title": "Ottoman Title Deeds in Türkiye: Inheritance, Registration and Land Search",
-      "link": "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search/",
+      "title": "Enforcement of Promissory Notes, Bills of Exchange and Cheques in Turkey",
+      "link": "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey/",
       "ok": true,
       "status": "ok_with_link_preview"
     },
     {
-      "title": "Tourism Law in Turkey",
-      "link": "https://cindemirlaw.com/tourism-law-in-turkey/",
+      "title": "Legal Opinion and Expert Opinion in Turkey: Why the Distinction Matters",
+      "link": "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters/",
       "ok": true,
       "status": "ok_with_link_preview"
     },
     {
-      "title": "Turkey Asset Repatriation 2026: Legal Framework for Bringing Foreign Assets to Turkey",
-      "link": "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey/",
+      "title": "How to Apply to the European Court of Human Rights (ECHR) – Legal Conditions and Procedure",
+      "link": "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure/",
       "ok": true,
       "status": "ok_with_link_preview"
     },
     {
-      "title": "Airport Detention in Turkey: Legal Risks for Foreign Travellers and How to Respond",
-      "link": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
+      "title": "Legal Rights of Foreign Nationals in Police Custody in Istanbul",
+      "link": "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul/",
       "ok": true,
-      "status": "ok_with_link_preview"
+      "status": "clicked_publish"
     }
   ],
-  "quality_remaining": 190,
+  "quality_remaining": 185,
   "daily": {
     "2026-07-17": {
       "count": 5,
@@ -376,11 +376,26 @@
         "https://cindemirlaw.com/tourism-law-in-turkey",
         "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey"
       ]
+    },
+    "2026-07-18": {
+      "count": 5,
+      "links": [
+        "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law",
+        "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey",
+        "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure",
+        "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters",
+        "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul"
+      ]
     }
   },
   "posted_with_link_preview": [
     "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond",
+    "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law",
     "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework",
+    "https://cindemirlaw.com/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey",
+    "https://cindemirlaw.com/how-to-apply-to-the-european-court-of-human-rights-echr-legal-conditions-and-procedure",
+    "https://cindemirlaw.com/legal-opinion-and-expert-opinion-in-turkey-why-the-distinction-matters",
+    "https://cindemirlaw.com/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul",
     "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search",
     "https://cindemirlaw.com/tourism-law-in-turkey",
     "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey"
