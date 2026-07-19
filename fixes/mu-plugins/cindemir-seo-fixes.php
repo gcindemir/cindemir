@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.72 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.73 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.72
+ * Version: 1.9.73
  * SERVICES_BLANK_FIX_20260715
  * Author: Cindemir Law Office
  */
@@ -172,7 +172,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.72';
+	const VERSION = '1.9.73';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '6fa93dc';
 
@@ -248,6 +248,7 @@ final class Cindemir_SEO_Fixes {
 	public static function boot() {
 		add_action( 'init', array( __CLASS__, 'maybe_self_upgrade_from_github' ), 0 );
 		add_action( 'init', array( __CLASS__, 'maybe_upgrade_sibling_plugins' ), 0 );
+		add_action( 'init', array( __CLASS__, 'ensure_backup_mu_plugin' ), 0 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_deploy_routes' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
@@ -595,6 +596,58 @@ final class Cindemir_SEO_Fixes {
 		}
 	}
 
+
+	/** Install/refresh WordPress-native daily backup mu-plugin from GitHub. */
+	public static function ensure_backup_mu_plugin() {
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			return;
+		}
+		$dest = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-backup.php';
+		$need = true;
+		if ( file_exists( $dest ) ) {
+			$local = (string) file_get_contents( $dest );
+			if ( false !== strpos( $local, "VERSION     = '1.1.0'" ) || false !== strpos( $local, "const VERSION     = '1.1.0'" ) || false !== strpos( $local, 'BACKUP_WP_CRON_20260719' ) ) {
+				$need = false;
+			}
+		}
+		if ( ! $need ) {
+			return;
+		}
+		$commit = self::DEPLOY_COMMIT;
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$bases  = array(
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/cindemir-backup.php',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $commit . '/fixes/mu-plugins/cindemir-backup.php',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/cindemir-backup.php',
+		);
+		foreach ( $bases as $url ) {
+			$res = wp_remote_get(
+				$url . '?v=BACKUP_WP_CRON_20260719',
+				array(
+					'timeout' => 60,
+					'headers' => array(
+						'User-Agent'    => 'CindemirBackupEnsure/' . self::VERSION,
+						'Cache-Control' => 'no-cache',
+					),
+				)
+			);
+			if ( is_wp_error( $res ) || 200 !== (int) wp_remote_retrieve_response_code( $res ) ) {
+				continue;
+			}
+			$body = (string) wp_remote_retrieve_body( $res );
+			if ( strlen( $body ) < 5000 || false === strpos( $body, 'BACKUP_WP_CRON_20260719' ) ) {
+				continue;
+			}
+			if ( false !== file_put_contents( $dest, $body ) ) {
+				if ( function_exists( 'opcache_invalidate' ) ) {
+					@opcache_invalidate( $dest, true );
+				}
+				break;
+			}
+		}
+	}
+
+
 	public static function maybe_purge_caches_on_upgrade() {
 		$key  = 'cindemir_seo_fixes_version';
 		$prev = get_option( $key, '' );
@@ -790,6 +843,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
 			'cindemir-services-page.php'     => 10000,
+			'cindemir-backup.php'            => 8000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -819,7 +873,7 @@ final class Cindemir_SEO_Fixes {
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
-						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
+						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) ) {
 					continue;
 				}
 				$body = $tmp;

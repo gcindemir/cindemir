@@ -5,6 +5,7 @@
  * Version: 1.3.17
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
+ * BACKUP_WP_CRON_20260719
  * Author: Cindemir Law Office
  */
 
@@ -969,6 +970,7 @@ final class Cindemir_Contact_Fixes {
 			'cindemir-expose-yoast-meta.php' => 2000,
 			'cindemir-purge-cache.php'       => 500,
 			'cindemir-services-page.php'     => 10000,
+			'cindemir-backup.php'            => 8000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -998,8 +1000,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.72' )
-						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
+					&& ( false === strpos( $tmp, 'Version: 1.9.73' )
+						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
