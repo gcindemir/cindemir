@@ -1,0 +1,111 @@
+# Daily full backup of cindemirlaw.com (DB + wp-content + wp-config)
+#
+# Required GitHub secrets:
+#   CINDEMIR_SSH_KEY   — private key for SSH user (cindemir)
+# Optional secrets:
+#   CINDEMIR_SSH_HOST  — default 162.241.252.122
+#   CINDEMIR_SSH_USER  — default cindemir
+#   CINDEMIR_BACKUP_PULL_CONTENT — set to "1" to also download wp-content.tar.gz
+#
+# Schedule: 02:00 UTC daily (~05:00 Turkey in summer)
+
+name: Daily cindemirlaw.com backup
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      pull_content:
+        description: "Also download wp-content.tar.gz (large)"
+        required: false
+        default: "0"
+      install_cron:
+        description: "Only install server crontab (set to 1)"
+        required: false
+        default: "0"
+
+concurrency:
+  group: cindemirlaw-daily-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.CINDEMIR_SSH_KEY }}
+        run: |
+          if [ -z "${SSH_KEY}" ]; then
+            echo "Missing secret CINDEMIR_SSH_KEY" >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/cindemirlaw_deploy
+          chmod 600 ~/.ssh/cindemirlaw_deploy
+          HOST="${{ secrets.CINDEMIR_SSH_HOST }}"
+          HOST="${HOST:-162.241.252.122}"
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Install server cron only
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.install_cron == '1' }}
+        run: |
+          export CINDEMIR_SSH_KEY="$HOME/.ssh/cindemirlaw_deploy"
+          export CINDEMIR_SSH_HOST="${{ secrets.CINDEMIR_SSH_HOST }}"
+          export CINDEMIR_SSH_USER="${{ secrets.CINDEMIR_SSH_USER }}"
+          : "${CINDEMIR_SSH_HOST:=162.241.252.122}"
+          : "${CINDEMIR_SSH_USER:=cindemir}"
+          chmod +x scripts/backup/run-daily-backup.sh fixes/scripts/server-daily-backup.sh
+          ./scripts/backup/run-daily-backup.sh --install-cron
+
+      - name: Run daily backup over SSH
+        if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.install_cron == '1') }}
+        env:
+          PULL_CONTENT_INPUT: ${{ github.event.inputs.pull_content }}
+          PULL_CONTENT_SECRET: ${{ secrets.CINDEMIR_BACKUP_PULL_CONTENT }}
+        run: |
+          export CINDEMIR_SSH_KEY="$HOME/.ssh/cindemirlaw_deploy"
+          export CINDEMIR_SSH_HOST="${{ secrets.CINDEMIR_SSH_HOST }}"
+          export CINDEMIR_SSH_USER="${{ secrets.CINDEMIR_SSH_USER }}"
+          : "${CINDEMIR_SSH_HOST:=162.241.252.122}"
+          : "${CINDEMIR_SSH_USER:=cindemir}"
+          if [ -n "$PULL_CONTENT_SECRET" ]; then
+            export CINDEMIR_BACKUP_PULL_CONTENT="$PULL_CONTENT_SECRET"
+          elif [ -n "$PULL_CONTENT_INPUT" ]; then
+            export CINDEMIR_BACKUP_PULL_CONTENT="$PULL_CONTENT_INPUT"
+          else
+            export CINDEMIR_BACKUP_PULL_CONTENT=0
+          fi
+          chmod +x scripts/backup/run-daily-backup.sh fixes/scripts/server-daily-backup.sh
+          ./scripts/backup/run-daily-backup.sh
+
+      - name: Upload backup artifacts
+        if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.install_cron == '1') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cindemirlaw-backup-${{ github.run_id }}
+          path: backups/live/**
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summary
+        if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.install_cron == '1') }}
+        run: |
+          {
+            echo "## cindemirlaw.com daily backup"
+            if [ -f backups/live/LATEST.json ]; then
+              echo '```json'
+              cat backups/live/LATEST.json
+              echo '```'
+            fi
+            echo
+            echo '### Files'
+            echo '```'
+            ls -lhR backups/live || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

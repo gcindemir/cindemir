@@ -3,6 +3,9 @@ backups/cindemirlaw.com-*/
 backups/cindemirlaw.com-*.tar.gz
 backups/wget-cindemirlaw.com-*.log
 
+# Live daily backups pulled over SSH (DB + secrets — never commit)
+backups/live/
+
 # SSH deploy key (never commit)
 fixes/.ssh/
 
@@ -10,3 +13,6 @@ fixes/.ssh/
 fixes/backups/cindemirlaw-*/
 fixes/backups/*.sql
 fixes/backups/*-FULL.tar.gz
+
+# Status file written on the server (if copied into a working tree by mistake)
+**/cindemir-backup-latest.json
