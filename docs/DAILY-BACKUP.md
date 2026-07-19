@@ -1,101 +1,85 @@
 # Daily backup — cindemirlaw.com
 
-Full WordPress backup (database + `wp-content` + `wp-config`), every day.
+Primary path: **WordPress WP-Cron** (no SSH). Optional SSH/GitHub Actions remain as a secondary offsite copy.
 
-## What you get
+## What you get (WordPress)
 
-Each run creates on the server:
+Each run stores under the site:
 
 ```
-~/backups/cindemirlaw/YYYY-MM-DD/
+wp-content/cindemir-backups/YYYY-MM-DD/
   database.sql.gz
   wp-config.php.gz
-  wp-content.tar.gz      # caches excluded
-  manifest.txt
+  code.zip              # mu-plugins + plugins + themes
+  uploads.zip           # if uploads tree < ~450MB
+  manifest.json
   STATUS.json
-~/backups/cindemirlaw/LATEST.json
-wp-content/cindemir-backup-latest.json   # for REST status
+wp-content/cindemir-backup-latest.json
 ```
 
-Retention on server: **14 days** (configurable via `CINDEMIR_BACKUP_KEEP_DAYS`).
+Retention: **14 days**. Directory is denied via `.htaccess`.
 
-Offsite copy: GitHub Actions uploads artifacts (DB + config + manifest by default) with **14-day** retention.
+Schedule: ~**02:00** site timezone (WP-Cron). If cron is lazy on shared hosting, an overdue run may start on front traffic (throttled).
 
-## 1) One-time setup
+## Deploy (mu-plugin)
 
-### A. GitHub secrets (repo → Settings → Secrets)
-
-| Secret | Required | Value |
-|--------|----------|--------|
-| `CINDEMIR_SSH_KEY` | yes | Private key for `cindemir@162.241.252.122` |
-| `CINDEMIR_SSH_HOST` | no | default `162.241.252.122` |
-| `CINDEMIR_SSH_USER` | no | default `cindemir` |
-| `CINDEMIR_BACKUP_PULL_CONTENT` | no | `1` to also download `wp-content.tar.gz` |
-
-### B. Install server script + cron
-
-Locally (or via Actions → Run workflow → `install_cron=1`):
+`cindemir-backup.php` is pulled with the usual pack:
 
 ```bash
-export CINDEMIR_SSH_KEY=~/.ssh/cindemirlaw_deploy
-chmod +x scripts/backup/run-daily-backup.sh fixes/scripts/server-daily-backup.sh
-./scripts/backup/run-daily-backup.sh --install-cron
+# After pushing to cursor/cindemirlaw-seo-tasks-d204:
+curl -sS -X POST \
+  "https://cindemirlaw.com/wp-json/cindemir/v1/pull-plugins?key=seo-pack-2026&commit=<sha>"
 ```
 
-Cron line (02:00 server time):
+SEO `ensure_backup_mu_plugin()` also installs/refreshes the backup plugin on `init` when missing or outdated.
 
-```
-0 2 * * * $HOME/bin/cindemir-daily-backup.sh >> $HOME/backups/cindemirlaw/cron.log 2>&1
-```
+## REST API (`key=seo-pack-2026`)
 
-### C. Deploy status mu-plugin (optional)
+| Route | Purpose |
+|-------|---------|
+| `GET /wp-json/cindemir/v1/backup-status` | Last run + next cron |
+| `GET /wp-json/cindemir/v1/backup-list` | Recent backup folders |
+| `POST /wp-json/cindemir/v1/backup-run` | Run backup now |
 
-Upload `fixes/mu-plugins/cindemir-backup.php` with the usual mu-plugin pull/SSH deploy, then:
+Examples:
 
 ```bash
 curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-status?key=seo-pack-2026'
+curl -sS -X POST 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-run?key=seo-pack-2026'
+curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-list?key=seo-pack-2026'
 ```
 
-## 2) Daily automation
-
-Workflow: `.github/workflows/daily-backup.yml`
-
-- **Schedule:** `0 2 * * *` UTC
-- **Manual:** Actions → “Daily cindemirlaw.com backup” → Run workflow
-
-It will:
-
-1. SSH to Bluehost  
-2. Run `~/bin/cindemir-daily-backup.sh`  
-3. Download `database.sql.gz`, `wp-config.php.gz`, `manifest.txt`, `STATUS.json`  
-4. Upload them as a GitHub Actions artifact (14 days)
-
-## 3) Manual run
+## Restore (overview)
 
 ```bash
-export CINDEMIR_SSH_KEY=~/.ssh/cindemirlaw_deploy
-./scripts/backup/run-daily-backup.sh
-
-# Also pull full wp-content archive:
-CINDEMIR_BACKUP_PULL_CONTENT=1 ./scripts/backup/run-daily-backup.sh
-```
-
-## 4) Restore (overview)
-
-```bash
-# DB
+# DB (on server / staging)
 gunzip -c database.sql.gz | wp db import - --path=~/public_html
 
-# wp-content
-cd ~/public_html && tar -xzf /path/to/wp-content.tar.gz
+# Code
+cd ~/public_html/wp-content && unzip /path/to/code.zip
 
-# wp-config (only if needed)
+# Uploads (if present)
+cd ~/public_html/wp-content && unzip /path/to/uploads.zip
+
+# wp-config only if needed
 gunzip -c wp-config.php.gz > ~/public_html/wp-config.php
 ```
 
 Prefer restoring into a staging copy first.
 
-## 5) Security notes
+## Optional: SSH / GitHub Actions (secondary)
+
+If `CINDEMIR_SSH_KEY` is set, the older Bluehost script + Actions workflow can still copy archives offsite:
+
+| Path | Role |
+|------|------|
+| `fixes/scripts/server-daily-backup.sh` | Full `wp-content` tar under `~/backups/cindemirlaw/` |
+| `scripts/backup/run-daily-backup.sh` | SSH runner + download |
+| `.github/workflows/daily-backup.yml` | Cron `0 2 * * *` UTC |
+
+Not required for the WordPress-native daily backup to work.
+
+## Security
 
 - Archives contain **database credentials and customer data** — never commit them to git.
 - `backups/live/` is gitignored.
@@ -105,8 +89,8 @@ Prefer restoring into a staging copy first.
 
 | Path | Role |
 |------|------|
-| `fixes/scripts/server-daily-backup.sh` | Runs on Bluehost |
-| `scripts/backup/run-daily-backup.sh` | SSH runner + download |
-| `.github/workflows/daily-backup.yml` | Daily GitHub Actions job |
-| `fixes/mu-plugins/cindemir-backup.php` | `/backup-status` REST |
+| `fixes/mu-plugins/cindemir-backup.php` | WP-Cron + REST (primary) |
 | `docs/DAILY-BACKUP.md` | This doc |
+| `fixes/scripts/server-daily-backup.sh` | Optional SSH full backup |
+| `scripts/backup/run-daily-backup.sh` | Optional SSH runner |
+| `.github/workflows/daily-backup.yml` | Optional Actions job |
