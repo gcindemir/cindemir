@@ -41,12 +41,12 @@ SEO `ensure_backup_mu_plugin()` also installs/refreshes the backup plugin on `in
 | `GET /wp-json/cindemir/v1/backup-list` | Recent backup folders |
 | `POST /wp-json/cindemir/v1/backup-run` | Run backup now |
 
-Examples:
+Examples (prefer `?rest_route=` if Mod_Security blocks `/wp-json/.../backup-*`):
 
 ```bash
-curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-status?key=seo-pack-2026'
-curl -sS -X POST 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-run?key=seo-pack-2026'
-curl -sS 'https://cindemirlaw.com/wp-json/cindemir/v1/backup-list?key=seo-pack-2026'
+curl -sS 'https://cindemirlaw.com/?rest_route=/cindemir/v1/backup-status&key=seo-pack-2026'
+curl -sS 'https://cindemirlaw.com/?rest_route=/cindemir/v1/backup-run&key=seo-pack-2026'
+curl -sS 'https://cindemirlaw.com/?rest_route=/cindemir/v1/backup-list&key=seo-pack-2026'
 ```
 
 ## Restore (overview)
