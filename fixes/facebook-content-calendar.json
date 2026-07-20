@@ -23,10 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 205,
+    "scheduled_posts": 195,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-08-28"
+    "date_range": "2026-07-18 → 2026-08-28",
+    "published_posts": 15
   },
   "days": [
     {
@@ -79,7 +80,7 @@
     {
       "day": 2,
       "date": "2026-07-19",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d2-1",
@@ -87,7 +88,8 @@
           "url": "https://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
           "summary": "Airport detention or customs issues can escalate quickly for foreign travellers in Türkiye.\n\nTurkey is a major international travel hub connecting Europe, Asia, the Middle East and Africa. Every day, thousands of foreign passengers enter or transit through airports such as Istanbul Airport, Sabiha Gökçen…\n\nRead the full article:\nhttps://cindemirlaw.com/airport-detention-in-turkey-legal-risks-for-foreign-travellers-and-how-to-respond/",
           "scheduled_at": "2026-07-19T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d2-2",
@@ -95,7 +97,8 @@
           "url": "https://cindemirlaw.com/sales-of-real-estate-to-foreigners-in-turkey/",
           "summary": "Foreign property purchases in Türkiye involve title, zoning and currency rules that need a legal check.\n\nExplains Sales of Real Estate to Foreigners In Turkey?, including heirs, probate, documents and practical risks for foreign families.\n\nRead the full article:\nhttps://cindemirlaw.com/sales-of-real-estate-to-foreigners-in-turkey/",
           "scheduled_at": "2026-07-19T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d2-3",
@@ -103,7 +106,8 @@
           "url": "https://cindemirlaw.com/turkish-citizenship-law-in-english/",
           "summary": "Turkish citizenship pathways are set out in Law No. 5901 — residence, marriage, investment and more.\n\nLaw No: 5901                                                                                   Adoption Date: 29/5/2009 PART ONE Objective, Scope, Definitions and the Implementation of Citizenship Services\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-citizenship-law-in-english/",
           "scheduled_at": "2026-07-19T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d2-4",
@@ -111,7 +115,8 @@
           "url": "https://cindemirlaw.com/enforcement-of-a-foreign-decision-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nExplains Enforcement of a Foreign Decision in Turkey, including enforcement steps, documents and practical risks for creditors.\n\nRead the full article:\nhttps://cindemirlaw.com/enforcement-of-a-foreign-decision-in-turkey/",
           "scheduled_at": "2026-07-19T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d2-5",
@@ -119,14 +124,15 @@
           "url": "https://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
           "summary": "Airport detention or customs issues can escalate quickly for foreign travellers in Türkiye.\n\nAirport customs controls in Türkiye operate under a strict legal framework aimed at safeguarding fiscal order, preventing unlawful trade, and ensuring compliance with import obligations. What many travelers consider…\n\nRead the full article:\nhttps://cindemirlaw.com/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
           "scheduled_at": "2026-07-19T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         }
       ]
     },
     {
       "day": 3,
       "date": "2026-07-20",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d3-1",
@@ -134,7 +140,8 @@
           "url": "https://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/",
           "summary": "Deportation and removal decisions under Turkish immigration law carry strict timelines and appeal rights.\n\nThe purpose of this article is to explain the rights of foreigners who are banned to enter to Turkey. Upon deportation from Turkey, an entry ban on the foreigner can be applied on the foreigner. The ban can be also…\n\nRead the full article:\nhttps://cindemirlaw.com/how-to-lift-entry-ban-to-turkey/",
           "scheduled_at": "2026-07-20T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d3-2",
@@ -142,7 +149,8 @@
           "url": "https://cindemirlaw.com/turkish-inheritance-law/",
           "summary": "Cross-border inheritance with Turkish assets raises probate, forced-heir and documentation issues.\n\nThis article aims to explain concerning inheritance law of turkey by Turkish lawyer in istanbul. Overview of relevant Turkish law topics, procedures, and leg…\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-inheritance-law/",
           "scheduled_at": "2026-07-20T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d3-3",
@@ -150,7 +158,8 @@
           "url": "https://cindemirlaw.com/humanitarian-residence-permit-in-turkey-legal-insights-by-cindemir-law-office/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nAt Cindemir Law Office, we regularly assist foreign nationals who face unique legal and humanitarian challenges while residing in Turkey. One of the most important legal instruments under Turkish immigration law is…\n\nRead the full article:\nhttps://cindemirlaw.com/humanitarian-residence-permit-in-turkey-legal-insights-by-cindemir-law-office/",
           "scheduled_at": "2026-07-20T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d3-4",
@@ -158,7 +167,8 @@
           "url": "https://cindemirlaw.com/can-russian-establish-a-company-in-turkey/",
           "summary": "Forming a company in Türkiye as a foreigner has clear registration and compliance steps.\n\nThe ongoing economic sanctions against Russia have resulted in increased difficulty for Russian nationals looking to establish companies abroad. However, there is a solution that could help overcome these obstacles –…\n\nRead the full article:\nhttps://cindemirlaw.com/can-russian-establish-a-company-in-turkey/",
           "scheduled_at": "2026-07-20T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         },
         {
           "id": "d3-5",
@@ -166,7 +176,8 @@
           "url": "https://cindemirlaw.com/criminal-record-deletion-in-turkey-for-foreign-nationals/",
           "summary": "Turkish criminal-record and police-clearance documents are often required for visas and residence abroad.\n\nForeign nationals who have been convicted of a crime in Turkey may face significant legal and practical consequences as a result of their criminal record. These consequences may include visa issues, difficulties with…\n\nRead the full article:\nhttps://cindemirlaw.com/criminal-record-deletion-in-turkey-for-foreign-nationals/",
           "scheduled_at": "2026-07-20T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-20T10:33:31.988619+00:00"
         }
       ]
     },
