@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 195,
+    "scheduled_posts": 190,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 15
+    "published_posts": 20
   },
   "days": [
     {
@@ -184,7 +184,7 @@
     {
       "day": 4,
       "date": "2026-07-21",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d4-1",
@@ -192,7 +192,8 @@
           "url": "https://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — cisg in turkey international sale of goods disputes and legal framework.\n\nRead the full article:\nhttps://cindemirlaw.com/cisg-in-turkey-international-sale-of-goods-disputes-and-legal-framework/",
           "scheduled_at": "2026-07-21T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-21T09:18:49.706695+00:00"
         },
         {
           "id": "d4-2",
@@ -200,7 +201,8 @@
           "url": "https://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search/",
           "summary": "Foreign property purchases in Türkiye involve title, zoning and currency rules that need a legal check.\n\nThis guide covers the key procedures, documents and risks for foreign clients — ottoman title deeds in turkiye inheritance registration and land search.\n\nRead the full article:\nhttps://cindemirlaw.com/ottoman-title-deeds-in-turkiye-inheritance-registration-and-land-search/",
           "scheduled_at": "2026-07-21T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-21T09:18:49.706695+00:00"
         },
         {
           "id": "d4-3",
@@ -208,7 +210,8 @@
           "url": "https://cindemirlaw.com/tourism-law-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — tourism law in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/tourism-law-in-turkey/",
           "scheduled_at": "2026-07-21T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-21T09:18:49.706695+00:00"
         },
         {
           "id": "d4-4",
@@ -216,7 +219,8 @@
           "url": "https://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkey asset repatriation 2026 legal framework for bringing foreign assets to turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/turkey-asset-repatriation-2026-legal-framework-for-bringing-foreign-assets-to-turkey/",
           "scheduled_at": "2026-07-21T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-21T09:18:49.706695+00:00"
         },
         {
           "id": "d4-5",
@@ -224,7 +228,8 @@
           "url": "https://cindemirlaw.com/child-abduction-and-retention-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — child abduction and retention under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/child-abduction-and-retention-under-turkish-law/",
           "scheduled_at": "2026-07-21T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-21T09:18:49.706695+00:00"
         }
       ]
     },
