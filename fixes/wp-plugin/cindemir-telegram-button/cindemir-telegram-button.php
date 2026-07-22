@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Cindemir Telegram Button
- * Description: Floating Telegram contact button (t.me/gcindemir) on every front-end page.
- * Version: 1.0.0
+ * Description: Floating Telegram button on Russian pages only — https://t.me/Cindemir_Law_Office — paired with WhatsApp (left).
+ * Version: 1.1.0
  * Author: Cindemir Law Office
  */
 
@@ -17,15 +17,40 @@ define( 'CINDEMIR_TELEGRAM_BUTTON_LOADED', true );
 
 final class Cindemir_Telegram_Button {
 
-	const USERNAME = 'gcindemir';
-	const URL      = 'https://t.me/gcindemir';
+	const USERNAME = 'Cindemir_Law_Office';
+	const URL      = 'https://t.me/Cindemir_Law_Office';
 
 	public static function boot() {
 		add_action( 'wp_footer', array( __CLASS__, 'render' ), 30 );
 	}
 
+	/**
+	 * Russian site only (WPML / ?lang=ru / locale).
+	 */
+	private static function is_russian() {
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && 'ru' === ICL_LANGUAGE_CODE ) {
+			return true;
+		}
+
+		$wpml = apply_filters( 'wpml_current_language', null );
+		if ( 'ru' === $wpml ) {
+			return true;
+		}
+
+		if ( isset( $_GET['lang'] ) && 'ru' === sanitize_text_field( wp_unslash( $_GET['lang'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return true;
+		}
+
+		$locale = function_exists( 'determine_locale' ) ? determine_locale() : get_locale();
+		if ( is_string( $locale ) && 0 === stripos( $locale, 'ru' ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public static function render() {
-		if ( is_admin() ) {
+		if ( is_admin() || ! self::is_russian() ) {
 			return;
 		}
 
@@ -33,15 +58,17 @@ final class Cindemir_Telegram_Button {
 		$label = esc_attr(
 			apply_filters(
 				'cindemir_telegram_label',
-				__( 'Telegram ile yazın', 'cindemir' )
+				'Написать в Telegram'
 			)
 		);
 		?>
 <style id="cindemir-telegram-button-css">
+/* Pair with #cindemir-wa-fallback (left): Telegram stays on the right. */
 #cindemir-tg-button{
 	position:fixed;
 	z-index:999989;
 	right:20px;
+	left:auto;
 	bottom:20px;
 	width:60px;
 	height:60px;
@@ -52,7 +79,7 @@ final class Cindemir_Telegram_Button {
 	align-items:center;
 	justify-content:center;
 	text-decoration:none!important;
-	transition:transform .2s ease, box-shadow .2s ease, bottom .2s ease, left .2s ease, right .2s ease;
+	transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
 }
 #cindemir-tg-button:hover,
 #cindemir-tg-button:focus{
@@ -67,11 +94,10 @@ final class Cindemir_Telegram_Button {
 	display:block;
 	margin-left:2px;
 }
-#cindemir-tg-button.cindemir-tg--left{
+/* If Joinchat ever shows on the right, stack Telegram above WhatsApp on the left. */
+#cindemir-tg-button.cindemir-tg--with-joinchat{
 	right:auto;
 	left:20px;
-}
-#cindemir-tg-button.cindemir-tg--above{
 	bottom:96px;
 }
 @media (max-width:767px){
@@ -81,11 +107,9 @@ final class Cindemir_Telegram_Button {
 		right:14px;
 		bottom:14px;
 	}
-	#cindemir-tg-button.cindemir-tg--left{
+	#cindemir-tg-button.cindemir-tg--with-joinchat{
 		right:auto;
 		left:14px;
-	}
-	#cindemir-tg-button.cindemir-tg--above{
 		bottom:86px;
 	}
 	#cindemir-tg-button svg{
@@ -105,7 +129,7 @@ final class Cindemir_Telegram_Button {
 	function isVisible(el) {
 		if (!el) return false;
 		var style = window.getComputedStyle(el);
-		if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+		if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
 			return false;
 		}
 		var rect = el.getBoundingClientRect();
@@ -113,28 +137,11 @@ final class Cindemir_Telegram_Button {
 	}
 
 	function place() {
-		btn.classList.remove('cindemir-tg--left', 'cindemir-tg--above');
-
-		var wa = document.getElementById('cindemir-wa-fallback');
 		var jc = document.querySelector('.joinchat.joinchat--show') || document.querySelector('.joinchat');
-		var waVisible = isVisible(wa);
-		var jcVisible = isVisible(jc);
-
-		// Prefer right side. If Joinchat (WhatsApp) occupies the right, move to left.
-		if (jcVisible) {
-			btn.classList.add('cindemir-tg--left');
-			// If custom WA fallback is also on the left, stack Telegram above it.
-			if (waVisible) {
-				btn.classList.add('cindemir-tg--above');
-			}
-			return;
-		}
-
-		// Joinchat hidden / absent: keep Telegram on the right.
-		// If something else sits on the right bottom later, leave room above WA only when WA is right (rare).
-		if (waVisible) {
-			// WA is left on this site — Telegram stays right; no stack needed.
-			return;
+		if (isVisible(jc)) {
+			btn.classList.add('cindemir-tg--with-joinchat');
+		} else {
+			btn.classList.remove('cindemir-tg--with-joinchat');
 		}
 	}
 

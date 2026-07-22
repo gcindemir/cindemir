@@ -1,6 +1,9 @@
-# Deploy: Floating Telegram button
+# Deploy: Telegram button (Russian pages)
 
-Adds a fixed Telegram contact button linking to **https://t.me/gcindemir** on every front-end page.
+Floating Telegram button on **Russian (`?lang=ru`)** pages only.
+
+- Link: **https://t.me/Cindemir_Law_Office** (`@Cindemir_Law_Office`)
+- Position: bottom-right (WhatsApp stays bottom-left — no overlap)
 
 ## Upload
 
@@ -8,21 +11,19 @@ Adds a fixed Telegram contact button linking to **https://t.me/gcindemir** on ev
 |------|--------|
 | `fixes/mu-plugins/cindemir-telegram-button.php` | `wp-content/mu-plugins/cindemir-telegram-button.php` |
 
-**Or** install as a normal plugin from `fixes/deploy-package/cindemir-telegram-button.zip` (Plugins → Add New → Upload).
+Or install `fixes/deploy-package/cindemir-telegram-button.zip` via Plugins → Upload.
 
-## Behavior
-
-- Blue circular button (Telegram brand color)
-- Default: bottom-right
-- If Joinchat (WhatsApp) is visible on the right, button moves to bottom-left
-- Does not replace footer/header Telegram icons
-
-## After upload
-
-Purge WP Rocket / host cache, then verify:
+## Verify
 
 ```bash
-UA='Mozilla/5.0'
-curl -s -A "$UA" https://cindemirlaw.com/ | grep -c 'cindemir-tg-button'   # >= 1
-curl -s -A "$UA" https://cindemir.av.tr/ | grep -c 'cindemir-tg-button'     # >= 1
+UA='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'
+
+# Russian: button present + correct username
+curl -s -A "$UA" 'https://cindemirlaw.com/?lang=ru' | grep -o 't.me/Cindemir_Law_Office' | head -1
+curl -s -A "$UA" 'https://cindemirlaw.com/?lang=ru' | grep -c 'cindemir-tg-button'
+
+# English: button must NOT appear
+curl -s -A "$UA" 'https://cindemirlaw.com/' | grep -c 'cindemir-tg-button'   # expect 0
 ```
+
+Purge WP Rocket / host cache after upload.
