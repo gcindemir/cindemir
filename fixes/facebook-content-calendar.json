@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 185,
+    "scheduled_posts": 180,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 25
+    "published_posts": 30
   },
   "days": [
     {
@@ -288,7 +288,7 @@
     {
       "day": 6,
       "date": "2026-07-23",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d6-1",
@@ -296,7 +296,8 @@
           "url": "https://cindemirlaw.com/turkish-companies-before-the-court-of-justice-of-the-european-union/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish companies before the court of justice of the european union.\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-companies-before-the-court-of-justice-of-the-european-union/",
           "scheduled_at": "2026-07-23T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-23T13:15:04.946163+00:00"
         },
         {
           "id": "d6-2",
@@ -304,7 +305,8 @@
           "url": "https://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal status of late registered turkish citizens concerning military service obligations under law no 7179.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-status-of-late-registered-turkish-citizens-concerning-military-service-obligations-under-law-no-7179/",
           "scheduled_at": "2026-07-23T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-23T13:15:04.946163+00:00"
         },
         {
           "id": "d6-3",
@@ -312,7 +314,8 @@
           "url": "https://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — understanding spks introduction guide for information systems independent audit.\n\nRead the full article:\nhttps://cindemirlaw.com/understanding-spks-introduction-guide-for-information-systems-independent-audit/",
           "scheduled_at": "2026-07-23T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-23T13:15:04.946163+00:00"
         },
         {
           "id": "d6-4",
@@ -320,7 +323,8 @@
           "url": "https://cindemirlaw.com/turkey-crypto-crimes-legal-landscape-enforcement-and-investor-protection/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkey crypto crimes legal landscape enforcement and investor protection.\n\nRead the full article:\nhttps://cindemirlaw.com/turkey-crypto-crimes-legal-landscape-enforcement-and-investor-protection/",
           "scheduled_at": "2026-07-23T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-23T13:15:04.946163+00:00"
         },
         {
           "id": "d6-5",
@@ -328,7 +332,8 @@
           "url": "https://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process/",
           "summary": "Cross-border inheritance with Turkish assets raises probate, forced-heir and documentation issues.\n\nThis guide covers the key procedures, documents and risks for foreign clients — inheritance investigation in turkey guiding international heirs through a complex process.\n\nRead the full article:\nhttps://cindemirlaw.com/inheritance-investigation-in-turkey-guiding-international-heirs-through-a-complex-process/",
           "scheduled_at": "2026-07-23T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-23T13:15:04.946163+00:00"
         }
       ]
     },
