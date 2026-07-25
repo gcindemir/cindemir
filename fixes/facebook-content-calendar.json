@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 180,
+    "scheduled_posts": 170,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 30
+    "published_posts": 40
   },
   "days": [
     {
@@ -340,7 +340,7 @@
     {
       "day": 7,
       "date": "2026-07-24",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d7-1",
@@ -348,7 +348,8 @@
           "url": "https://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — financial rights of daughters under turkish social security law.\n\nRead the full article:\nhttps://cindemirlaw.com/financial-rights-of-daughters-under-turkish-social-security-law/",
           "scheduled_at": "2026-07-24T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d7-2",
@@ -356,7 +357,8 @@
           "url": "https://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — survivor pension for spouses of deceased turkish citizens.\n\nRead the full article:\nhttps://cindemirlaw.com/survivor-pension-for-spouses-of-deceased-turkish-citizens/",
           "scheduled_at": "2026-07-24T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d7-3",
@@ -364,7 +366,8 @@
           "url": "https://cindemirlaw.com/title-deeds-in-turkey-a-legal-and-historical-overview/",
           "summary": "Foreign property purchases in Türkiye involve title, zoning and currency rules that need a legal check.\n\nThis guide covers the key procedures, documents and risks for foreign clients — title deeds in turkey a legal and historical overview.\n\nRead the full article:\nhttps://cindemirlaw.com/title-deeds-in-turkey-a-legal-and-historical-overview/",
           "scheduled_at": "2026-07-24T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d7-4",
@@ -372,7 +375,8 @@
           "url": "https://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto market manipulation and its legal implications under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/crypto-market-manipulation-and-its-legal-implications-under-turkish-law/",
           "scheduled_at": "2026-07-24T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d7-5",
@@ -380,14 +384,15 @@
           "url": "https://cindemirlaw.com/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — a practical overview of crypto asset service providers and platforms in turkiye.\n\nRead the full article:\nhttps://cindemirlaw.com/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
           "scheduled_at": "2026-07-24T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         }
       ]
     },
     {
       "day": 8,
       "date": "2026-07-25",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d8-1",
@@ -395,7 +400,8 @@
           "url": "https://cindemirlaw.com/crypto-asset-fraud-common-schemes-legal-analysis-what-victims-should-do/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset fraud common schemes legal analysis what victims should do.\n\nRead the full article:\nhttps://cindemirlaw.com/crypto-asset-fraud-common-schemes-legal-analysis-what-victims-should-do/",
           "scheduled_at": "2026-07-25T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d8-2",
@@ -403,7 +409,8 @@
           "url": "https://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset fraud in turkey legal perspective.\n\nRead the full article:\nhttps://cindemirlaw.com/crypto-asset-fraud-in-turkey-legal-perspective/",
           "scheduled_at": "2026-07-25T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d8-3",
@@ -411,7 +418,8 @@
           "url": "https://cindemirlaw.com/ottoman-archival-documents-and-their-role-in-legal-and-historical-investigations/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — ottoman archival documents and their role in legal and historical investigations.\n\nRead the full article:\nhttps://cindemirlaw.com/ottoman-archival-documents-and-their-role-in-legal-and-historical-investigations/",
           "scheduled_at": "2026-07-25T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d8-4",
@@ -419,7 +427,8 @@
           "url": "https://cindemirlaw.com/eu-representative-services-for-non-eu-companies-under-the-gdpr/",
           "summary": "EU-facing compliance (GDPR, AI Act) often requires a non-EU company to appoint a legal representative.\n\nThis guide covers the key procedures, documents and risks for foreign clients — eu representative services for non eu companies under the gdpr.\n\nRead the full article:\nhttps://cindemirlaw.com/eu-representative-services-for-non-eu-companies-under-the-gdpr/",
           "scheduled_at": "2026-07-25T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         },
         {
           "id": "d8-5",
@@ -427,7 +436,8 @@
           "url": "https://cindemirlaw.com/eu-legal-representative-services-for-ai-companies-outside-the-european-union/",
           "summary": "EU-facing compliance (GDPR, AI Act) often requires a non-EU company to appoint a legal representative.\n\nThis guide covers the key procedures, documents and risks for foreign clients — eu legal representative services for ai companies outside the european union.\n\nRead the full article:\nhttps://cindemirlaw.com/eu-legal-representative-services-for-ai-companies-outside-the-european-union/",
           "scheduled_at": "2026-07-25T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-25T07:06:31.951618+00:00"
         }
       ]
     },
