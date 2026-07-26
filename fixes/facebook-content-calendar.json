@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 170,
+    "scheduled_posts": 160,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 40
+    "published_posts": 50
   },
   "days": [
     {
@@ -444,7 +444,7 @@
     {
       "day": 9,
       "date": "2026-07-26",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d9-1",
@@ -452,7 +452,8 @@
           "url": "https://cindemirlaw.com/legal-assistance-for-foreign-lawyers-visiting-prisoners-in-turkey/",
           "summary": "Visiting or assisting a foreign detainee in a Turkish prison requires procedure-aware counsel.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal assistance for foreign lawyers visiting prisoners in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-assistance-for-foreign-lawyers-visiting-prisoners-in-turkey/",
           "scheduled_at": "2026-07-26T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d9-2",
@@ -460,7 +461,8 @@
           "url": "https://cindemirlaw.com/eu-ai-act-prohibited-practices-and-compliance-obligations/",
           "summary": "EU-facing compliance (GDPR, AI Act) often requires a non-EU company to appoint a legal representative.\n\nThis guide covers the key procedures, documents and risks for foreign clients — eu ai act prohibited practices and compliance obligations.\n\nRead the full article:\nhttps://cindemirlaw.com/eu-ai-act-prohibited-practices-and-compliance-obligations/",
           "scheduled_at": "2026-07-26T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d9-3",
@@ -468,7 +470,8 @@
           "url": "https://cindemirlaw.com/legal-alert-new-regulation-on-timeshare-rights-in-turkey-7-day-minimum-period-introduced/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal alert new regulation on timeshare rights in turkey 7 day minimum period introduced.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-alert-new-regulation-on-timeshare-rights-in-turkey-7-day-minimum-period-introduced/",
           "scheduled_at": "2026-07-26T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d9-4",
@@ -476,7 +479,8 @@
           "url": "https://cindemirlaw.com/assistance-for-foreign-families-supporting-inmates-in-turkish-prisons/",
           "summary": "Visiting or assisting a foreign detainee in a Turkish prison requires procedure-aware counsel.\n\nThis guide covers the key procedures, documents and risks for foreign clients — assistance for foreign families supporting inmates in turkish prisons.\n\nRead the full article:\nhttps://cindemirlaw.com/assistance-for-foreign-families-supporting-inmates-in-turkish-prisons/",
           "scheduled_at": "2026-07-26T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d9-5",
@@ -484,14 +488,15 @@
           "url": "https://cindemirlaw.com/legal-support-for-visiting-foreign-nationals-in-turkish-prisons/",
           "summary": "Visiting or assisting a foreign detainee in a Turkish prison requires procedure-aware counsel.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal support for visiting foreign nationals in turkish prisons.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-support-for-visiting-foreign-nationals-in-turkish-prisons/",
           "scheduled_at": "2026-07-26T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         }
       ]
     },
     {
       "day": 10,
       "date": "2026-07-27",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d10-1",
@@ -499,7 +504,8 @@
           "url": "https://cindemirlaw.com/legal-visits-in-prison-lawyer-services-for-detainees-and-convicts-in-turkey/",
           "summary": "Visiting or assisting a foreign detainee in a Turkish prison requires procedure-aware counsel.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal visits in prison lawyer services for detainees and convicts in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-visits-in-prison-lawyer-services-for-detainees-and-convicts-in-turkey/",
           "scheduled_at": "2026-07-27T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d10-2",
@@ -507,7 +513,8 @@
           "url": "https://cindemirlaw.com/legal-risks-in-token-launches-how-crypto-startups-can-stay-compliant-across-jurisdictions/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal risks in token launches how crypto startups can stay compliant across jurisdictions.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-risks-in-token-launches-how-crypto-startups-can-stay-compliant-across-jurisdictions/",
           "scheduled_at": "2026-07-27T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d10-3",
@@ -515,7 +522,8 @@
           "url": "https://cindemirlaw.com/new-spk-decision-on-crypto-assets-a-comprehensive-overview-of-regulatory-amendments/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — new spk decision on crypto assets a comprehensive overview of regulatory amendments.\n\nRead the full article:\nhttps://cindemirlaw.com/new-spk-decision-on-crypto-assets-a-comprehensive-overview-of-regulatory-amendments/",
           "scheduled_at": "2026-07-27T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d10-4",
@@ -523,7 +531,8 @@
           "url": "https://cindemirlaw.com/administration-of-crypto-assets-under-turkish-law/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — administration of crypto assets under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/administration-of-crypto-assets-under-turkish-law/",
           "scheduled_at": "2026-07-27T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         },
         {
           "id": "d10-5",
@@ -531,7 +540,8 @@
           "url": "https://cindemirlaw.com/crypto-asset-issuers-under-turkish-law/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset issuers under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/crypto-asset-issuers-under-turkish-law/",
           "scheduled_at": "2026-07-27T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-26T21:33:30.097114+00:00"
         }
       ]
     },

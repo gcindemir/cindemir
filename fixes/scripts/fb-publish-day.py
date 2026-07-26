@@ -158,13 +158,40 @@ def publish_post(page, text, idx):
     snap(page, f"post-{idx}-draft")
 
     # Next then Share (new Pages UI) OR direct Paylaş
-    ileri = page.get_by_role("button", name="İleri")
-    if ileri.count():
-        ileri.first.click(timeout=8000)
-        time.sleep(3)
+    page.get_by_text("İleri", exact=True).last.click(timeout=8000, force=True)
+    time.sleep(3)
 
-    page.get_by_role("button", name="Paylaş", exact=True).click(timeout=12000)
-    time.sleep(10)
+    dialog = page.locator('div[role="dialog"]').filter(has_text="Şimdi yayınla")
+    if not dialog.count():
+        dialog = page.locator('div[role="dialog"]').filter(has_text="Gönderi ayarları")
+    share = dialog.last.get_by_role("button", name="Paylaş", exact=True) if dialog.count() else page.get_by_role("button", name="Paylaş", exact=True)
+    if share.count():
+        share.last.click(timeout=12000, force=True)
+    else:
+        page.evaluate(
+            """() => {
+              const dialogs=[...document.querySelectorAll('[role=dialog]')];
+              const d=dialogs.find(x => x.innerText.includes('Şimdi yayınla')) || dialogs.at(-1);
+              const cand=[...d.querySelectorAll('[role=button],button')]
+                .filter(el => el.innerText.trim()==='Paylaş');
+              if(!cand.length) throw new Error('no Paylaş');
+              cand.at(-1).click();
+            }"""
+        )
+    time.sleep(4)
+    # dismiss accidental group-share dialog
+    body = page.locator("body").inner_text(timeout=10000)
+    if "Hiç grup bulunamadı" in body:
+        close_popups(page)
+        for t in ["Bitti", "Done", "Kapat"]:
+            b = page.get_by_role("button", name=t)
+            if b.count():
+                try:
+                    b.first.click(timeout=2000, force=True)
+                except Exception:
+                    pass
+        raise RuntimeError("opened group share dialog instead of publishing")
+    time.sleep(8)
     snap(page, f"post-{idx}-live")
     log(f"published post {idx}")
     return True
