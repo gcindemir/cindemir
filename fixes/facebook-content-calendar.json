@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 160,
+    "scheduled_posts": 150,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 50
+    "published_posts": 60
   },
   "days": [
     {
@@ -548,7 +548,7 @@
     {
       "day": 11,
       "date": "2026-07-28",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d11-1",
@@ -556,7 +556,8 @@
           "url": "https://cindemirlaw.com/market-abuse-in-the-crypto-asset-market-in-turkey/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — market abuse in the crypto asset market in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/market-abuse-in-the-crypto-asset-market-in-turkey/",
           "scheduled_at": "2026-07-28T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d11-2",
@@ -564,7 +565,8 @@
           "url": "https://cindemirlaw.com/new-crypto-asset-regulation-of-turkey-and-understanding-provisions-related-to-crypto-asset-service-providers-casps/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — new crypto asset regulation of turkey and understanding provisions related to crypto asset service providers casps.\n\nRead the full article:\nhttps://cindemirlaw.com/new-crypto-asset-regulation-of-turkey-and-understanding-provisions-related-to-crypto-asset-service-providers-casps/",
           "scheduled_at": "2026-07-28T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d11-3",
@@ -572,7 +574,8 @@
           "url": "https://cindemirlaw.com/regulatory-landscape-for-crypto-asset-trading-platforms-in-turkey/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — regulatory landscape for crypto asset trading platforms in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/regulatory-landscape-for-crypto-asset-trading-platforms-in-turkey/",
           "scheduled_at": "2026-07-28T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d11-4",
@@ -580,7 +583,8 @@
           "url": "https://cindemirlaw.com/legal-services-for-digital-asset-businesses/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal services for digital asset businesses.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-services-for-digital-asset-businesses/",
           "scheduled_at": "2026-07-28T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d11-5",
@@ -588,14 +592,15 @@
           "url": "https://cindemirlaw.com/legal-affidavit-preparation-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal affidavit preparation in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-affidavit-preparation-in-turkey/",
           "scheduled_at": "2026-07-28T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         }
       ]
     },
     {
       "day": 12,
       "date": "2026-07-29",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d12-1",
@@ -603,7 +608,8 @@
           "url": "https://cindemirlaw.com/exit-bans-in-turkey-a-critical-exploration-of-judicial-control/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — exit bans in turkey a critical exploration of judicial control.\n\nRead the full article:\nhttps://cindemirlaw.com/exit-bans-in-turkey-a-critical-exploration-of-judicial-control/",
           "scheduled_at": "2026-07-29T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d12-2",
@@ -611,7 +617,8 @@
           "url": "https://cindemirlaw.com/crypto-assets-status-a-perspective-following-turkeys-stance-on-crypto-use/",
           "summary": "Crypto-asset disputes and fraud in Türkiye sit at the intersection of criminal, civil and regulatory law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto assets status a perspective following turkeys stance on crypto use.\n\nRead the full article:\nhttps://cindemirlaw.com/crypto-assets-status-a-perspective-following-turkeys-stance-on-crypto-use/",
           "scheduled_at": "2026-07-29T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d12-3",
@@ -619,7 +626,8 @@
           "url": "https://cindemirlaw.com/principle-of-family-unity-deportation-procedures-and-protection-of-family-unity-for-deportees/",
           "summary": "Deportation and removal decisions under Turkish immigration law carry strict timelines and appeal rights.\n\nThis guide covers the key procedures, documents and risks for foreign clients — principle of family unity deportation procedures and protection of family unity for deportees.\n\nRead the full article:\nhttps://cindemirlaw.com/principle-of-family-unity-deportation-procedures-and-protection-of-family-unity-for-deportees/",
           "scheduled_at": "2026-07-29T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d12-4",
@@ -627,7 +635,8 @@
           "url": "https://cindemirlaw.com/international-death-certificate-form-c-and-procedures-for-obtaining-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international death certificate form c and procedures for obtaining in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/international-death-certificate-form-c-and-procedures-for-obtaining-in-turkey/",
           "scheduled_at": "2026-07-29T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         },
         {
           "id": "d12-5",
@@ -635,7 +644,8 @@
           "url": "https://cindemirlaw.com/international-marriage-certificate-form-b-turkey-marriage-records/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international marriage certificate form b turkey marriage records.\n\nRead the full article:\nhttps://cindemirlaw.com/international-marriage-certificate-form-b-turkey-marriage-records/",
           "scheduled_at": "2026-07-29T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-07-29T17:09:04.069266+00:00"
         }
       ]
     },

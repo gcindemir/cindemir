@@ -134,21 +134,74 @@ def update_bio(page, bio):
     return False
 
 
+def switch_to_page(page):
+    """Switch into Page identity if Facebook shows Geçiş Yap / Switch."""
+    close_popups(page)
+    for label in ["Şimdi Geçiş Yap", "Geçiş Yap", "Switch Now", "Switch"]:
+        try:
+            loc = page.get_by_role("button", name=label)
+            if loc.count():
+                loc.first.click(timeout=5000, force=True)
+                time.sleep(6)
+                log(f"switched to page ({label})")
+                return True
+        except Exception:
+            pass
+        try:
+            loc = page.get_by_text(label, exact=True)
+            if loc.count():
+                loc.first.click(timeout=5000, force=True)
+                time.sleep(6)
+                log(f"switched to page text ({label})")
+                return True
+        except Exception:
+            pass
+    # JS fallback
+    try:
+        res = page.evaluate(
+            """() => {
+              const labels=['Şimdi Geçiş Yap','Geçiş Yap','Switch Now','Switch'];
+              const btns=[...document.querySelectorAll('[role=button]')];
+              for (const label of labels) {
+                const hit=btns.find(el => (el.innerText||'').trim()===label);
+                if (hit) { hit.click(); return label; }
+              }
+              return '';
+            }"""
+        )
+        if res:
+            time.sleep(6)
+            log(f"switched to page js ({res})")
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def publish_post(page, text, idx):
     page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
     time.sleep(5)
     close_popups(page)
     assert_page(page)
+    switch_to_page(page)
+    close_popups(page)
 
     # open composer
+    opened = False
     for sel in [
         'span:has-text("Ne düşünüyorsun")',
+        'span:has-text("Bir düşünceni paylaş")',
+        'span:has-text("What\'s on your mind")',
         'span:has-text("Güncelleme yaz")',
         'div[role="button"]:has-text("Gönderi oluştur")',
+        'div[role="button"]:has-text("Create post")',
     ]:
         if page.locator(sel).count():
-            page.locator(sel).first.click(timeout=8000)
+            page.locator(sel).first.click(timeout=8000, force=True)
+            opened = True
             break
+    if not opened:
+        raise RuntimeError("composer not found — maybe not switched to page")
     time.sleep(3)
 
     editor = page.locator('div[contenteditable="true"][role="textbox"]').last
@@ -220,7 +273,11 @@ def main():
             f"-o {LOGO}"
         )
 
-    os.system("pkill -9 -f 'google-chrome.*fb-jifkln9c' 2>/dev/null")
+    # Avoid matching this shell command line: kill only chrome with this profile
+    os.system(
+        "pgrep -af 'user-data-dir=/tmp/fb-jifkln9c' | awk '{print $1}' | "
+        "xargs -r kill -9 2>/dev/null"
+    )
     time.sleep(2)
 
     with sync_playwright() as p:
