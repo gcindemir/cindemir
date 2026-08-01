@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -10,6 +10,7 @@
  * HREFLANG_FIX_20260801
  * HREFLANG_AFTER_STAMP_20260801
  * NO_TITLE_META_OVERRIDE_20260801
+ * RU_SLUG_404_FIX_20260801
  * Author: Cindemir Law Office
  */
 
@@ -140,6 +141,21 @@ final class Cindemir_SEO_Fixes {
 		'/hakan' => 'https://cindemirlaw.com/hakan/?lang=zh-hans',
 		'/contacts-2' => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 		'/fde1' => 'https://cindemirlaw.com/fde1/?lang=ru',
+	);
+
+	/**
+	 * WPML RU translation slugs that 404 when ?lang=ru is appended.
+	 * Map → English slug (works with ?lang=ru). Special: pod has no EN+lang=ru.
+	 *
+	 * @var array<string,string|null>
+	 */
+	private static $ru_slug_to_en = array(
+		'/onas'         => '/about-us',
+		'/kontak'       => '/contacts',
+		'/komanda'      => '/team',
+		'/stati'        => '/articles',
+		'/nashiyurist'  => '/services',
+		'/pod'          => null, // RU-only slug; bare /pod/ is 200, /pod/?lang=ru is 404.
 	);
 
 	private static $url_replace = array(
@@ -921,7 +937,12 @@ final class Cindemir_SEO_Fixes {
 			return $hreflangs;
 		}
 		foreach ( $hreflangs as $lang => $url ) {
-			$hreflangs[ $lang ] = self::normalize_hreflang_url( $url, is_string( $lang ) ? $lang : null );
+			$fixed = self::normalize_hreflang_url( $url, is_string( $lang ) ? $lang : null );
+			if ( ! is_string( $fixed ) || '' === $fixed ) {
+				unset( $hreflangs[ $lang ] );
+				continue;
+			}
+			$hreflangs[ $lang ] = $fixed;
 		}
 		return $hreflangs;
 	}
@@ -929,6 +950,7 @@ final class Cindemir_SEO_Fixes {
 	/**
 	 * Force distinct, valid hreflang targets for WPML query-string mode.
 	 * Fixes Ahrefs: same ?lang=ru URL used for en + ru + x-default, and lang=ru&lang=ru.
+	 * Also avoids RU translation slugs + ?lang=ru (those 404; bare slug or EN+lang=ru works).
 	 */
 	private static function normalize_hreflang_url( $url, $lang = null ) {
 		if ( ! is_string( $url ) || '' === $url ) {
@@ -938,7 +960,7 @@ final class Cindemir_SEO_Fixes {
 		$url = str_replace( '/contacts-2/', '/contacts/', $url );
 		$url = str_replace( '/contacts-2?', '/contacts?', $url );
 		$parts = wp_parse_url( $url );
-		$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
+		$path  = isset( $parts['path'] ) ? rawurldecode( $parts['path'] ) : '/';
 		$q     = array();
 		if ( ! empty( $parts['query'] ) ) {
 			parse_str( $parts['query'], $q );
@@ -950,10 +972,53 @@ final class Cindemir_SEO_Fixes {
 		if ( 'zh' === $code || 0 === strpos( $code, 'zh' ) ) {
 			$code = 'zh-hans';
 		}
+
+		$path_key = untrailingslashit( $path );
+		if ( '' === $path_key ) {
+			$path_key = '/';
+		}
+
+		// Map broken RU slugs (onas/kontak/…) to EN equivalents for all languages.
+		if ( isset( self::$ru_slug_to_en[ $path_key ] ) ) {
+			$en_path = self::$ru_slug_to_en[ $path_key ];
+			if ( null === $en_path ) {
+				// /pod/: RU page lives at bare slug only.
+				if ( 'ru' === $code ) {
+					return self::build_unfiltered_url( $path, array() );
+				}
+				// EN/x-default → /support/ (EN counterpart).
+				return self::build_unfiltered_url( '/support/', array() );
+			}
+			$path     = $en_path;
+			$path_key = untrailingslashit( $path );
+		}
+
+		$is_cyr = (bool) preg_match( '/[А-Яа-яЁё]/u', $path );
+
 		if ( in_array( $code, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) ) {
+			if ( $is_cyr ) {
+				// No real EN URL for Cyrillic-only posts; omit fake en, x-default = RU bare.
+				if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
+					return '';
+				}
+				return self::build_unfiltered_url( $path, array() );
+			}
+			// If this Latin path is forced to ?lang=ru via $redirects, bare URL 301s — omit en, x-default=ru.
+			if ( isset( self::$redirects[ $path_key ] ) ) {
+				$dest = self::$redirects[ $path_key ];
+				if ( is_string( $dest ) && false !== strpos( $dest, 'lang=ru' ) ) {
+					if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
+						return '';
+					}
+					return self::build_unfiltered_url( $path, array( 'lang' => 'ru' ) );
+				}
+			}
 			// Default language / x-default: clean URL without ?lang=.
 		} elseif ( 'ru' === $code ) {
-			$q['lang'] = 'ru';
+			// Cyrillic permalinks 404 with ?lang=ru; bare path is 200.
+			if ( ! $is_cyr ) {
+				$q['lang'] = 'ru';
+			}
 		} elseif ( 'zh-hans' === $code ) {
 			$q['lang'] = 'zh-hans';
 		} elseif ( '' !== $code ) {
@@ -962,6 +1027,39 @@ final class Cindemir_SEO_Fixes {
 
 		// Build without home_url()/add_query_arg() — WPML re-injects current ?lang= on RU pages.
 		return self::build_unfiltered_url( $path, $q );
+	}
+
+	/**
+	 * RU slug + ?lang=ru → working URL (EN+lang=ru, or bare RU-native path).
+	 *
+	 * @param string $path Normalized path (may be decoded).
+	 * @param string $query Raw query string.
+	 * @return string|false Absolute redirect target or false.
+	 */
+	private static function fix_ru_slug_lang_404( $path, $query ) {
+		if ( ! is_string( $query ) || false === strpos( $query, 'lang=ru' ) ) {
+			return false;
+		}
+		$path = rawurldecode( (string) $path );
+		$path_key = untrailingslashit( $path );
+		if ( '' === $path_key ) {
+			$path_key = '/';
+		}
+
+		if ( isset( self::$ru_slug_to_en[ $path_key ] ) ) {
+			$en = self::$ru_slug_to_en[ $path_key ];
+			if ( null === $en ) {
+				return 'https://cindemirlaw.com' . user_trailingslashit( $path_key );
+			}
+			return 'https://cindemirlaw.com' . user_trailingslashit( $en ) . '?lang=ru';
+		}
+
+		// Cyrillic (and mixed) RU permalinks: strip ?lang=ru.
+		if ( preg_match( '/[А-Яа-яЁё]/u', $path_key ) ) {
+			return 'https://cindemirlaw.com' . user_trailingslashit( $path_key );
+		}
+
+		return false;
 	}
 
 	/** Absolute URL from option home + path + query (no WPML language injection). */
@@ -2325,6 +2423,14 @@ final class Cindemir_SEO_Fixes {
 		$req  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		$req_parts = wp_parse_url( $req );
 		$req_q = isset( $req_parts['query'] ) ? $req_parts['query'] : '';
+
+		// Ahrefs 404s: RU translation slug + ?lang=ru (bare slug is 200).
+		$ru_fix = self::fix_ru_slug_lang_404( $path, $req_q );
+		if ( $ru_fix ) {
+			wp_redirect( $ru_fix, 301 );
+			exit;
+		}
+
 		$dest = self::resolve_path_dest( $path, $req_q );
 		if ( ! $dest ) {
 			return;
@@ -3653,6 +3759,18 @@ public static function homepage_hero_styles() {
 				if ( preg_match( '#\.(?:css|js|jpe?g|png|gif|webp|svg|ico|woff2?|ttf|eot|map|xml)(?:\?|$)#i', $url ) ) {
 					return $m[0];
 				}
+				// RU translation slugs / Cyrillic permalinks break when ?lang=ru is appended.
+				$path = (string) ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
+				$path = rawurldecode( $path );
+				$key  = untrailingslashit( $path );
+				if ( isset( self::$ru_slug_to_en[ $key ] ) || preg_match( '/[А-Яа-яЁё]/u', $path ) ) {
+					$en = isset( self::$ru_slug_to_en[ $key ] ) ? self::$ru_slug_to_en[ $key ] : null;
+					if ( null !== $en && 'ru' === $lang ) {
+						$stamped++;
+						return 'href=' . $m[1] . esc_attr( 'https://cindemirlaw.com' . user_trailingslashit( $en ) . '?lang=ru' ) . $m[1];
+					}
+					return $m[0];
+				}
 				$stamped++;
 				return 'href=' . $m[1] . esc_attr( self::raw_append_lang( $url, $lang ) ) . $m[1];
 			},
@@ -3707,14 +3825,14 @@ public static function homepage_hero_styles() {
 		if ( isset( self::$redirects[ $path ] ) ) {
 			return self::$redirects[ $path ];
 		}
-		// WPML RU hash slugs and Cyrillic paths redirect to ?lang=ru when missing.
+		// Already has a language query — do not re-target (Cyrillic+lang=ru is a 404).
 		if ( $query && false !== strpos( $query, 'lang=' ) ) {
 			return false;
 		}
 		$is_fde = ( 0 === strpos( $path, '/fde' ) );
-		$is_cyr = (bool) preg_match( '/[А-Яа-яЁё]/u', $path );
-		if ( $is_fde || $is_cyr ) {
-			return home_url( user_trailingslashit( $path ) . '?lang=ru' );
+		// Cyrillic permalinks are already RU and 200 without ?lang=; appending lang=ru 404s.
+		if ( $is_fde ) {
+			return 'https://cindemirlaw.com' . user_trailingslashit( $path ) . '?lang=ru';
 		}
 		return false;
 	}
@@ -3775,6 +3893,10 @@ public static function homepage_hero_styles() {
 				}
 				$lang = strtolower( $lm[2] );
 				$url  = self::normalize_hreflang_url( $um[2], $lang );
+				// Omit bogus en targets (no real EN page / would only 301→ru).
+				if ( ! is_string( $url ) || '' === $url ) {
+					return '';
+				}
 				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_attr( $url ) . '" />';
 			},
 			$html

@@ -9,6 +9,7 @@
  * ASSET_FIX_20260801
  * HREFLANG_FIX_20260801
  * NO_TITLE_META_OVERRIDE_20260801
+ * RU_SLUG_404_FIX_20260801
  * Author: Cindemir Law Office
  */
 
@@ -696,14 +697,26 @@ final class Cindemir_Contact_Fixes {
 	/** Stamp every JoinChat / wa.me telephone onto the office WhatsApp number. */
 
 
-	/** Ahrefs hreflang: distinct URLs per language (en/x-default clean, ru with ?lang=ru). */
+	/** Ahrefs hreflang: defer to SEO fixes when loaded (handles RU-slug 404s). */
 	private static function fix_hreflang_link_tags( $html ) {
 		if ( ! is_string( $html ) || false === stripos( $html, 'hreflang' ) ) {
 			return $html;
 		}
+		// Outer seo-fixes buffer rewrites hreflang last; avoid a second naive ?lang=ru pass here.
+		if ( class_exists( 'Cindemir_SEO_Fixes', false ) ) {
+			return $html;
+		}
+		$map = array(
+			'/onas'        => '/about-us',
+			'/kontak'      => '/contacts',
+			'/komanda'     => '/team',
+			'/stati'       => '/articles',
+			'/nashiyurist' => '/services',
+			'/pod'         => null,
+		);
 		$next = preg_replace_callback(
 			'#<link\b(?=[^>]*\bhreflang=)(?=[^>]*\bhref=)[^>]*>#i',
-			static function ( $m ) {
+			static function ( $m ) use ( $map ) {
 				$tag = $m[0];
 				if ( ! preg_match( '#\bhreflang=(["\'])([^"\']+)\1#i', $tag, $lm ) ) {
 					return $tag;
@@ -715,7 +728,7 @@ final class Cindemir_Contact_Fixes {
 				$url  = html_entity_decode( $um[2], ENT_QUOTES, 'UTF-8' );
 				$url  = str_replace( array( '/contacts-2/', '/contacts-2?' ), array( '/contacts/', '/contacts?' ), $url );
 				$parts = wp_parse_url( $url );
-				$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
+				$path  = isset( $parts['path'] ) ? rawurldecode( $parts['path'] ) : '/';
 				$q     = array();
 				if ( ! empty( $parts['query'] ) ) {
 					parse_str( $parts['query'], $q );
@@ -724,17 +737,30 @@ final class Cindemir_Contact_Fixes {
 				if ( 'zh' === $lang || 0 === strpos( $lang, 'zh' ) ) {
 					$lang = 'zh-hans';
 				}
-				if ( 'ru' === $lang ) {
-					$q['lang'] = 'ru';
+				$key = untrailingslashit( $path );
+				if ( isset( $map[ $key ] ) ) {
+					if ( null === $map[ $key ] ) {
+						if ( 'ru' === $lang ) {
+							$path = $key;
+						} else {
+							$path = '/support';
+						}
+					} else {
+						$path = $map[ $key ];
+						if ( 'ru' === $lang ) {
+							$q['lang'] = 'ru';
+						}
+					}
+				} elseif ( 'ru' === $lang ) {
+					if ( ! preg_match( '/[А-Яа-яЁё]/u', $path ) ) {
+						$q['lang'] = 'ru';
+					}
 				} elseif ( 'zh-hans' === $lang ) {
 					$q['lang'] = 'zh-hans';
 				} elseif ( ! in_array( $lang, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) && '' !== $lang ) {
 					$q['lang'] = $lang;
 				}
-				$home = (string) get_option( 'home' );
-				$home = preg_replace( '/[?&]lang=[^&]*/', '', $home );
-				$home = untrailingslashit( explode( '#', $home, 2 )[0] );
-				$home = rtrim( $home, '?&' );
+				$home = 'https://cindemirlaw.com';
 				if ( '/' !== $path[0] ) {
 					$path = '/' . $path;
 				}
