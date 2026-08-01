@@ -1,10 +1,11 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.73 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.74 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.73
+ * Version: 1.9.74
  * SERVICES_BLANK_FIX_20260715
+ * RU_HREFLANG_404_20260801
  * Author: Cindemir Law Office
  */
 
@@ -87,6 +88,8 @@ final class Cindemir_SEO_Fixes {
 		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd1fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfd83fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf/?lang=ru',
 		'/cindemir-hukuk-burosu-cindemir-law-office-kusdili-caddesi-osmanaga-mahallesi-artunc-apartmani-no173-34714-kadikoy-istanbul' => 'https://cindemirlaw.com/cindemir/',
 		'/pig-butchering-cryptocurrency-scam-key-risks-and-legal-considerations-for-investors-in-turkey' => 'https://cindemirlaw.com/pig-butchering-cryptocurrency-scam-key-risks-and-legal-considerations-for-investors-in-turkey/?lang=ru',
+		// WP truncates long Cyrillic slugs (~200 chars); Ahrefs/full spelling → stored slug.
+		'/преступления-с-криптовалютой-в-турции' => 'https://cindemirlaw.com/%d0%bf%d1%80%d0%b5%d1%81%d1%82%d1%83%d0%bf%d0%bb%d0%b5%d0%bd%d0%b8%d1%8f-%d1%81-%d0%ba%d1%80%d0%b8%d0%bf%d1%82%d0%be%d0%b2%d0%b0%d0%bb%d1%8e%d1%82%d0%be%d0%b9-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8/?lang=ru',
 		'/eu-ai-act-compliance-for-non-eu-companies-legal-requirements-under-the-destination-principle' => 'https://cindemirlaw.com/eu-ai-act-compliance-for-non-eu-companies-legal-requirements-under-the-destination-principle/?lang=ru',
 		'/obtaining-an-e-devlet-password-in-turkey-through-a-power-of-attorney' => 'https://cindemirlaw.com/obtaining-an-e-devlet-password-in-turkey-through-a-power-of-attorney/?lang=ru',
 		'/репатриация-активов-в-турцию-в-2026-году-п' => 'https://cindemirlaw.com/%d1%80%d0%b5%d0%bf%d0%b0%d1%82%d1%80%d0%b8%d0%b0%d1%86%d0%b8%d1%8f-%d0%b0%d0%ba%d1%82%d0%b8%d0%b2%d0%be%d0%b2-%d0%b2-%d1%82%d1%83%d1%80%d1%86%d0%b8%d1%8e-%d0%b2-2026-%d0%b3%d0%be%d0%b4%d1%83-%d0%bf/?lang=ru',
@@ -172,13 +175,16 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.73';
+	const VERSION = '1.9.74';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '07253fc';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
 	const TEAM_PHOTO_CACHE_VER = '20260718f';
+
+	/** One-shot: reclassify Cyrillic posts wrongly filed as English in WPML. */
+	const RU_WPML_REPAIR_KEY = 'cindemir_ru_wpml_repair_20260801';
 
 	/** Deploy freshness marker for pull-plugins. */
 	const DEPLOY_MARKER = 'ELENA_ZARA_RU_BIO_20260718';
@@ -257,12 +263,15 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
 		add_action( 'send_headers', array( __CLASS__, 'persist_lang_cookie' ), 0 );
 		add_action( 'wpml_loaded', array( __CLASS__, 'switch_wpml_from_cookie' ), 0 );
+		add_action( 'wpml_loaded', array( __CLASS__, 'repair_ru_posts_wpml_language' ), 5 );
+		add_action( 'init', array( __CLASS__, 'repair_ru_posts_wpml_language' ), 6 );
 		add_action( 'plugins_loaded', array( __CLASS__, 'switch_wpml_from_cookie' ), 20 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_cookie_lang_to_query' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'clear_lang_cookie_redirect' ), 0 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
+		add_action( 'template_redirect', array( __CLASS__, 'rescue_ru_lang_404' ), 1 );
 		add_action( 'template_redirect', array( __CLASS__, 'strip_default_lang_redirect' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'disable_author_archives' ), 0 );
 		// Start FIRST so our rewrite is the outermost buffer (runs after WPML Absolute Links).
@@ -790,6 +799,36 @@ final class Cindemir_SEO_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/repair-ru-wpml',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_repair_ru_wpml' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_repair_ru_wpml( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		$force = (string) $request->get_param( 'force' );
+		if ( '1' === $force || 'true' === strtolower( $force ) ) {
+			delete_option( self::RU_WPML_REPAIR_KEY );
+			delete_transient( 'cindemir_ru_wpml_repair_lock' );
+		}
+		self::repair_ru_posts_wpml_language();
+		return new WP_REST_Response(
+			array(
+				'ok'      => (bool) get_option( self::RU_WPML_REPAIR_KEY ),
+				'version' => self::VERSION,
+				'result'  => get_option( self::RU_WPML_REPAIR_KEY ),
+			),
+			200
+		);
 	}
 
 	public static function rest_sync_team_photo( $request ) {
@@ -918,6 +957,11 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	public static function filter_hreflang_urls( $hreflangs ) {
+		// Prefer real WPML translation targets on singular content (never invent ?lang=ru 404s).
+		$built = self::build_singular_hreflangs();
+		if ( is_array( $built ) && $built ) {
+			return $built;
+		}
 		if ( ! is_array( $hreflangs ) ) {
 			return $hreflangs;
 		}
@@ -925,6 +969,83 @@ final class Cindemir_SEO_Fixes {
 			$hreflangs[ $lang ] = self::normalize_hreflang_url( $url, is_string( $lang ) ? $lang : null );
 		}
 		return $hreflangs;
+	}
+
+	/**
+	 * Build hreflang map from actual WPML translations for the current singular post/page.
+	 *
+	 * @return array|null
+	 */
+	private static function build_singular_hreflangs() {
+		if ( ! function_exists( 'is_singular' ) || ! is_singular() ) {
+			return null;
+		}
+		$id = (int) get_queried_object_id();
+		if ( $id <= 0 ) {
+			return null;
+		}
+		$type = get_post_type( $id );
+		if ( ! $type ) {
+			return null;
+		}
+		$codes = array( 'en', 'ru', 'zh-hans' );
+		$out   = array();
+		foreach ( $codes as $code ) {
+			$tid = self::wpml_translated_id( $id, $type, $code );
+			if ( ! $tid ) {
+				continue;
+			}
+			$url = get_permalink( $tid );
+			if ( ! is_string( $url ) || '' === $url ) {
+				continue;
+			}
+			$out[ $code ] = self::normalize_hreflang_url( $url, $code );
+		}
+		if ( ! $out ) {
+			return null;
+		}
+		if ( isset( $out['en'] ) ) {
+			$out['x-default'] = $out['en'];
+		} else {
+			$first            = reset( $out );
+			$out['x-default'] = $first;
+		}
+		return $out;
+	}
+
+	/**
+	 * @param int    $id   Post ID.
+	 * @param string $type Post type.
+	 * @param string $lang Language code.
+	 * @return int
+	 */
+	private static function wpml_translated_id( $id, $type, $lang ) {
+		$id   = (int) $id;
+		$lang = strtolower( (string) $lang );
+		if ( $id <= 0 ) {
+			return 0;
+		}
+		if ( 'zh' === $lang ) {
+			$lang = 'zh-hans';
+		}
+		$tid = apply_filters( 'wpml_object_id', $id, $type, false, $lang );
+		$tid = (int) $tid;
+		if ( $tid > 0 ) {
+			$p = get_post( $tid );
+			if ( $p && 'publish' === $p->post_status ) {
+				return $tid;
+			}
+		}
+		// Fallback: if this post itself is already that language, keep it.
+		$details = apply_filters( 'wpml_element_language_details', null, array(
+			'element_id'   => $id,
+			'element_type' => 'post_' . $type,
+		) );
+		if ( is_object( $details ) && isset( $details->language_code )
+			&& strtolower( (string) $details->language_code ) === $lang ) {
+			return $id;
+		}
+		return 0;
 	}
 
 	private static function normalize_hreflang_url( $url, $lang = null ) {
@@ -948,7 +1069,10 @@ final class Cindemir_SEO_Fixes {
 		if ( 'zh' === $code ) {
 			$code = 'zh-hans';
 		}
-		if ( $code && ! in_array( $code, array( 'en', 'x-default' ), true ) && empty( $q['lang'] ) ) {
+		if ( 'x-default' === $code ) {
+			// x-default follows English canonical shape (no lang param).
+			unset( $q['lang'] );
+		} elseif ( $code && ! in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) && empty( $q['lang'] ) ) {
 			$q['lang'] = $code;
 		}
 		$new = home_url( user_trailingslashit( $path ) );
@@ -1130,6 +1254,210 @@ final class Cindemir_SEO_Fixes {
 		}
 		$settings['language_negotiation_type'] = 3;
 		update_option( 'icl_sitepress_settings', $settings );
+	}
+
+	/**
+	 * Ahrefs 404s: Cyrillic posts filed as English → ?lang=ru excludes them.
+	 * Reclassify known RU posts (and link to EN siblings) once.
+	 */
+	public static function repair_ru_posts_wpml_language() {
+		if ( get_option( self::RU_WPML_REPAIR_KEY ) ) {
+			return;
+		}
+		if ( ! isset( $GLOBALS['sitepress'] ) || ! is_object( $GLOBALS['sitepress'] ) ) {
+			return;
+		}
+		if ( get_transient( 'cindemir_ru_wpml_repair_lock' ) ) {
+			return;
+		}
+		set_transient( 'cindemir_ru_wpml_repair_lock', 1, 5 * MINUTE_IN_SECONDS );
+
+		// RU post ID => EN sibling ID (when a translation pair exists).
+		$pairs = array(
+			900059 => 900057, // CISG
+			900014 => 900012, // tourism law
+			4906   => 4904,   // inheritance investigation
+			4911   => 4909,   // crypto crimes (stored slug truncated …турци)
+		);
+
+		$sitepress = $GLOBALS['sitepress'];
+		$fixed     = array();
+		foreach ( $pairs as $ru_id => $en_id ) {
+			$ru = get_post( (int) $ru_id );
+			$en = get_post( (int) $en_id );
+			if ( ! $ru || 'publish' !== $ru->post_status ) {
+				continue;
+			}
+			$trid = 0;
+			if ( $en && 'publish' === $en->post_status && method_exists( $sitepress, 'get_element_trid' ) ) {
+				$trid = (int) $sitepress->get_element_trid( (int) $en_id, 'post_post' );
+				if ( ! $trid && method_exists( $sitepress, 'set_element_language_details' ) ) {
+					$sitepress->set_element_language_details( (int) $en_id, 'post_post', null, 'en' );
+					$trid = (int) $sitepress->get_element_trid( (int) $en_id, 'post_post' );
+				}
+			}
+			$details = apply_filters(
+				'wpml_element_language_details',
+				null,
+				array(
+					'element_id'   => (int) $ru_id,
+					'element_type' => 'post_post',
+				)
+			);
+			$cur = ( is_object( $details ) && isset( $details->language_code ) )
+				? strtolower( (string) $details->language_code )
+				: '';
+			if ( 'ru' === $cur && $trid && is_object( $details ) && (int) $details->trid === $trid ) {
+				$fixed[ (string) $ru_id ] = 'already-ru';
+				continue;
+			}
+			do_action(
+				'wpml_set_element_language_details',
+				array(
+					'element_id'           => (int) $ru_id,
+					'element_type'         => 'post_post',
+					'trid'                 => $trid ? $trid : null,
+					'language_code'        => 'ru',
+					'source_language_code' => $trid ? 'en' : null,
+				)
+			);
+			if ( method_exists( $sitepress, 'set_element_language_details' ) ) {
+				$sitepress->set_element_language_details(
+					(int) $ru_id,
+					'post_post',
+					$trid ? $trid : null,
+					'ru',
+					$trid ? 'en' : null
+				);
+			}
+			clean_post_cache( (int) $ru_id );
+			$fixed[ (string) $ru_id ] = $trid ? ( 'linked:' . $trid ) : 'ru-original';
+		}
+
+		// Broader sweep: published posts with Cyrillic titles still marked English.
+		global $wpdb;
+		if ( isset( $wpdb ) && is_object( $wpdb ) ) {
+			$table = $wpdb->prefix . 'icl_translations';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows  = $wpdb->get_results(
+				"SELECT t.element_id, p.post_title
+				 FROM {$table} t
+				 INNER JOIN {$wpdb->posts} p ON p.ID = t.element_id
+				 WHERE t.element_type = 'post_post'
+				   AND t.language_code = 'en'
+				   AND p.post_status = 'publish'
+				   AND p.post_type = 'post'
+				 LIMIT 200"
+			);
+			if ( is_array( $rows ) ) {
+				foreach ( $rows as $row ) {
+					$pid   = (int) $row->element_id;
+					$title = (string) $row->post_title;
+					if ( $pid <= 0 || ! preg_match( '/\p{Cyrillic}/u', $title ) ) {
+						continue;
+					}
+					if ( isset( $pairs[ $pid ] ) ) {
+						continue;
+					}
+					do_action(
+						'wpml_set_element_language_details',
+						array(
+							'element_id'           => $pid,
+							'element_type'         => 'post_post',
+							'trid'                 => null,
+							'language_code'        => 'ru',
+							'source_language_code' => null,
+						)
+					);
+					if ( method_exists( $sitepress, 'set_element_language_details' ) ) {
+						$sitepress->set_element_language_details( $pid, 'post_post', null, 'ru', null );
+					}
+					clean_post_cache( $pid );
+					$fixed[ (string) $pid ] = 'sweep-ru';
+				}
+			}
+		}
+
+		update_option( self::RU_WPML_REPAIR_KEY, array(
+			'utc'   => gmdate( 'c' ),
+			'fixed' => $fixed,
+		), false );
+		delete_transient( 'cindemir_ru_wpml_repair_lock' );
+
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( class_exists( 'WPSEO_Sitemaps_Cache' ) ) {
+			WPSEO_Sitemaps_Cache::clear();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+	}
+
+	/**
+	 * Safety net for Cyrillic / RU article 404s:
+	 * - ?lang=ru on a published slug → 301 to working RU permalink
+	 * - bare Cyrillic slug after WPML reclassify → 301 to ?lang=ru
+	 */
+	public static function rescue_ru_lang_404() {
+		if ( is_admin() || ! is_404() ) {
+			return;
+		}
+		$lang = isset( $_GET['lang'] ) ? strtolower( (string) wp_unslash( $_GET['lang'] ) ) : '';
+		if ( $lang && 'ru' !== $lang ) {
+			return;
+		}
+		$path = self::path();
+		$dec  = rawurldecode( $path );
+		$slug = trim( $dec, '/' );
+		if ( '' === $slug ) {
+			return;
+		}
+		$looks_ru = (bool) preg_match( '/\p{Cyrillic}/u', $dec )
+			|| 0 === strpos( $slug, 'cisg-' );
+		if ( ! $looks_ru ) {
+			return;
+		}
+		$posts = get_posts(
+			array(
+				'name'             => $slug,
+				'post_type'        => 'post',
+				'post_status'      => 'publish',
+				'posts_per_page'   => 1,
+				'suppress_filters' => true,
+			)
+		);
+		if ( ! $posts && false !== strpos( $slug, 'преступления-с-криптовалютой' ) ) {
+			$posts = get_posts(
+				array(
+					'name'             => 'преступления-с-криптовалютой-в-турци',
+					'post_type'        => 'post',
+					'post_status'      => 'publish',
+					'posts_per_page'   => 1,
+					'suppress_filters' => true,
+				)
+			);
+		}
+		if ( ! $posts ) {
+			return;
+		}
+		$dest = get_permalink( $posts[0] );
+		if ( ! is_string( $dest ) || '' === $dest ) {
+			return;
+		}
+		$dest = self::normalize_hreflang_url( $dest, 'ru' );
+		if ( ! $dest ) {
+			return;
+		}
+		// Avoid redirect loops.
+		$req = ( is_ssl() ? 'https://' : 'http://' ) . ( isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : 'cindemirlaw.com' )
+			. ( isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' );
+		if ( untrailingslashit( $req ) === untrailingslashit( $dest ) ) {
+			return;
+		}
+		wp_redirect( $dest, 301 );
+		exit;
 	}
 
 	/** Remember active front language so bare permalinks keep serving it. */
@@ -3717,10 +4045,33 @@ public static function homepage_hero_styles() {
 	}
 
 	private static function fix_hreflang_html( $html ) {
+		$built = self::build_singular_hreflangs();
+		if ( is_array( $built ) && $built ) {
+			$block = '';
+			foreach ( $built as $code => $url ) {
+				$block .= '<link rel="alternate" hreflang="' . esc_attr( $code ) . '" href="' . esc_url( $url ) . '" />' . "\n";
+			}
+			$html = preg_replace(
+				'#<link\b[^>]*\bhreflang=(["\'])[^"\']+\1[^>]*>\s*#i',
+				'',
+				$html
+			);
+			$html = preg_replace(
+				'/(<link\b[^>]*\brel=(["\'])canonical\2[^>]*>)/i',
+				'$1' . "\n" . $block,
+				$html,
+				1,
+				$count
+			);
+			if ( ! $count ) {
+				$html = preg_replace( '/<\/head>/i', $block . '</head>', $html, 1 );
+			}
+			return $html;
+		}
 		return preg_replace_callback(
 			'#<link\b[^>]*\bhreflang=(["\'])([^"\']+)\1[^>]*\bhref=(["\'])([^"\']+)\3[^>]*>#i',
 			function ( $m ) {
-				$url = self::normalize_hreflang_url( $m[4] );
+				$url = self::normalize_hreflang_url( $m[4], $m[2] );
 				return '<link rel="alternate" hreflang="' . esc_attr( $m[2] ) . '" href="' . esc_url( $url ) . '" />';
 			},
 			$html
