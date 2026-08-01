@@ -1072,13 +1072,15 @@ final class Cindemir_Contact_Fixes {
 			$commit = '03319c8';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
-		$bases  = array(
+		$bases = array(
 			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/mu-plugins/',
 			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $commit . '/fixes/mu-plugins/',
-			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/',
-			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
 		);
+		if ( strlen( $commit ) < 40 ) {
+			$bases[] = 'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/mu-plugins/';
+			$bases[] = 'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/';
+		}
 		$files  = array(
 			'cindemir-seo-fixes.php'         => 155000,
 			'cindemir-contact-fixes.php'     => 20000,
@@ -1114,8 +1116,12 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( ( false === strpos( $tmp, 'Version: 1.9.69' ) && false === strpos( $tmp, 'Version: 1.9.74' ) && false === strpos( $tmp, 'Version: 1.9.75' ) )
-						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
+					&& ( ( false === strpos( $tmp, 'Version: 1.9.69' )
+						&& false === strpos( $tmp, 'Version: 1.9.74' )
+						&& false === strpos( $tmp, 'Version: 1.9.75' )
+						&& false === strpos( $tmp, 'Version: 1.9.76' ) )
+						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' )
+						|| false === strpos( $tmp, 'HREFLANG_AFTER_STAMP_20260801' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
