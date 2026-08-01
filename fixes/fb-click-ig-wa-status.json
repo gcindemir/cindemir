@@ -1,0 +1,104 @@
+{
+  "actions": [
+    {
+      "step": "ig_approve",
+      "result": {
+        "ok": true,
+        "text": "Erişimi onayla",
+        "tag": "DIV",
+        "score": 1242.4127197265625
+      },
+      "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1"
+    },
+    {
+      "step": "ig_dialog_Onayla",
+      "result": {
+        "ok": true,
+        "text": "Erişimi onayla",
+        "tag": "DIV",
+        "score": 1242.4127197265625
+      },
+      "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1"
+    },
+    {
+      "step": "wa_basla",
+      "result": {
+        "ok": true,
+        "text": "Başla",
+        "tag": "SPAN",
+        "score": 706.3493257855662
+      },
+      "url": "https://business.facebook.com/latest/inbox/wec?asset_id=336218871992&business_id=1161971660662915"
+    },
+    {
+      "step": "wa_Devam",
+      "result": {
+        "ok": true,
+        "text": "Devam",
+        "tag": "SPAN",
+        "score": 905.0795083121702
+      },
+      "url": "https://business.facebook.com/latest/inbox/wec?asset_id=336218871992&business_id=1161971660662915"
+    },
+    {
+      "step": "wa_İleri",
+      "result": {
+        "ok": true,
+        "text": "İleri",
+        "tag": "SPAN",
+        "score": 485.07943011087264
+      },
+      "url": "https://business.facebook.com/latest/inbox/wec?asset_id=336218871992&business_id=1161971660662915"
+    },
+    {
+      "step": "wa_Bağla",
+      "result": {
+        "ok": true,
+        "text": "Erişimi onayla Bağlantı kesildi",
+        "tag": "SPAN",
+        "score": 1650.2860482836695
+      },
+      "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1"
+    },
+    {
+      "step": "wa_Onayla",
+      "result": {
+        "ok": true,
+        "text": "Erişimi onayla",
+        "tag": "DIV",
+        "score": 1242.4127197265625
+      },
+      "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1"
+    },
+    {
+      "step": "wa_Confirm",
+      "result": {
+        "ok": true,
+        "text": "Confirm Instagram message access",
+        "tag": "DIV",
+        "score": 5251.429333823093
+      },
+      "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1"
+    }
+  ],
+  "updated": "2026-07-18T10:02:37Z",
+  "instagram_after": {
+    "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915",
+    "needs_approve": true,
+    "disconnected": true,
+    "no_messages_placeholder": true,
+    "shot": "/workspace/fixes/fb-click-2-ig-check.png"
+  },
+  "whatsapp_after": {
+    "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1",
+    "shows_basla": false,
+    "shows_yeni": true,
+    "snip": "Gelen Kutusu Mesajlara yanıt ver, otomasyonları ayarla ve daha fazlasını yap. Otomasyonlar Mesajlaşma reklamı oluştur ​ Mesajlaşma istatistikleri ​ Müsaitlik durumu ​ Müsait Mesaj Ayarları ​ Tüm mesajlar Messenger Instagram Erişimi onayla Bağlantı kesildi WhatsApp Yeni Yeni Facebook yorumları Instagram yorumları Confirm Instagram message access Instagram messages are unavailable in Inbox until you confirm that people who manage your Facebook Page can also manage your Instagram messages. Learn More Erişimi onayla Meta Business Suite Bağlantılar Ana Sayfa Ana Sayfa Bildirimler Bildirimler Reklam Yöneticisi Reklam Yöneticisi Gelen Kutusu Gelen Kutusu İçerik İçerik Bağlantılar İçerik üreticisi pazar yeri İçerik üreticisi pazar yeri Planlayıcı Planlayıcı Reklamlar Reklamlar İstatistikler İstatistikler Tüm Araçlar Tüm Araçlar Para Kazanma Para Kazanma Düzenle Oluştur Oluştur Ara Ara Bağlantılar Ayarlar Ayarlar Yardım Yardım"
+  },
+  "final": {
+    "ig_approve": true,
+    "ig_disconnected": true,
+    "wa_setup_cta": false,
+    "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE"
+  }
+}
