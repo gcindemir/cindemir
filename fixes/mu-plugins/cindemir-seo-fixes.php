@@ -1069,7 +1069,7 @@ final class Cindemir_SEO_Fixes {
 
 	/** Materialize missing press crop so Apache 404s become 200 (HTML rewrite alone is not enough). */
 	public static function ensure_office_lens_crop() {
-		if ( get_option( 'cindemir_office_lens_722_v1' ) ) {
+		if ( get_option( 'cindemir_office_lens_722_v2' ) ) {
 			return;
 		}
 		$dir = trailingslashit( WP_CONTENT_DIR ) . 'uploads/2020/06/';
@@ -1091,7 +1091,7 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 		if ( $ok && file_exists( $dir . 'Office-Lens-20160311-153101-722x1030.jpg' ) ) {
-			update_option( 'cindemir_office_lens_722_v1', 1, false );
+			update_option( 'cindemir_office_lens_722_v2', 1, false );
 		}
 	}
 
