@@ -1,11 +1,12 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.77 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.78 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.77
+ * Version: 1.9.78
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
+ * AHREFS_AUG2026
  * Author: Cindemir Law Office
  */
 
@@ -175,7 +176,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.77';
+	const VERSION = '1.9.78';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '98092b2';
 
@@ -184,7 +185,21 @@ final class Cindemir_SEO_Fixes {
 	const TEAM_PHOTO_CACHE_VER = '20260718f';
 
 	/** One-shot: reclassify Cyrillic posts wrongly filed as English in WPML. */
-	const RU_WPML_REPAIR_KEY = 'cindemir_ru_wpml_repair_20260801';
+	const RU_WPML_REPAIR_KEY = 'cindemir_ru_wpml_repair_20260801b';
+
+	/**
+	 * Known RU page ID → EN page ID (WPML pairs for core nav pages).
+	 *
+	 * @var array<int,int>
+	 */
+	private static $ru_en_page_pairs = array(
+		2    => 16,  // onas → about-us
+		105  => 17,  // stati → articles
+		2427 => 19,  // komanda → team
+		2446 => 20,  // kontak → contacts
+		103  => 392, // pod → support
+		56   => 18,  // nashiyurist → services
+	);
 
 	/** Deploy freshness marker for pull-plugins. */
 	const DEPLOY_MARKER = 'ELENA_ZARA_RU_BIO_20260718';
@@ -270,6 +285,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'template_redirect', array( __CLASS__, 'clear_lang_cookie_redirect' ), 0 );
 		add_filter( 'option_polylang', array( __CLASS__, 'filter_polylang_options' ) );
 		add_filter( 'redirection_url_target', array( __CLASS__, 'cancel_broken' ), 1, 2 );
+		add_action( 'template_redirect', array( __CLASS__, 'strip_upload_asset_trailing_slash' ), -1 );
 		add_action( 'template_redirect', array( __CLASS__, 'flatten_redirects' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'rescue_ru_lang_404' ), 1 );
 		add_action( 'template_redirect', array( __CLASS__, 'strip_default_lang_redirect' ), 0 );
@@ -957,6 +973,9 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	public static function filter_hreflang_urls( $hreflangs ) {
+		if ( self::is_home_request() ) {
+			return self::home_hreflangs();
+		}
 		// Prefer real WPML translation targets on singular content (never invent ?lang=ru 404s).
 		$built = self::build_singular_hreflangs();
 		if ( is_array( $built ) && $built ) {
@@ -971,12 +990,42 @@ final class Cindemir_SEO_Fixes {
 		return $hreflangs;
 	}
 
+	/** @return bool */
+	private static function is_home_request() {
+		if ( function_exists( 'is_front_page' ) && is_front_page() ) {
+			return true;
+		}
+		if ( function_exists( 'is_home' ) && is_home() && ! ( function_exists( 'is_singular' ) && is_singular() ) ) {
+			return true;
+		}
+		$id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		// Static front page + common WPML home translations.
+		return in_array( $id, array( 15 ), true );
+	}
+
+	/**
+	 * Final homepage alternates (no /home/ or /glavnaya/ hops).
+	 *
+	 * @return array<string,string>
+	 */
+	private static function home_hreflangs() {
+		return array(
+			'en'        => 'https://cindemirlaw.com/',
+			'ru'        => 'https://cindemirlaw.com/?lang=ru',
+			'zh-hans'   => 'https://cindemirlaw.com/?lang=zh-hans',
+			'x-default' => 'https://cindemirlaw.com/',
+		);
+	}
+
 	/**
 	 * Build hreflang map from actual WPML translations for the current singular post/page.
 	 *
 	 * @return array|null
 	 */
 	private static function build_singular_hreflangs() {
+		if ( self::is_home_request() ) {
+			return self::home_hreflangs();
+		}
 		if ( ! function_exists( 'is_singular' ) || ! is_singular() ) {
 			return null;
 		}
@@ -1004,13 +1053,30 @@ final class Cindemir_SEO_Fixes {
 		if ( ! $out ) {
 			return null;
 		}
+		// Never claim EN self-hreflang on a Russian URL (html lang mismatch).
+		if ( isset( $out['en'] ) && self::url_looks_russian( $out['en'] ) && ! isset( $out['ru'] ) ) {
+			$out['ru'] = self::normalize_hreflang_url( $out['en'], 'ru' );
+			unset( $out['en'] );
+		} elseif ( isset( $out['en'] ) && self::url_looks_russian( $out['en'] ) && isset( $out['ru'] ) ) {
+			unset( $out['en'] );
+		}
 		if ( isset( $out['en'] ) ) {
 			$out['x-default'] = $out['en'];
+		} elseif ( isset( $out['ru'] ) ) {
+			$out['x-default'] = $out['ru'];
 		} else {
 			$first            = reset( $out );
 			$out['x-default'] = $first;
 		}
 		return $out;
+	}
+
+	/** @param string $url URL. @return bool */
+	private static function url_looks_russian( $url ) {
+		$path = (string) ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
+		$dec  = rawurldecode( $path );
+		return (bool) preg_match( '/\p{Cyrillic}/u', $dec )
+			|| (bool) preg_match( '#/(?:onas|stati|komanda|kontak|pod|nashiyurist|glavnaya)(/|$)#i', $dec );
 	}
 
 	/**
@@ -1026,6 +1092,14 @@ final class Cindemir_SEO_Fixes {
 		if ( 'zh' === $lang ) {
 			$lang = 'zh-hans';
 		}
+		// Static front page / WPML home translations → final root URL.
+		if ( in_array( $post_id, array( 15 ), true ) || (int) get_option( 'page_on_front' ) === $post_id ) {
+			$url = 'https://cindemirlaw.com/';
+			if ( ! in_array( $lang, array( 'en', 'en-us', 'en_us', 'x-default', '' ), true ) ) {
+				$url = add_query_arg( 'lang', $lang, $url );
+			}
+			return $url;
+		}
 		$url = '';
 		if ( has_filter( 'wpml_permalink' ) ) {
 			$url = (string) apply_filters( 'wpml_permalink', get_permalink( $post_id ), $lang );
@@ -1037,6 +1111,11 @@ final class Cindemir_SEO_Fixes {
 			return '';
 		}
 		$url = remove_query_arg( array( 'lang', 'cindemir_lang' ), $url );
+		// Collapse home aliases from get_permalink/WPML.
+		$path = (string) ( wp_parse_url( $url, PHP_URL_PATH ) ?: '/' );
+		if ( in_array( untrailingslashit( rawurldecode( $path ) ), array( '/home', '/glavnaya', '/shouye', '/index' ), true ) ) {
+			$url = 'https://cindemirlaw.com/';
+		}
 		if ( ! in_array( $lang, array( 'en', 'en-us', 'en_us', 'x-default', '' ), true ) ) {
 			$url = add_query_arg( 'lang', $lang, $url );
 		}
@@ -1063,7 +1142,27 @@ final class Cindemir_SEO_Fixes {
 		if ( $tid > 0 ) {
 			$p = get_post( $tid );
 			if ( $p && 'publish' === $p->post_status ) {
-				return $tid;
+				// Reject EN lookup that returns a Russian slug page.
+				if ( 'en' === $lang && 'page' === $type && self::url_looks_russian( get_permalink( $tid ) ) ) {
+					$tid = 0;
+				} else {
+					return $tid;
+				}
+			}
+		}
+		// Hard-coded core page pairs when WPML links are missing/wrong.
+		if ( 'page' === $type ) {
+			if ( 'en' === $lang && isset( self::$ru_en_page_pairs[ $id ] ) ) {
+				return (int) self::$ru_en_page_pairs[ $id ];
+			}
+			if ( 'ru' === $lang ) {
+				$flip = array_flip( self::$ru_en_page_pairs );
+				if ( isset( $flip[ $id ] ) ) {
+					return (int) $flip[ $id ];
+				}
+				if ( isset( self::$ru_en_page_pairs[ $id ] ) ) {
+					return $id;
+				}
 			}
 		}
 		// Fallback: if this post itself is already that language, keep it.
@@ -1073,6 +1172,9 @@ final class Cindemir_SEO_Fixes {
 		) );
 		if ( is_object( $details ) && isset( $details->language_code )
 			&& strtolower( (string) $details->language_code ) === $lang ) {
+			if ( 'en' === $lang && 'page' === $type && self::url_looks_russian( get_permalink( $id ) ) ) {
+				return 0;
+			}
 			return $id;
 		}
 		return 0;
@@ -1086,6 +1188,11 @@ final class Cindemir_SEO_Fixes {
 		$url = str_replace( '/contacts-2?', '/contacts?', $url );
 		$parts = wp_parse_url( $url );
 		$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
+		// Collapse WPML home aliases to the final root URL.
+		$plain = untrailingslashit( rawurldecode( $path ) );
+		if ( in_array( $plain, array( '/home', '/glavnaya', '/shouye', '/index' ), true ) || '' === $plain ) {
+			$path = '/';
+		}
 		$q     = array();
 		if ( ! empty( $parts['query'] ) ) {
 			parse_str( $parts['query'], $q );
@@ -1302,13 +1409,13 @@ final class Cindemir_SEO_Fixes {
 		}
 		set_transient( 'cindemir_ru_wpml_repair_lock', 1, 5 * MINUTE_IN_SECONDS );
 
-		// RU post ID => EN sibling ID (when a translation pair exists).
+		// RU element ID => EN sibling ID (posts + core pages).
 		$pairs = array(
 			900059 => 900057, // CISG
 			900014 => 900012, // tourism law
 			4906   => 4904,   // inheritance investigation
 			4911   => 4909,   // crypto crimes (stored slug truncated …турци)
-		);
+		) + self::$ru_en_page_pairs;
 
 		$sitepress = $GLOBALS['sitepress'];
 		$fixed     = array();
@@ -1318,12 +1425,13 @@ final class Cindemir_SEO_Fixes {
 			if ( ! $ru || 'publish' !== $ru->post_status ) {
 				continue;
 			}
-			$trid = 0;
+			$etype = ( 'page' === $ru->post_type ) ? 'post_page' : 'post_post';
+			$trid  = 0;
 			if ( $en && 'publish' === $en->post_status && method_exists( $sitepress, 'get_element_trid' ) ) {
-				$trid = (int) $sitepress->get_element_trid( (int) $en_id, 'post_post' );
+				$trid = (int) $sitepress->get_element_trid( (int) $en_id, $etype );
 				if ( ! $trid && method_exists( $sitepress, 'set_element_language_details' ) ) {
-					$sitepress->set_element_language_details( (int) $en_id, 'post_post', null, 'en' );
-					$trid = (int) $sitepress->get_element_trid( (int) $en_id, 'post_post' );
+					$sitepress->set_element_language_details( (int) $en_id, $etype, null, 'en' );
+					$trid = (int) $sitepress->get_element_trid( (int) $en_id, $etype );
 				}
 			}
 			$details = apply_filters(
@@ -1331,7 +1439,7 @@ final class Cindemir_SEO_Fixes {
 				null,
 				array(
 					'element_id'   => (int) $ru_id,
-					'element_type' => 'post_post',
+					'element_type' => $etype,
 				)
 			);
 			$cur = ( is_object( $details ) && isset( $details->language_code ) )
@@ -1345,7 +1453,7 @@ final class Cindemir_SEO_Fixes {
 				'wpml_set_element_language_details',
 				array(
 					'element_id'           => (int) $ru_id,
-					'element_type'         => 'post_post',
+					'element_type'         => $etype,
 					'trid'                 => $trid ? $trid : null,
 					'language_code'        => 'ru',
 					'source_language_code' => $trid ? 'en' : null,
@@ -1354,7 +1462,7 @@ final class Cindemir_SEO_Fixes {
 			if ( method_exists( $sitepress, 'set_element_language_details' ) ) {
 				$sitepress->set_element_language_details(
 					(int) $ru_id,
-					'post_post',
+					$etype,
 					$trid ? $trid : null,
 					'ru',
 					$trid ? 'en' : null
@@ -2644,6 +2752,30 @@ final class Cindemir_SEO_Fixes {
 		}
 	}
 
+	/**
+	 * Ahrefs 404: static uploads linked with a trailing slash (…pdf/ …jpg/).
+	 */
+	public static function strip_upload_asset_trailing_slash() {
+		if ( is_admin() ) {
+			return;
+		}
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		if ( '' === $uri || false === strpos( $uri, '/wp-content/uploads/' ) ) {
+			return;
+		}
+		$parts = wp_parse_url( $uri );
+		$path  = isset( $parts['path'] ) ? (string) $parts['path'] : '';
+		if ( ! preg_match( '#^/wp-content/uploads/.+\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?|css|js)/$#i', $path ) ) {
+			return;
+		}
+		$dest = untrailingslashit( $path );
+		if ( ! empty( $parts['query'] ) ) {
+			$dest .= '?' . $parts['query'];
+		}
+		wp_redirect( 'https://cindemirlaw.com' . $dest, 301 );
+		exit;
+	}
+
 	public static function flatten_redirects() {
 		if ( is_admin() ) {
 			return;
@@ -2685,6 +2817,7 @@ final class Cindemir_SEO_Fixes {
 			return $html;
 		}
 		$html = self::rewrite_hrefs_in_html( $html );
+		$html = self::strip_upload_trailing_slash_hrefs( $html );
 		$html = self::fix_header_logo_html( $html );
 		$html = self::inject_header_brand_html( $html );
 		$html = self::ensure_missing_h1_html( $html );
@@ -3908,6 +4041,18 @@ public static function homepage_hero_styles() {
 
 	public static function fix_empty_alts( $content ) {
 		return self::fill_empty_alts_html( $content );
+	}
+
+	/** Remove bogus trailing slash on static upload asset hrefs. */
+	private static function strip_upload_trailing_slash_hrefs( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		return preg_replace(
+			'#(/wp-content/uploads/[^"\']+\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?))(?=/)(["\'\?#])#i',
+			'$1$2',
+			$html
+		);
 	}
 
 	private static function rewrite_hrefs_in_html( $html ) {
