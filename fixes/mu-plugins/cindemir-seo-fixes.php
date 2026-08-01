@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 + CYR_REDIRECTS_REMOVED_20260801 + REMAINING_AHREFS_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 + CYR_REDIRECTS_REMOVED_20260801 + REMAINING_AHREFS_20260801 + OFFICE_LENS_V4_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -14,6 +14,7 @@
  * RU_SLUG_404_FIX_20260801
  * CYR_REDIRECT_LOOP_FIX_20260801
  * REMAINING_AHREFS_20260801
+ * OFFICE_LENS_V4_20260801
  * Author: Cindemir Law Office
  */
 
@@ -801,6 +802,29 @@ final class Cindemir_SEO_Fixes {
 				'permission_callback' => '__return_true',
 			)
 		);
+		register_rest_route(
+			'cindemir/v1',
+			'/fix-office-lens',
+			array(
+				'methods'             => array( 'GET', 'POST' ),
+				'callback'            => array( __CLASS__, 'rest_fix_office_lens' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	public static function rest_fix_office_lens( $request ) {
+		$key = $request->get_param( 'key' );
+		if ( 'seo-pack-2026' !== $key ) {
+			return new WP_REST_Response( array( 'error' => 'Forbidden' ), 403 );
+		}
+		delete_option( 'cindemir_office_lens_722_v2' );
+		delete_option( 'cindemir_office_lens_722_v3' );
+		delete_option( 'cindemir_office_lens_722_v4' );
+		$report = self::repair_office_lens_crop( true );
+		$report['version'] = self::VERSION;
+		$report['flag']    = (int) get_option( 'cindemir_office_lens_722_v4' );
+		return new WP_REST_Response( $report, 200 );
 	}
 
 	public static function rest_sync_team_photo( $request ) {
@@ -891,7 +915,8 @@ final class Cindemir_SEO_Fixes {
 						&& false === strpos( $tmp, 'Version: 1.9.75' )
 						&& false === strpos( $tmp, 'Version: 1.9.76' ) )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'HREFLANG_AFTER_STAMP_20260801' ) ) ) {
+						|| false === strpos( $tmp, 'HREFLANG_AFTER_STAMP_20260801' )
+						|| false === strpos( $tmp, 'OFFICE_LENS_V4_20260801' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -910,6 +935,13 @@ final class Cindemir_SEO_Fixes {
 			$out[ $name ] = array( 'ok' => true, 'bytes' => strlen( $body ), 'src' => $src );
 		}
 		delete_option( 'cindemir_seo_fixes_version' );
+		// Force Office-Lens htaccess cleanup + crop copy on next request / explicit fix call.
+		if ( ! empty( $out['cindemir-seo-fixes.php']['ok'] ) ) {
+			delete_option( 'cindemir_office_lens_722_v2' );
+			delete_option( 'cindemir_office_lens_722_v3' );
+			delete_option( 'cindemir_office_lens_722_v4' );
+			$out['office_lens'] = self::repair_office_lens_crop( true );
+		}
 		wp_cache_flush();
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
@@ -1067,32 +1099,113 @@ final class Cindemir_SEO_Fixes {
 		return false;
 	}
 
-	/** Materialize missing press crop so Apache 404s become 200 (HTML rewrite alone is not enough). */
+	/**
+	 * Materialize missing press crops as real files and remove the old Apache
+	 * RedirectMatch that 301'd every NxN crop (including after the file exists).
+	 * Bluehost .htaccess often uses CRLF — strip must be line-ending agnostic.
+	 */
 	public static function ensure_office_lens_crop() {
-		if ( get_option( 'cindemir_office_lens_722_v2' ) ) {
+		if ( get_option( 'cindemir_office_lens_722_v4' ) ) {
 			return;
 		}
+		self::repair_office_lens_crop( false );
+	}
+
+	/**
+	 * @param bool $force Re-run even if the success option is set.
+	 * @return array<string,mixed>
+	 */
+	public static function repair_office_lens_crop( $force = false ) {
 		$dir = trailingslashit( WP_CONTENT_DIR ) . 'uploads/2020/06/';
 		$src = $dir . 'Office-Lens-20160311-153101-scaled.jpg';
+		$report = array(
+			'src_readable' => is_readable( $src ),
+			'htaccess'     => array(),
+			'crops'        => array(),
+			'ok'           => false,
+		);
 		if ( ! is_readable( $src ) ) {
-			return;
+			return $report;
 		}
+
+		$ht_dirs = array(
+			$dir,
+			trailingslashit( WP_CONTENT_DIR ) . 'uploads/2020/',
+			trailingslashit( WP_CONTENT_DIR ) . 'uploads/',
+		);
+		$ht_clean = true;
+		foreach ( $ht_dirs as $ht_dir ) {
+			$ht = $ht_dir . '.htaccess';
+			$entry = array(
+				'path'      => $ht,
+				'exists'    => file_exists( $ht ),
+				'readable'  => is_readable( $ht ),
+				'writable'  => is_writable( $ht ),
+				'had_rule'  => false,
+				'removed'   => false,
+				'still_has' => false,
+			);
+			if ( is_readable( $ht ) ) {
+				$existing = (string) file_get_contents( $ht );
+				$entry['had_rule'] = ( false !== stripos( $existing, 'Office-Lens-20160311-153101' )
+					|| false !== stripos( $existing, 'Cindemir Office-Lens' ) );
+				if ( $entry['had_rule'] ) {
+					$cleaned = preg_replace(
+						'/^[^\r\n]*(?:Office-Lens-20160311-153101|Cindemir Office-Lens)[^\r\n]*(?:\r\n|\n|\r)?/mi',
+						'',
+						$existing
+					);
+					if ( is_string( $cleaned ) && $cleaned !== $existing && is_writable( $ht ) ) {
+						$entry['removed'] = ( false !== @file_put_contents( $ht, $cleaned ) );
+						$existing = $entry['removed'] ? $cleaned : $existing;
+					}
+				}
+				$entry['still_has'] = ( false !== stripos( $existing, 'Office-Lens-20160311-153101' )
+					|| false !== stripos( $existing, 'Cindemir Office-Lens' ) );
+				if ( $entry['still_has'] ) {
+					$ht_clean = false;
+				}
+			}
+			$report['htaccess'][] = $entry;
+		}
+
 		$ok = true;
-		foreach ( array( '722x1030', '300x200', '150x150', '600x400' ) as $size ) {
+		foreach ( array( '722x1030', '495x400', '300x200', '150x150', '600x400', '210x300', '494x705' ) as $size ) {
 			$dst = $dir . 'Office-Lens-20160311-153101-' . $size . '.jpg';
-			if ( file_exists( $dst ) ) {
+			$crop = array( 'file' => basename( $dst ), 'bytes' => 0, 'copied' => false );
+			if ( file_exists( $dst ) && filesize( $dst ) > 1000 ) {
+				$crop['bytes'] = (int) filesize( $dst );
+				$report['crops'][] = $crop;
 				continue;
 			}
-			if ( ! @copy( $src, $dst ) ) {
+			if ( @copy( $src, $dst ) ) {
+				$crop['copied'] = true;
+				$crop['bytes']  = file_exists( $dst ) ? (int) filesize( $dst ) : 0;
+			} else {
 				$bytes = @file_get_contents( $src );
-				if ( false === $bytes || false === @file_put_contents( $dst, $bytes ) ) {
+				if ( false !== $bytes && false !== @file_put_contents( $dst, $bytes ) ) {
+					$crop['copied'] = true;
+					$crop['bytes']  = strlen( $bytes );
+				} else {
 					$ok = false;
 				}
 			}
+			$report['crops'][] = $crop;
 		}
-		if ( $ok && file_exists( $dir . 'Office-Lens-20160311-153101-722x1030.jpg' ) ) {
-			update_option( 'cindemir_office_lens_722_v2', 1, false );
+
+		$dst_main = $dir . 'Office-Lens-20160311-153101-722x1030.jpg';
+		$report['ok'] = ( $ok && $ht_clean && file_exists( $dst_main ) && filesize( $dst_main ) > 1000 );
+		if ( $report['ok'] ) {
+			update_option( 'cindemir_office_lens_722_v4', 1, false );
+			// Clear older one-shot flags so a partial v2/v3 run cannot block retries.
+			delete_option( 'cindemir_office_lens_722_v2' );
+			delete_option( 'cindemir_office_lens_722_v3' );
+		} elseif ( $force ) {
+			delete_option( 'cindemir_office_lens_722_v4' );
+			delete_option( 'cindemir_office_lens_722_v2' );
+			delete_option( 'cindemir_office_lens_722_v3' );
 		}
+		return $report;
 	}
 
 	/** Absolute URL from option home + path + query (no WPML language injection). */
