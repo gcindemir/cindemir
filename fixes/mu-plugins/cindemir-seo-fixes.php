@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -11,6 +11,7 @@
  * HREFLANG_AFTER_STAMP_20260801
  * NO_TITLE_META_OVERRIDE_20260801
  * RU_SLUG_404_FIX_20260801
+ * CYR_REDIRECT_LOOP_FIX_20260801
  * Author: Cindemir Law Office
  */
 
@@ -141,6 +142,8 @@ final class Cindemir_SEO_Fixes {
 		'/hakan' => 'https://cindemirlaw.com/hakan/?lang=zh-hans',
 		'/contacts-2' => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 		'/fde1' => 'https://cindemirlaw.com/fde1/?lang=ru',
+		// Missing press crop (Ahrefs 404) → existing scaled original.
+		'/wp-content/uploads/2020/06/Office-Lens-20160311-153101-722x1030.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg',
 	);
 
 	/**
@@ -3824,17 +3827,19 @@ public static function homepage_hero_styles() {
 			return home_url( '/' );
 		}
 		if ( isset( self::$redirects[ $path ] ) ) {
-			return self::$redirects[ $path ];
+			$dest = self::$redirects[ $path ];
+			// Cyrillic bare pages are already 200 RU. Mapping them to ?lang=ru
+			// loops with fix_ru_slug_lang_404() which strips lang=ru again.
+			if ( is_string( $dest ) && preg_match( '/[А-Яа-яЁё]/u', $path ) && false !== strpos( $dest, 'lang=ru' ) ) {
+				return false;
+			}
+			return $dest;
 		}
 		// Already has a language query — do not re-target (Cyrillic+lang=ru is a 404).
 		if ( $query && false !== strpos( $query, 'lang=' ) ) {
 			return false;
 		}
-		$is_fde = ( 0 === strpos( $path, '/fde' ) );
-		// Cyrillic permalinks are already RU and 200 without ?lang=; appending lang=ru 404s.
-		if ( $is_fde ) {
-			return 'https://cindemirlaw.com' . user_trailingslashit( $path ) . '?lang=ru';
-		}
+		// Do not auto-append ?lang=ru to unknown /fde* paths — many 404 with lang=.
 		return false;
 	}
 
