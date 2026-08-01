@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.78 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.79 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.78
+ * Version: 1.9.79
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -176,7 +176,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.78';
+	const VERSION = '1.9.79';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = 'f0e9a33';
 
@@ -276,6 +276,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'sync_updated_team_photo' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
+		add_action( 'init', array( __CLASS__, 'ensure_uploads_slash_htaccess' ), 5 );
 		add_action( 'send_headers', array( __CLASS__, 'persist_lang_cookie' ), 0 );
 		add_action( 'wpml_loaded', array( __CLASS__, 'switch_wpml_from_cookie' ), 0 );
 		add_action( 'wpml_loaded', array( __CLASS__, 'repair_ru_posts_wpml_language' ), 5 );
@@ -2754,6 +2755,7 @@ final class Cindemir_SEO_Fixes {
 
 	/**
 	 * Ahrefs 404: static uploads linked with a trailing slash (…pdf/ …jpg/).
+	 * Apache often serves /uploads directly, so PHP never sees these — also write .htaccess.
 	 */
 	public static function strip_upload_asset_trailing_slash() {
 		if ( is_admin() ) {
@@ -2774,6 +2776,39 @@ final class Cindemir_SEO_Fixes {
 		}
 		wp_redirect( 'https://cindemirlaw.com' . $dest, 301 );
 		exit;
+	}
+
+	/** Ensure Apache 301s upload asset URLs that incorrectly end with /. */
+	public static function ensure_uploads_slash_htaccess() {
+		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+			return;
+		}
+		$dir = trailingslashit( WP_CONTENT_DIR ) . 'uploads';
+		if ( ! is_dir( $dir ) || ! is_writable( $dir ) ) {
+			return;
+		}
+		$ht   = trailingslashit( $dir ) . '.htaccess';
+		$mark = '# cindemir-upload-slash-fix';
+		$rule = $mark . "\n"
+			. "<IfModule mod_rewrite.c>\n"
+			. "RewriteEngine On\n"
+			. "RewriteRule ^(.+\\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?|css|js))/$ /$1 [R=301,L,NC]\n"
+			. "</IfModule>\n";
+		// Prefer site-root relative target for Bluehost docroot.
+		$rule = $mark . "\n"
+			. "<IfModule mod_rewrite.c>\n"
+			. "RewriteEngine On\n"
+			. "RewriteRule ^(.+\\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?|css|js))/$ /wp-content/uploads/$1 [R=301,L,NC]\n"
+			. "</IfModule>\n";
+		if ( ! file_exists( $ht ) ) {
+			@file_put_contents( $ht, $rule );
+			return;
+		}
+		$cur = (string) file_get_contents( $ht );
+		if ( false !== strpos( $cur, $mark ) ) {
+			return;
+		}
+		@file_put_contents( $ht, rtrim( $cur ) . "\n\n" . $rule );
 	}
 
 	public static function flatten_redirects() {
