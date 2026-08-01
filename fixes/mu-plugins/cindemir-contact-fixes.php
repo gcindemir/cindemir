@@ -955,7 +955,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit with RU hreflang 404 fix (1.9.77). Override via ?commit=.
-			$commit = '49708eb';
+			$commit = '98092b2';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
