@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.75 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.75
+ * Version: 1.9.76
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * Author: Cindemir Law Office
@@ -175,7 +175,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.75';
+	const VERSION = '1.9.76';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = 'cb0baca';
 
@@ -2688,7 +2688,6 @@ final class Cindemir_SEO_Fixes {
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::strip_blocked_external_images( $html );
-		$html = self::fix_hreflang_html( $html );
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
 		$html = self::rewrite_ru_article_seo( $html );
@@ -2701,6 +2700,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_menu_label_html( $html );
 		// Language switcher must point at TARGET language, not the current one.
 		$html = self::fix_language_switcher_html( $html );
+		// Hreflang AFTER lang-stamping so EN/x-default are not polluted with ?lang=ru.
+		$html = self::fix_hreflang_html( $html );
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::polish_homepage_hero_html( $html );
