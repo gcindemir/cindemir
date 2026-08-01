@@ -2,11 +2,12 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.19
+ * Version: 1.3.20
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * TELEGRAM_RU_BUTTON_20260722
  * ASSET_FIX_20260801
+ * HREFLANG_FIX_20260801
  * Author: Cindemir Law Office
  */
 
@@ -334,6 +335,7 @@ final class Cindemir_Contact_Fixes {
 		);
 		$html = str_replace( '/contacts-2/?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		$html = str_replace( '/contacts-2?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
+		$html = self::fix_hreflang_link_tags( $html );
 		$html = self::rewrite_whatsapp_numbers( $html );
 		$html = self::strip_joinchat_markup( $html );
 		$next = preg_replace_callback(
@@ -691,6 +693,50 @@ final class Cindemir_Contact_Fixes {
 	}
 
 	/** Stamp every JoinChat / wa.me telephone onto the office WhatsApp number. */
+
+	/** Ahrefs hreflang: distinct URLs per language (en/x-default clean, ru with ?lang=ru). */
+	private static function fix_hreflang_link_tags( $html ) {
+		if ( ! is_string( $html ) || false === stripos( $html, 'hreflang' ) ) {
+			return $html;
+		}
+		$next = preg_replace_callback(
+			'#<link\b[^>]*\bhreflang=(["\'])([^"\']+)\1[^>]*\bhref=(["\'])([^"\']+)\3[^>]*>#i',
+			static function ( $m ) {
+				$lang = strtolower( $m[2] );
+				$url  = html_entity_decode( $m[4], ENT_QUOTES, 'UTF-8' );
+				$url  = str_replace( array( '/contacts-2/', '/contacts-2?' ), array( '/contacts/', '/contacts?' ), $url );
+				$parts = wp_parse_url( $url );
+				$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
+				$q     = array();
+				if ( ! empty( $parts['query'] ) ) {
+					parse_str( $parts['query'], $q );
+				}
+				unset( $q['lang'] );
+				if ( 'zh' === $lang || 0 === strpos( $lang, 'zh' ) ) {
+					$lang = 'zh-hans';
+				}
+				if ( 'ru' === $lang ) {
+					$q['lang'] = 'ru';
+				} elseif ( 'zh-hans' === $lang ) {
+					$q['lang'] = 'zh-hans';
+				} elseif ( ! in_array( $lang, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) && '' !== $lang ) {
+					$q['lang'] = $lang;
+				}
+				if ( preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip)$/i', $path ) ) {
+					$new = home_url( $path );
+				} else {
+					$new = home_url( user_trailingslashit( $path ) );
+				}
+				if ( ! empty( $q ) ) {
+					$new = add_query_arg( $q, $new );
+				}
+				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_url( $new ) . '" />';
+			},
+			$html
+		);
+		return is_string( $next ) ? $next : $html;
+	}
+
 	private static function rewrite_whatsapp_numbers( $html ) {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
@@ -1018,7 +1064,7 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.69' )
+					&& ( ( false === strpos( $tmp, 'Version: 1.9.69' ) && false === strpos( $tmp, 'Version: 1.9.74' ) )
 						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
 					continue;
 				}
