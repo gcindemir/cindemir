@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 150,
+    "scheduled_posts": 135,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 60
+    "published_posts": 75
   },
   "days": [
     {
@@ -652,7 +652,7 @@
     {
       "day": 13,
       "date": "2026-07-30",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d13-1",
@@ -660,7 +660,8 @@
           "url": "https://cindemirlaw.com/form-a-document-legal-proof-of-birth-in-turkey-and-application-procedures/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — form a document legal proof of birth in turkey and application procedures.\n\nRead the full article:\nhttps://cindemirlaw.com/form-a-document-legal-proof-of-birth-in-turkey-and-application-procedures/",
           "scheduled_at": "2026-07-30T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d13-2",
@@ -668,7 +669,8 @@
           "url": "https://cindemirlaw.com/turkish-lawyer-online-consultancy/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish lawyer online consultancy.\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-lawyer-online-consultancy/",
           "scheduled_at": "2026-07-30T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d13-3",
@@ -676,7 +678,8 @@
           "url": "https://cindemirlaw.com/starting-a-company-in-turkey-a-comprehensive-guide-for-entrepreneurs/",
           "summary": "Forming a company in Türkiye as a foreigner has clear registration and compliance steps.\n\nThis guide covers the key procedures, documents and risks for foreign clients — starting a company in turkey a comprehensive guide for entrepreneurs.\n\nRead the full article:\nhttps://cindemirlaw.com/starting-a-company-in-turkey-a-comprehensive-guide-for-entrepreneurs/",
           "scheduled_at": "2026-07-30T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d13-4",
@@ -684,7 +687,8 @@
           "url": "https://cindemirlaw.com/overcoming-the-5-year-entry-ban-in-turkey-a-path-to-redemption/",
           "summary": "Deportation and removal decisions under Turkish immigration law carry strict timelines and appeal rights.\n\nThis guide covers the key procedures, documents and risks for foreign clients — overcoming the 5 year entry ban in turkey a path to redemption.\n\nRead the full article:\nhttps://cindemirlaw.com/overcoming-the-5-year-entry-ban-in-turkey-a-path-to-redemption/",
           "scheduled_at": "2026-07-30T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d13-5",
@@ -692,14 +696,15 @@
           "url": "https://cindemirlaw.com/inheritance-rights-for-divorced-spouses/",
           "summary": "Uncontested divorce in Türkiye can move faster when spouses settle custody and property in a protocol.\n\nThis guide covers the key procedures, documents and risks for foreign clients — inheritance rights for divorced spouses.\n\nRead the full article:\nhttps://cindemirlaw.com/inheritance-rights-for-divorced-spouses/",
           "scheduled_at": "2026-07-30T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         }
       ]
     },
     {
       "day": 14,
       "date": "2026-07-31",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d14-1",
@@ -707,7 +712,8 @@
           "url": "https://cindemirlaw.com/inheritance-contracts-under-turkish-civil-code/",
           "summary": "Cross-border inheritance with Turkish assets raises probate, forced-heir and documentation issues.\n\nThis guide covers the key procedures, documents and risks for foreign clients — inheritance contracts under turkish civil code.\n\nRead the full article:\nhttps://cindemirlaw.com/inheritance-contracts-under-turkish-civil-code/",
           "scheduled_at": "2026-07-31T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d14-2",
@@ -715,7 +721,8 @@
           "url": "https://cindemirlaw.com/understanding-the-role-and-responsibilities-of-a-commercial-agent/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — understanding the role and responsibilities of a commercial agent.\n\nRead the full article:\nhttps://cindemirlaw.com/understanding-the-role-and-responsibilities-of-a-commercial-agent/",
           "scheduled_at": "2026-07-31T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d14-3",
@@ -723,7 +730,8 @@
           "url": "https://cindemirlaw.com/compulsory-earthquake-insurance-in-turkey-compensation-claim/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compulsory earthquake insurance in turkey compensation claim.\n\nRead the full article:\nhttps://cindemirlaw.com/compulsory-earthquake-insurance-in-turkey-compensation-claim/",
           "scheduled_at": "2026-07-31T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d14-4",
@@ -731,7 +739,8 @@
           "url": "https://cindemirlaw.com/institutionalized-nominee-director/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — institutionalized nominee director.\n\nRead the full article:\nhttps://cindemirlaw.com/institutionalized-nominee-director/",
           "scheduled_at": "2026-07-31T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d14-5",
@@ -739,14 +748,15 @@
           "url": "https://cindemirlaw.com/nominee-directory-services-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — nominee directory services in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/nominee-directory-services-in-turkey/",
           "scheduled_at": "2026-07-31T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         }
       ]
     },
     {
       "day": 15,
       "date": "2026-08-01",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d15-1",
@@ -754,7 +764,8 @@
           "url": "https://cindemirlaw.com/unfair-competition-in-turkey-understanding-the-issues-and-finding-solutions/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — unfair competition in turkey understanding the issues and finding solutions.\n\nRead the full article:\nhttps://cindemirlaw.com/unfair-competition-in-turkey-understanding-the-issues-and-finding-solutions/",
           "scheduled_at": "2026-08-01T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d15-2",
@@ -762,7 +773,8 @@
           "url": "https://cindemirlaw.com/how-to-establish-a-limited-partnership-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — how to establish a limited partnership in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/how-to-establish-a-limited-partnership-in-turkey/",
           "scheduled_at": "2026-08-01T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d15-3",
@@ -770,7 +782,8 @@
           "url": "https://cindemirlaw.com/finding-a-nominee-director-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — finding a nominee director in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/finding-a-nominee-director-in-turkey/",
           "scheduled_at": "2026-08-01T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d15-4",
@@ -778,7 +791,8 @@
           "url": "https://cindemirlaw.com/free-trade-zone-company-in-turkey/",
           "summary": "Forming a company in Türkiye as a foreigner has clear registration and compliance steps.\n\nThis guide covers the key procedures, documents and risks for foreign clients — free trade zone company in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/free-trade-zone-company-in-turkey/",
           "scheduled_at": "2026-08-01T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         },
         {
           "id": "d15-5",
@@ -786,7 +800,8 @@
           "url": "https://cindemirlaw.com/transferring-a-tiktok-account-with-escrow/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — transferring a tiktok account with escrow.\n\nRead the full article:\nhttps://cindemirlaw.com/transferring-a-tiktok-account-with-escrow/",
           "scheduled_at": "2026-08-01T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-01T18:13:18.988191+00:00"
         }
       ]
     },
