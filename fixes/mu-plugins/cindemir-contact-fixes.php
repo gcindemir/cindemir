@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.20
+ * Version: 1.3.21
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * TELEGRAM_RU_BUTTON_20260722
@@ -694,16 +694,24 @@ final class Cindemir_Contact_Fixes {
 
 	/** Stamp every JoinChat / wa.me telephone onto the office WhatsApp number. */
 
+
 	/** Ahrefs hreflang: distinct URLs per language (en/x-default clean, ru with ?lang=ru). */
 	private static function fix_hreflang_link_tags( $html ) {
 		if ( ! is_string( $html ) || false === stripos( $html, 'hreflang' ) ) {
 			return $html;
 		}
 		$next = preg_replace_callback(
-			'#<link\b[^>]*\bhreflang=(["\'])([^"\']+)\1[^>]*\bhref=(["\'])([^"\']+)\3[^>]*>#i',
+			'#<link\b(?=[^>]*\bhreflang=)(?=[^>]*\bhref=)[^>]*>#i',
 			static function ( $m ) {
-				$lang = strtolower( $m[2] );
-				$url  = html_entity_decode( $m[4], ENT_QUOTES, 'UTF-8' );
+				$tag = $m[0];
+				if ( ! preg_match( '#\bhreflang=(["\'])([^"\']+)\1#i', $tag, $lm ) ) {
+					return $tag;
+				}
+				if ( ! preg_match( '#\bhref=(["\'])([^"\']+)\1#i', $tag, $um ) ) {
+					return $tag;
+				}
+				$lang = strtolower( $lm[2] );
+				$url  = html_entity_decode( $um[2], ENT_QUOTES, 'UTF-8' );
 				$url  = str_replace( array( '/contacts-2/', '/contacts-2?' ), array( '/contacts/', '/contacts?' ), $url );
 				$parts = wp_parse_url( $url );
 				$path  = isset( $parts['path'] ) ? $parts['path'] : '/';
