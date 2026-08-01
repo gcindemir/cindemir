@@ -979,7 +979,8 @@ final class Cindemir_SEO_Fixes {
 		}
 
 		// Map broken RU slugs (onas/kontak/…) to EN equivalents for all languages.
-		if ( isset( self::$ru_slug_to_en[ $path_key ] ) ) {
+		// array_key_exists: /pod maps to null (bare slug only).
+		if ( array_key_exists( $path_key, self::$ru_slug_to_en ) ) {
 			$en_path = self::$ru_slug_to_en[ $path_key ];
 			if ( null === $en_path ) {
 				// /pod/: RU page lives at bare slug only.
@@ -1046,7 +1047,7 @@ final class Cindemir_SEO_Fixes {
 			$path_key = '/';
 		}
 
-		if ( isset( self::$ru_slug_to_en[ $path_key ] ) ) {
+		if ( array_key_exists( $path_key, self::$ru_slug_to_en ) ) {
 			$en = self::$ru_slug_to_en[ $path_key ];
 			if ( null === $en ) {
 				return 'https://cindemirlaw.com' . user_trailingslashit( $path_key );
@@ -3763,8 +3764,8 @@ public static function homepage_hero_styles() {
 				$path = (string) ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
 				$path = rawurldecode( $path );
 				$key  = untrailingslashit( $path );
-				if ( isset( self::$ru_slug_to_en[ $key ] ) || preg_match( '/[А-Яа-яЁё]/u', $path ) ) {
-					$en = isset( self::$ru_slug_to_en[ $key ] ) ? self::$ru_slug_to_en[ $key ] : null;
+				if ( array_key_exists( $key, self::$ru_slug_to_en ) || preg_match( '/[А-Яа-яЁё]/u', $path ) ) {
+					$en = array_key_exists( $key, self::$ru_slug_to_en ) ? self::$ru_slug_to_en[ $key ] : null;
 					if ( null !== $en && 'ru' === $lang ) {
 						$stamped++;
 						return 'href=' . $m[1] . esc_attr( 'https://cindemirlaw.com' . user_trailingslashit( $en ) . '?lang=ru' ) . $m[1];
