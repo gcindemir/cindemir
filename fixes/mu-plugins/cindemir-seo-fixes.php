@@ -1074,22 +1074,23 @@ final class Cindemir_SEO_Fixes {
 		}
 		$dir = trailingslashit( WP_CONTENT_DIR ) . 'uploads/2020/06/';
 		$src = $dir . 'Office-Lens-20160311-153101-scaled.jpg';
-		$dst = $dir . 'Office-Lens-20160311-153101-722x1030.jpg';
-		if ( is_readable( $src ) && ! file_exists( $dst ) ) {
-			@copy( $src, $dst );
+		if ( ! is_readable( $src ) ) {
+			return;
 		}
-		// Belt-and-suspenders for other missing crops of the same original.
-		$ht = $dir . '.htaccess';
-		$rule = "\n# Cindemir Office-Lens crop fallback\n"
-			. "RedirectMatch 301 (?i)^/wp-content/uploads/2020/06/Office-Lens-20160311-153101-\\d+x\\d+\\.jpg$ "
-			. "/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg\n";
-		if ( is_dir( $dir ) ) {
-			$existing = is_readable( $ht ) ? (string) file_get_contents( $ht ) : '';
-			if ( false === strpos( $existing, 'Office-Lens-20160311-153101' ) ) {
-				@file_put_contents( $ht, $existing . $rule );
+		$ok = true;
+		foreach ( array( '722x1030', '300x200', '150x150', '600x400' ) as $size ) {
+			$dst = $dir . 'Office-Lens-20160311-153101-' . $size . '.jpg';
+			if ( file_exists( $dst ) ) {
+				continue;
+			}
+			if ( ! @copy( $src, $dst ) ) {
+				$bytes = @file_get_contents( $src );
+				if ( false === $bytes || false === @file_put_contents( $dst, $bytes ) ) {
+					$ok = false;
+				}
 			}
 		}
-		if ( file_exists( $dst ) || ( is_readable( $ht ) && false !== strpos( (string) file_get_contents( $ht ), 'Office-Lens-20160311-153101' ) ) ) {
+		if ( $ok && file_exists( $dir . 'Office-Lens-20160311-153101-722x1030.jpg' ) ) {
 			update_option( 'cindemir_office_lens_722_v1', 1, false );
 		}
 	}
