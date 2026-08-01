@@ -8,6 +8,7 @@
  * TELEGRAM_RU_BUTTON_20260722
  * ASSET_FIX_20260801
  * HREFLANG_FIX_20260801
+ * NO_TITLE_META_OVERRIDE_20260801
  * Author: Cindemir Law Office
  */
 
@@ -965,7 +966,7 @@ final class Cindemir_Contact_Fixes {
 		);
 	}
 
-	/** Apply reklamsız Yoast meta descriptions for 14 pages (Görev 1). */
+	/** Disabled: do not overwrite Yoast title / meta description / focus keyword / keywords. */
 	public static function apply_seo_meta( $request ) {
 		$key = $request->get_param( 'key' );
 		if ( 'seo-pack-2026' !== $key ) {
@@ -974,6 +975,15 @@ final class Cindemir_Contact_Fixes {
 		if ( $request->get_param( 'pull' ) ) {
 			return self::pull_plugins( $request );
 		}
+
+		return new WP_REST_Response(
+			array(
+				'ok'      => true,
+				'skipped' => true,
+				'reason'  => 'NO_TITLE_META_OVERRIDE_20260801',
+			),
+			200
+		);
 
 		$pages = array(
 			43   => "Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa.",
