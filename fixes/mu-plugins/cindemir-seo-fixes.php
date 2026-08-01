@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.74 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.75 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -963,16 +963,27 @@ final class Cindemir_SEO_Fixes {
 			$q['lang'] = $code;
 		}
 
-		// Avoid trailing slash on file-like paths.
-		if ( preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip)$/i', $path ) ) {
-			$new = home_url( $path );
-		} else {
-			$new = home_url( user_trailingslashit( $path ) );
+		// Build without home_url()/add_query_arg() — WPML re-injects current ?lang= on RU pages.
+		return self::build_unfiltered_url( $path, $q );
+	}
+
+	/** Absolute URL from option home + path + query (no WPML language injection). */
+	private static function build_unfiltered_url( $path, $query = array() ) {
+		$home = untrailingslashit( (string) get_option( 'home' ) );
+		if ( ! is_string( $path ) || '' === $path ) {
+			$path = '/';
 		}
-		if ( ! empty( $q ) ) {
-			$new = add_query_arg( $q, $new );
+		if ( '/' !== $path[0] ) {
+			$path = '/' . $path;
 		}
-		return $new;
+		if ( ! preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip)$/i', $path ) ) {
+			$path = user_trailingslashit( $path );
+		}
+		$url = $home . $path;
+		if ( ! empty( $query ) && is_array( $query ) ) {
+			$url .= ( false === strpos( $url, '?' ) ? '?' : '&' ) . http_build_query( $query, '', '&', PHP_QUERY_RFC3986 );
+		}
+		return $url;
 	}
 
 	/** Polylang: hide language param for default language URLs. */

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.21
+ * Version: 1.3.22
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * TELEGRAM_RU_BUTTON_20260722
@@ -730,13 +730,16 @@ final class Cindemir_Contact_Fixes {
 				} elseif ( ! in_array( $lang, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) && '' !== $lang ) {
 					$q['lang'] = $lang;
 				}
-				if ( preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip)$/i', $path ) ) {
-					$new = home_url( $path );
-				} else {
-					$new = home_url( user_trailingslashit( $path ) );
+				$home = untrailingslashit( (string) get_option( 'home' ) );
+				if ( '/' !== $path[0] ) {
+					$path = '/' . $path;
 				}
+				if ( ! preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip)$/i', $path ) ) {
+					$path = user_trailingslashit( $path );
+				}
+				$new = $home . $path;
 				if ( ! empty( $q ) ) {
-					$new = add_query_arg( $q, $new );
+					$new .= ( false === strpos( $new, '?' ) ? '?' : '&' ) . http_build_query( $q, '', '&', PHP_QUERY_RFC3986 );
 				}
 				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_url( $new ) . '" />';
 			},
@@ -1072,7 +1075,7 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( ( false === strpos( $tmp, 'Version: 1.9.69' ) && false === strpos( $tmp, 'Version: 1.9.74' ) )
+					&& ( ( false === strpos( $tmp, 'Version: 1.9.69' ) && false === strpos( $tmp, 'Version: 1.9.74' ) && false === strpos( $tmp, 'Version: 1.9.75' ) )
 						|| false === strpos( $tmp, 'SCHEMA_FIX_20260718' ) ) ) {
 					continue;
 				}
