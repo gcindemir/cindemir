@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 + CYR_REDIRECTS_REMOVED_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 + CYR_REDIRECTS_REMOVED_20260801 + REMAINING_AHREFS_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -13,6 +13,7 @@
  * NO_TITLE_META_OVERRIDE_20260801
  * RU_SLUG_404_FIX_20260801
  * CYR_REDIRECT_LOOP_FIX_20260801
+ * REMAINING_AHREFS_20260801
  * Author: Cindemir Law Office
  */
 
@@ -267,6 +268,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_deploy_routes' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
+		add_action( 'init', array( __CLASS__, 'ensure_office_lens_crop' ), 2 );
 		add_action( 'init', array( __CLASS__, 'sync_updated_team_photo' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
@@ -1007,11 +1009,11 @@ final class Cindemir_SEO_Fixes {
 
 		if ( in_array( $code, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) ) {
 			if ( $is_cyr ) {
-				// No real EN URL for Cyrillic-only posts; omit fake en, x-default = RU bare.
+				// No real EN URL for Cyrillic-only posts; omit fake en, x-default = RU+lang.
 				if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
 					return '';
 				}
-				return self::build_unfiltered_url( $path, array() );
+				return self::build_unfiltered_url( $path, array( 'lang' => 'ru' ) );
 			}
 			// Latin RU-only: bare URL 301s to ?lang=ru — omit en, x-default = ru URL.
 			if ( $ru_only_latin ) {
@@ -1022,10 +1024,7 @@ final class Cindemir_SEO_Fixes {
 			}
 			// Default language / x-default: clean URL without ?lang=.
 		} elseif ( 'ru' === $code ) {
-			// Cyrillic permalinks 404 with ?lang=ru; bare path is 200.
-			if ( ! $is_cyr ) {
-				$q['lang'] = 'ru';
-			}
+			$q['lang'] = 'ru';
 		} elseif ( 'zh-hans' === $code ) {
 			$q['lang'] = 'zh-hans';
 		} elseif ( '' !== $code ) {
@@ -1037,27 +1036,28 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * RU slug + ?lang=ru → working URL (EN+lang=ru, or bare RU-native path).
+	 * Canonicalize WPML RU translation slugs to working EN+?lang=ru URLs.
+	 * Also fixes /onas/?lang=ru 404s and missing self-hreflang on bare /onas/.
 	 *
 	 * @param string $path Normalized path (may be decoded).
 	 * @param string $query Raw query string.
 	 * @return string|false Absolute redirect target or false.
 	 */
 	private static function fix_ru_slug_lang_404( $path, $query ) {
-		if ( ! is_string( $query ) || false === strpos( $query, 'lang=ru' ) ) {
-			return false;
-		}
-		$path = rawurldecode( (string) $path );
+		$path     = rawurldecode( (string) $path );
 		$path_key = untrailingslashit( $path );
 		if ( '' === $path_key ) {
 			$path_key = '/';
 		}
+		$has_ru = is_string( $query ) && false !== strpos( $query, 'lang=ru' );
 
 		if ( array_key_exists( $path_key, self::$ru_slug_to_en ) ) {
 			$en = self::$ru_slug_to_en[ $path_key ];
 			if ( null === $en ) {
-				return 'https://cindemirlaw.com' . user_trailingslashit( $path_key );
+				// /pod/: bare slug is the working RU URL; ?lang=ru 404s.
+				return $has_ru ? ( 'https://cindemirlaw.com' . user_trailingslashit( $path_key ) ) : false;
 			}
+			// /onas/, /kontak/, … → /about-us/?lang=ru (with or without ?lang= on the RU slug).
 			return 'https://cindemirlaw.com' . user_trailingslashit( $en ) . '?lang=ru';
 		}
 
@@ -1065,6 +1065,33 @@ final class Cindemir_SEO_Fixes {
 		// 301 bare Cyrillic → ?lang=ru; stripping creates a redirect loop.
 
 		return false;
+	}
+
+	/** Materialize missing press crop so Apache 404s become 200 (HTML rewrite alone is not enough). */
+	public static function ensure_office_lens_crop() {
+		if ( get_option( 'cindemir_office_lens_722_v1' ) ) {
+			return;
+		}
+		$dir = trailingslashit( WP_CONTENT_DIR ) . 'uploads/2020/06/';
+		$src = $dir . 'Office-Lens-20160311-153101-scaled.jpg';
+		$dst = $dir . 'Office-Lens-20160311-153101-722x1030.jpg';
+		if ( is_readable( $src ) && ! file_exists( $dst ) ) {
+			@copy( $src, $dst );
+		}
+		// Belt-and-suspenders for other missing crops of the same original.
+		$ht = $dir . '.htaccess';
+		$rule = "\n# Cindemir Office-Lens crop fallback\n"
+			. "RedirectMatch 301 (?i)^/wp-content/uploads/2020/06/Office-Lens-20160311-153101-\\d+x\\d+\\.jpg$ "
+			. "/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg\n";
+		if ( is_dir( $dir ) ) {
+			$existing = is_readable( $ht ) ? (string) file_get_contents( $ht ) : '';
+			if ( false === strpos( $existing, 'Office-Lens-20160311-153101' ) ) {
+				@file_put_contents( $ht, $existing . $rule );
+			}
+		}
+		if ( file_exists( $dst ) || ( is_readable( $ht ) && false !== strpos( (string) file_get_contents( $ht ), 'Office-Lens-20160311-153101' ) ) ) {
+			update_option( 'cindemir_office_lens_722_v1', 1, false );
+		}
 	}
 
 	/** Absolute URL from option home + path + query (no WPML language injection). */
