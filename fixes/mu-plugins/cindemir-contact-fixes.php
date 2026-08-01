@@ -2,10 +2,11 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.18
+ * Version: 1.3.19
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * TELEGRAM_RU_BUTTON_20260722
+ * ASSET_FIX_20260801
  * Author: Cindemir Law Office
  */
 
@@ -312,6 +313,12 @@ final class Cindemir_Contact_Fixes {
 			'#((?:href|src)=(["\']))(?:https?://(?:www\.)?cindemirlaw\.com)?/(?:russian|chinese)/wp-content/#i' => '$1$2/wp-content/',
 			'#((?:href|src|data-lazy-src)=(["\']))(?:https?:)?//d\.barobirlik\.org\.tr/amblem/tbb_amblem_60\.png\2#i' => '$1' . esc_url( get_option( 'cindemir_tbb_badge_local', 'https://cindemirlaw.com/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg' ) ) . '$2',
 			'#<link\b[^>]*\bhreflang=(["\'])[^"\']+\1[^>]*\bhref=(["\'])[^"\']*contacts-2[^"\']*\2[^>]*>#i' => '',
+			// Ahrefs Error: press/ used missing Office-Lens crops; only -scaled.jpg exists on disk.
+			'#https?://(?:www\.)?cindemirlaw\.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101(?:-\d+x\d+)?\.jpg#i' => 'https://cindemirlaw.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg',
+			'#(/wp-content/uploads/2020/06/Office-Lens-20160311-153101)(?:-\d+x\d+)?\.jpg#i' => '$1-scaled.jpg',
+			// Ahrefs Error: PDF links with trailing slash 404; file without slash is 200.
+			'#(https?://(?:www\.)?cindemirlaw\.com/wp-content/uploads/[^"\'\s>]+?\.pdf)/(\?|#|"|\'|\s|>|$)#i' => '$1$2',
+			'#(/(?:wp-content/uploads/[^"\'\s>]+?\.pdf))/(\?|#|"|\'|\s|>|$)#i' => '$1$2',
 		);
 		foreach ( $replacements as $pattern => $replace ) {
 			$next = preg_replace( $pattern, $replace, $html );
@@ -319,6 +326,12 @@ final class Cindemir_Contact_Fixes {
 				$html = $next;
 			}
 		}
+		// Avoid rewriting the good scaled URL into scaled-scaled.
+		$html = str_replace(
+			'Office-Lens-20160311-153101-scaled-scaled.jpg',
+			'Office-Lens-20160311-153101-scaled.jpg',
+			$html
+		);
 		$html = str_replace( '/contacts-2/?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		$html = str_replace( '/contacts-2?lang=zh-hans', '/contacts/?lang=zh-hans', $html );
 		$html = self::rewrite_whatsapp_numbers( $html );
