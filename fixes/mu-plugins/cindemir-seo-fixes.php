@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.79 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.80 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.79
+ * Version: 1.9.80
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -176,7 +176,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.79';
+	const VERSION = '1.9.80';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '12d50b8';
 
@@ -2846,7 +2846,13 @@ final class Cindemir_SEO_Fixes {
 			return $html;
 		}
 		$html = self::rewrite_hrefs_in_html( $html );
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
 		$html = self::strip_upload_trailing_slash_hrefs( $html );
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
 		$html = self::fix_header_logo_html( $html );
 		$html = self::inject_header_brand_html( $html );
 		$html = self::ensure_missing_h1_html( $html );
@@ -4077,11 +4083,13 @@ public static function homepage_hero_styles() {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		return preg_replace(
-			'#(/wp-content/uploads/[^"\']+\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?))(?=/)(["\'\?#])#i',
+		// Bounded quantifier — unbounded [^"']+ on large HTML can PCRE-fail and blank the page.
+		$out = preg_replace(
+			'#(/wp-content/uploads/[^\s"\']{1,300}\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?))/(["\'])#i',
 			'$1$2',
 			$html
 		);
+		return is_string( $out ) ? $out : $html;
 	}
 
 	private static function rewrite_hrefs_in_html( $html ) {
