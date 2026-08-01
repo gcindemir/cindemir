@@ -956,7 +956,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit with Ahrefs Aug 2026 fixes (1.9.79). Override via ?commit=.
-			$commit = 'f0e9a33';
+			$commit = '12d50b8';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
