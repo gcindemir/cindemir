@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -8,6 +8,7 @@
  * Version: 1.9.69
  * SERVICES_BLANK_FIX_20260715
  * HREFLANG_FIX_20260801
+ * HREFLANG_AFTER_STAMP_20260801
  * Author: Cindemir Law Office
  */
 
@@ -2364,7 +2365,6 @@ final class Cindemir_SEO_Fixes {
 		$html = self::ensure_missing_h1_html( $html );
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::strip_blocked_external_images( $html );
-		$html = self::fix_hreflang_html( $html );
 		$html = self::fix_canonical_html( $html );
 		$html = self::shorten_title_tag( $html );
 		$html = self::rewrite_ru_article_seo( $html );
@@ -2381,6 +2381,8 @@ final class Cindemir_SEO_Fixes {
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
+		// AFTER stamp_lang: that pass otherwise paints ?lang=ru onto en/x-default hreflang hrefs.
+		$html = self::fix_hreflang_html( $html );
 		return $html;
 	}
 
@@ -3630,6 +3632,20 @@ public static function homepage_hero_styles() {
 		if ( ! $lang || in_array( $lang, array( 'en', 'en-us', 'en_us' ), true ) ) {
 			return $html;
 		}
+		// Protect alternate/hreflang link tags — stamping would collapse en + ru to the same URL.
+		$hreflang_slots = array();
+		$html             = preg_replace_callback(
+			'#<link\b[^>]*\bhreflang=[^>]*>#i',
+			static function ( $m ) use ( &$hreflang_slots ) {
+				$key                    = '<!--CINDEMIR_HREFLANG_' . count( $hreflang_slots ) . '-->';
+				$hreflang_slots[ $key ] = $m[0];
+				return $key;
+			},
+			$html
+		);
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
 		$stamped = 0;
 		$out     = preg_replace_callback(
 			'#\bhref=(["\'])(https?://(?:www\.)?cindemirlaw\.com(?:/[^"\']*)?|/[^"\']+)\1#i',
@@ -3649,6 +3665,9 @@ public static function homepage_hero_styles() {
 			},
 			$html
 		);
+		if ( is_string( $out ) && $hreflang_slots ) {
+			$out = str_replace( array_keys( $hreflang_slots ), array_values( $hreflang_slots ), $out );
+		}
 		if ( null === $out ) {
 			return $html;
 		}
