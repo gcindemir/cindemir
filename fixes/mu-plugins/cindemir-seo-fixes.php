@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -9,6 +9,7 @@
  * SERVICES_BLANK_FIX_20260715
  * HREFLANG_FIX_20260801
  * HREFLANG_AFTER_STAMP_20260801
+ * NO_TITLE_META_OVERRIDE_20260801
  * Author: Cindemir Law Office
  */
 
@@ -323,16 +324,10 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
 		add_filter( 'wpseo_sitemap_entry', array( __CLASS__, 'filter_sitemap_entry' ), 10, 3 );
-		add_filter( 'wpseo_metadesc', array( __CLASS__, 'filter_page_metadesc' ), 20 );
-		add_filter( 'wpseo_title', array( __CLASS__, 'filter_page_title' ), 20 );
-		add_filter( 'wpseo_opengraph_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
-		add_filter( 'wpseo_opengraph_desc', array( __CLASS__, 'filter_page_og_desc' ), 20 );
-		add_filter( 'wpseo_twitter_title', array( __CLASS__, 'filter_page_og_title' ), 20 );
-		add_filter( 'wpseo_twitter_description', array( __CLASS__, 'filter_page_og_desc' ), 20 );
+		// Do not override Yoast title / meta description / focus keyword / keywords (or OG/Twitter copies).
 		add_filter( 'robots_txt', array( __CLASS__, 'filter_robots_txt' ), 99, 2 );
 		add_action( 'init', array( __CLASS__, 'maybe_rewrite_static_robots' ), 23 );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'exclude_utility_from_sitemap' ), 10 );
-		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 22 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
 		add_filter( 'get_canonical_url', array( __CLASS__, 'filter_canonical_url' ), 20 );
 		add_filter( 'wpml_hreflangs', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
@@ -2366,11 +2361,9 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fill_empty_alts_html( $html );
 		$html = self::strip_blocked_external_images( $html );
 		$html = self::fix_canonical_html( $html );
-		$html = self::shorten_title_tag( $html );
+		// Title / meta description left to Yoast — no shorten/override/OG sync from maps.
 		$html = self::rewrite_ru_article_seo( $html );
 		$html = self::rewrite_jsonld_html( $html );
-		$html = self::apply_title_overrides_html( $html );
-		$html = self::fix_og_tags_html( $html );
 		$html = self::normalize_robots_meta( $html );
 		// Final pass after other rewriters — keep menu/site links on active lang.
 		$html = self::stamp_lang_on_internal_hrefs( $html );
@@ -3665,11 +3658,13 @@ public static function homepage_hero_styles() {
 			},
 			$html
 		);
-		if ( is_string( $out ) && $hreflang_slots ) {
-			$out = str_replace( array_keys( $hreflang_slots ), array_values( $hreflang_slots ), $out );
-		}
 		if ( null === $out ) {
-			return $html;
+			return $hreflang_slots
+				? str_replace( array_keys( $hreflang_slots ), array_values( $hreflang_slots ), $html )
+				: $html;
+		}
+		if ( $hreflang_slots ) {
+			$out = str_replace( array_keys( $hreflang_slots ), array_values( $hreflang_slots ), $out );
 		}
 		if ( $stamped > 0 && false === strpos( $out, 'cindemir-lang-stamp' ) ) {
 			$out = preg_replace(
