@@ -3735,10 +3735,17 @@ public static function homepage_hero_styles() {
 
 	private static function fix_hreflang_html( $html ) {
 		return preg_replace_callback(
-			'#<link\b[^>]*\bhreflang=(["\'])([^"\']+)\1[^>]*\bhref=(["\'])([^"\']+)\3[^>]*>#i',
+			'#<link\b(?=[^>]*\bhreflang=)(?=[^>]*\bhref=)[^>]*>#i',
 			static function ( $m ) {
-				$lang = strtolower( $m[2] );
-				$url  = self::normalize_hreflang_url( $m[4], $lang );
+				$tag = $m[0];
+				if ( ! preg_match( '#\bhreflang=(["\'])([^"\']+)\1#i', $tag, $lm ) ) {
+					return $tag;
+				}
+				if ( ! preg_match( '#\bhref=(["\'])([^"\']+)\1#i', $tag, $um ) ) {
+					return $tag;
+				}
+				$lang = strtolower( $lm[2] );
+				$url  = self::normalize_hreflang_url( $um[2], $lang );
 				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_url( $url ) . '" />';
 			},
 			$html
