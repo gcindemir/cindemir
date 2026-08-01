@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.76 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + HREFLANG_FIX_20260801 + HREFLANG_AFTER_STAMP_20260801 + NO_TITLE_META_OVERRIDE_20260801 + RU_SLUG_404_FIX_20260801 + CYR_REDIRECT_LOOP_FIX_20260801 + CYR_REDIRECTS_REMOVED_20260801 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -1061,10 +1061,8 @@ final class Cindemir_SEO_Fixes {
 			return 'https://cindemirlaw.com' . user_trailingslashit( $en ) . '?lang=ru';
 		}
 
-		// Cyrillic (and mixed) RU permalinks: strip ?lang=ru.
-		if ( preg_match( '/[А-Яа-яЁё]/u', $path_key ) ) {
-			return 'https://cindemirlaw.com' . user_trailingslashit( $path_key );
-		}
+		// Do NOT strip ?lang=ru from Cyrillic paths here — WPML (or others) may
+		// 301 bare Cyrillic → ?lang=ru; stripping creates a redirect loop.
 
 		return false;
 	}
