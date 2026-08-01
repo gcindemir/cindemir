@@ -178,7 +178,7 @@ final class Cindemir_SEO_Fixes {
 
 	const VERSION = '1.9.79';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = 'f0e9a33';
+	const DEPLOY_COMMIT = '12d50b8';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
@@ -2789,12 +2789,6 @@ final class Cindemir_SEO_Fixes {
 		}
 		$ht   = trailingslashit( $dir ) . '.htaccess';
 		$mark = '# cindemir-upload-slash-fix';
-		$rule = $mark . "\n"
-			. "<IfModule mod_rewrite.c>\n"
-			. "RewriteEngine On\n"
-			. "RewriteRule ^(.+\\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?|css|js))/$ /$1 [R=301,L,NC]\n"
-			. "</IfModule>\n";
-		// Prefer site-root relative target for Bluehost docroot.
 		$rule = $mark . "\n"
 			. "<IfModule mod_rewrite.c>\n"
 			. "RewriteEngine On\n"
