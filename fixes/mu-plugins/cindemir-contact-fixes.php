@@ -316,9 +316,9 @@ final class Cindemir_Contact_Fixes {
 			// Ahrefs Error: press/ used missing Office-Lens crops; only -scaled.jpg exists on disk.
 			'#https?://(?:www\.)?cindemirlaw\.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101(?:-\d+x\d+)?\.jpg#i' => 'https://cindemirlaw.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg',
 			'#(/wp-content/uploads/2020/06/Office-Lens-20160311-153101)(?:-\d+x\d+)?\.jpg#i' => '$1-scaled.jpg',
-			// Ahrefs Error: PDF links with trailing slash 404; file without slash is 200.
-			'#(https?://(?:www\.)?cindemirlaw\.com/wp-content/uploads/[^"\'\s>]+?\.pdf)/(\?|#|"|\'|\s|>|$)#i' => '$1$2',
-			'#(/(?:wp-content/uploads/[^"\'\s>]+?\.pdf))/(\?|#|"|\'|\s|>|$)#i' => '$1$2',
+			// Ahrefs Error: PDF links with trailing slash (often + ?lang=) 404; file without slash is 200.
+			'#(https?://(?:www\.)?cindemirlaw\.com/wp-content/uploads/[^"\'\s>]+?\.pdf)/(?:\?[^"\'\s>]*)?(?=["\'\s>]|$)#i' => '$1',
+			'#(/(?:wp-content/uploads/[^"\'\s>]+?\.pdf))/(?:\?[^"\'\s>]*)?(?=["\'\s>]|$)#i' => '$1',
 		);
 		foreach ( $replacements as $pattern => $replace ) {
 			$next = preg_replace( $pattern, $replace, $html );
@@ -340,6 +340,10 @@ final class Cindemir_Contact_Fixes {
 			'#(\shref=(["\']))(https?://(?:www\.)?cindemirlaw\.com)(/[^"\']*?)(\?[^"\']*lang=[^"\']*)(\2)#i',
 			function ( $m ) {
 				$path = isset( $m[4] ) ? rawurldecode( $m[4] ) : '';
+				// Never force a trailing slash onto real files (Ahrefs: .pdf/ → 404).
+				if ( $path && preg_match( '/\.(?:pdf|jpe?g|png|gif|webp|svg|zip|docx?|xlsx?|pptx?)$/i', $path ) ) {
+					return $m[1] . $m[3] . $path . $m[6];
+				}
 				if ( $path && ! preg_match( '/[А-Яа-яЁё]/u', $path ) && ! preg_match( '#^/fde#i', $path ) ) {
 					return $m[1] . $m[3] . user_trailingslashit( $path ) . $m[6];
 				}
