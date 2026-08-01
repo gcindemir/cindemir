@@ -3757,7 +3757,7 @@ public static function homepage_hero_styles() {
 				}
 				$lang = strtolower( $lm[2] );
 				$url  = self::normalize_hreflang_url( $um[2], $lang );
-				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_url( $url ) . '" />';
+				return '<link rel="alternate" hreflang="' . esc_attr( $lang ) . '" href="' . esc_attr( $url ) . '" />';
 			},
 			$html
 		);
