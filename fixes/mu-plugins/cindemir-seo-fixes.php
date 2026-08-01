@@ -142,8 +142,8 @@ final class Cindemir_SEO_Fixes {
 		'/hakan' => 'https://cindemirlaw.com/hakan/?lang=zh-hans',
 		'/contacts-2' => 'https://cindemirlaw.com/contacts/?lang=zh-hans',
 		'/fde1' => 'https://cindemirlaw.com/fde1/?lang=ru',
-		// Missing press crop (Ahrefs 404) → existing scaled original.
-		'/wp-content/uploads/2020/06/Office-Lens-20160311-153101-722x1030.jpg' => 'https://cindemirlaw.com/wp-content/uploads/2020/06/Office-Lens-20160311-153101-scaled.jpg',
+		// Dead WPML hash (Ahrefs 404) → RU home.
+		'/fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdd0fde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bfdbefde1068e3bda46a37dd24126f9ec4b09df0c999365011ec71028e1a7d4c45bf' => 'https://cindemirlaw.com/?lang=ru',
 	);
 
 	/**
@@ -159,6 +159,25 @@ final class Cindemir_SEO_Fixes {
 		'/stati'        => '/articles',
 		'/nashiyurist'  => '/services',
 		'/pod'          => null, // RU-only slug; bare /pod/ is 200, /pod/?lang=ru is 404.
+	);
+
+	/**
+	 * Latin slugs that are RU-only (bare URL 301 → ?lang=ru). No real EN page.
+	 * Hreflang: omit en; x-default + ru use ?lang=ru.
+	 *
+	 * @var string[]
+	 */
+	private static $ru_only_latin = array(
+		'/proisshestvie-v-lifte-otelya-turtsii',
+		'/yuridicheskaya-sila-smart-kontraktov-v-turtsii',
+		'/dokazatelstva-posle-proisshestviya-v-otele-turtsii',
+		'/otel-turoperator-strahovshchik-proisshestvie-turtsiya',
+		'/otravlenie-v-otele-turtsii-chto-delat',
+		'/padenie-v-otele-turtsii-chto-delat',
+		'/padenie-s-balkona-otelya-v-turtsii-chto-delat',
+		'/pravovoy-status-dao-v-turtsii',
+		'/hotel-elevator-accident-turkey-what-to-do',
+		'/iski-po-neschastnym-sluchayam-v-otelyakh-turtsii',
 	);
 
 	private static $url_replace = array(
@@ -999,6 +1018,14 @@ final class Cindemir_SEO_Fixes {
 
 		$is_cyr = (bool) preg_match( '/[А-Яа-яЁё]/u', $path );
 
+		$ru_only_latin = in_array( $path_key, self::$ru_only_latin, true );
+		if ( ! $ru_only_latin && isset( self::$redirects[ $path_key ] ) ) {
+			$rd = self::$redirects[ $path_key ];
+			if ( is_string( $rd ) && false !== strpos( $rd, 'lang=ru' ) && ! preg_match( '/[А-Яа-яЁё]/u', $path_key ) ) {
+				$ru_only_latin = true;
+			}
+		}
+
 		if ( in_array( $code, array( 'en', 'en-us', 'en_us', 'x-default' ), true ) ) {
 			if ( $is_cyr ) {
 				// No real EN URL for Cyrillic-only posts; omit fake en, x-default = RU bare.
@@ -1007,15 +1034,12 @@ final class Cindemir_SEO_Fixes {
 				}
 				return self::build_unfiltered_url( $path, array() );
 			}
-			// If this Latin path is forced to ?lang=ru via $redirects, bare URL 301s — omit en, x-default=ru.
-			if ( isset( self::$redirects[ $path_key ] ) ) {
-				$dest = self::$redirects[ $path_key ];
-				if ( is_string( $dest ) && false !== strpos( $dest, 'lang=ru' ) ) {
-					if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
-						return '';
-					}
-					return self::build_unfiltered_url( $path, array( 'lang' => 'ru' ) );
+			// Latin RU-only: bare URL 301s to ?lang=ru — omit en, x-default = ru URL.
+			if ( $ru_only_latin ) {
+				if ( in_array( $code, array( 'en', 'en-us', 'en_us' ), true ) ) {
+					return '';
 				}
+				return self::build_unfiltered_url( $path, array( 'lang' => 'ru' ) );
 			}
 			// Default language / x-default: clean URL without ?lang=.
 		} elseif ( 'ru' === $code ) {
