@@ -1,0 +1,16 @@
+# Copy to ~/.ssh/config (Mac/Linux):
+#   mkdir -p ~/.ssh && chmod 700 ~/.ssh
+#   cat fixes/ssh-config.example >> ~/.ssh/config
+#   chmod 600 ~/.ssh/config
+#
+# Then connect with:
+#   ssh cindemirlaw
+
+Host cindemirlaw
+  HostName 162.241.252.122
+  User cindemir
+  Port 22
+  IdentityFile ~/.ssh/cindemirlaw_deploy
+  IdentitiesOnly yes
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
