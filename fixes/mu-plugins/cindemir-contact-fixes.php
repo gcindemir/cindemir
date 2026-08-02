@@ -2,12 +2,13 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.17
+ * Version: 1.3.18
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * BACKUP_WP_CRON_20260719
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
+ * GA4_G_NLWQ6XLHDF_20260802
  * Author: Cindemir Law Office
  */
 
@@ -955,8 +956,8 @@ final class Cindemir_Contact_Fixes {
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
-			// Known-good commit with Ahrefs Aug 2026 fixes (1.9.80). Override via ?commit=.
-			$commit = '2de22fd';
+			// Known-good commit with GA4 restore (1.9.81). Override via ?commit=.
+			$commit = 'REPLACE_AFTER_COMMIT';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
@@ -985,7 +986,7 @@ final class Cindemir_Contact_Fixes {
 					array(
 						'timeout' => 90,
 						'headers' => array(
-							'User-Agent'    => 'CindemirPull/1.3.17',
+							'User-Agent'    => 'CindemirPull/1.3.18',
 							'Cache-Control' => 'no-cache',
 							'Pragma'        => 'no-cache',
 						),
@@ -1002,7 +1003,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.80' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.81' )
+						|| false === strpos( $tmp, 'GA4_G_NLWQ6XLHDF_20260802' )
 						|| false === strpos( $tmp, 'AHREFS_AUG2026' ) ) ) {
 					continue;
 				}
