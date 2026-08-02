@@ -962,7 +962,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit with GA4 Rocket undelay (1.9.83). Override via ?commit=.
-			$commit = 'REPLACE_AFTER_COMMIT';
+			$commit = '2bbc4db';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
