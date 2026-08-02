@@ -1,13 +1,14 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.81 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + GA4_G_NLWQ6XLHDF_20260802 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.82 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + GA4_G_NLWQ6XLHDF_20260802 + GA4_ROCKET_UNDELAY_20260802 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.81
+ * Version: 1.9.82
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
  * GA4_G_NLWQ6XLHDF_20260802
+ * GA4_ROCKET_UNDELAY_20260802
  * Author: Cindemir Law Office
  */
 
@@ -177,9 +178,9 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.81';
+	const VERSION = '1.9.82';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = 'b496558';
+	const DEPLOY_COMMIT = 'REPLACE_AFTER_COMMIT';
 
 	/** Google Analytics 4 measurement ID (Site Kit / gtag). */
 	const GA4_MEASUREMENT_ID = 'G-NLWQ6XLHDF';
@@ -346,6 +347,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_exclude_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
+		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
+		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -1818,11 +1821,85 @@ final class Cindemir_SEO_Fixes {
 		$id = self::GA4_MEASUREMENT_ID;
 		// data-nowprocket / nowprocket: WP Rocket Delay JS must not defer the tag.
 		echo "\n<!-- Google tag (gtag.js) " . esc_html( $id ) . " -->\n"
-			. '<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_attr( $id ) . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1"></script>' . "\n"
-			. '<script id="cindemir-ga4" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1">'
+			. '<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_attr( $id ) . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"></script>' . "\n"
+			. '<script id="cindemir-ga4" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false">'
 			. 'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
 			. 'gtag("js",new Date());gtag("config",' . wp_json_encode( $id ) . ');'
 			. '</script>' . "\n";
+	}
+
+	/**
+	 * Undo WP Rocket Delay/LazyLoad JS on the GA4 tag so collection is not gated on user interaction.
+	 * Rocket rewrites our head scripts to data-rocketlazyloadscript even with data-nowprocket when
+	 * the cache-busting local copy no longer matches exclusion URL patterns.
+	 *
+	 * @param string $html HTML buffer.
+	 * @return string
+	 */
+	public static function undelay_ga4_scripts( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$id = self::GA4_MEASUREMENT_ID;
+
+		// Restore inline config script (#cindemir-ga4).
+		$next = preg_replace_callback(
+			'#<script\b([^>]*\bid=(["\'])cindemir-ga4\2[^>]*)>(.*?)</script>#is',
+			static function ( $m ) use ( $id ) {
+				$attrs = $m[1];
+				$inner = $m[3];
+				if ( preg_match( '/data-rocketlazyloadscript=(["\'])data:text\/javascript;base64,([A-Za-z0-9+\/=]+)\1/i', $attrs, $bm ) ) {
+					$decoded = base64_decode( $bm[2], true );
+					if ( is_string( $decoded ) && false !== strpos( $decoded, $id ) ) {
+						$inner = $decoded;
+					}
+				}
+				if ( false === strpos( (string) $inner, $id ) ) {
+					$inner = 'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
+						. 'gtag("js",new Date());gtag("config",' . wp_json_encode( $id ) . ');';
+				}
+				$attrs = preg_replace( '/\sdata-rocketlazyloadscript=(["\']).*?\1/i', '', $attrs );
+				$attrs = preg_replace( '/\stype=(["\'])rocketlazyloadscript\1/i', '', $attrs );
+				if ( ! is_string( $attrs ) ) {
+					$attrs = ' id="cindemir-ga4" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"';
+				} elseif ( false === strpos( $attrs, 'data-nowprocket' ) ) {
+					$attrs .= ' data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"';
+				}
+				return '<script' . $attrs . '>' . $inner . '</script>';
+			},
+			$html
+		);
+		if ( is_string( $next ) ) {
+			$html = $next;
+		}
+
+		// Re-emit a clean async gtag.js loader right after our marker comment.
+		$loader = '<!-- Google tag (gtag.js) ' . $id . " -->\n"
+			. '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $id . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"></script>';
+		$next   = preg_replace(
+			'#<!-- Google tag \(gtag\.js\) ' . preg_quote( $id, '#' ) . ' -->\s*<script\b[^>]*>\s*</script>#i',
+			$loader,
+			$html,
+			1
+		);
+		if ( is_string( $next ) ) {
+			$html = $next;
+		}
+
+		// Any remaining rocket-lazy gtag/js?id=G-… → normal async script.
+		$next = preg_replace_callback(
+			'#<script\b([^>]*data-rocketlazyloadscript=(["\'])([^"\']*gtag/js\?id=G-[^"\']*)\2[^>]*)>\s*</script>#i',
+			static function ( $m ) {
+				$src = html_entity_decode( $m[3], ENT_QUOTES, 'UTF-8' );
+				return '<script async src="' . esc_url( $src ) . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"></script>';
+			},
+			$html
+		);
+		if ( is_string( $next ) ) {
+			$html = $next;
+		}
+
+		return $html;
 	}
 
 	/** Drop unused Google Identity Services / Ads / old GTM — keep Site Kit GA4. */
