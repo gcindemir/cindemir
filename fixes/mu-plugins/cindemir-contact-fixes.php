@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.19
+ * Version: 1.3.20
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * BACKUP_WP_CRON_20260719
@@ -961,8 +961,8 @@ final class Cindemir_Contact_Fixes {
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
-			// Known-good commit with GA4 Rocket undelay (1.9.82). Override via ?commit=.
-			$commit = 'dd8a2c4';
+			// Known-good commit with GA4 Rocket undelay (1.9.83). Override via ?commit=.
+			$commit = 'REPLACE_AFTER_COMMIT';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
@@ -991,7 +991,7 @@ final class Cindemir_Contact_Fixes {
 					array(
 						'timeout' => 90,
 						'headers' => array(
-							'User-Agent'    => 'CindemirPull/1.3.19',
+							'User-Agent'    => 'CindemirPull/1.3.20',
 							'Cache-Control' => 'no-cache',
 							'Pragma'        => 'no-cache',
 						),
@@ -1008,7 +1008,7 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.82' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.83' )
 						|| false === strpos( $tmp, 'GA4_ROCKET_UNDELAY_20260802' )
 						|| false === strpos( $tmp, 'GA4_G_NLWQ6XLHDF_20260802' )
 						|| false === strpos( $tmp, 'AHREFS_AUG2026' ) ) ) {
