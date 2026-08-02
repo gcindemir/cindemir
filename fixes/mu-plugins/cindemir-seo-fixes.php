@@ -1860,6 +1860,10 @@ final class Cindemir_SEO_Fixes {
 				}
 				$attrs = preg_replace( '/\sdata-rocketlazyloadscript=(["\']).*?\1/i', '', $attrs );
 				$attrs = preg_replace( '/\stype=(["\'])rocketlazyloadscript\1/i', '', $attrs );
+				// Debloat/Rocket may move inline body into defer src="data:text/javascript;base64,…".
+				$attrs = preg_replace( '/\ssrc=(["\'])data:text\/javascript;base64,[A-Za-z0-9+\/=]+\1/i', '', $attrs );
+				$attrs = preg_replace( '/\sdefer\b/i', '', $attrs );
+				$attrs = preg_replace( '/\sasync\b/i', '', $attrs );
 				if ( ! is_string( $attrs ) ) {
 					$attrs = ' id="cindemir-ga4" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"';
 				} elseif ( false === strpos( $attrs, 'data-nowprocket' ) ) {
