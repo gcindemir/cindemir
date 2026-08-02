@@ -1,12 +1,13 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.80 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.81 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + GA4_G_NLWQ6XLHDF_20260802 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.80
+ * Version: 1.9.81
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
+ * GA4_G_NLWQ6XLHDF_20260802
  * Author: Cindemir Law Office
  */
 
@@ -176,9 +177,12 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.80';
+	const VERSION = '1.9.81';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = '2de22fd';
+	const DEPLOY_COMMIT = 'REPLACE_AFTER_COMMIT';
+
+	/** Google Analytics 4 measurement ID (Site Kit / gtag). */
+	const GA4_MEASUREMENT_ID = 'G-NLWQ6XLHDF';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
@@ -307,6 +311,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'wp_head', array( __CLASS__, 'homepage_hero_styles' ), 51 );
 		add_action( 'wp_head', array( __CLASS__, 'team_photo_background_fix' ), 52 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_head_hints' ), 1 );
+		add_action( 'wp_head', array( __CLASS__, 'inject_ga4_tag' ), 2 );
 		add_action( 'wp_head', array( __CLASS__, 'pagespeed_a11y_styles' ), 52 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'pagespeed_dequeue_heavy' ), 100 );
 		add_filter( 'script_loader_tag', array( __CLASS__, 'pagespeed_filter_script_tag' ), 20, 3 );
@@ -1802,7 +1807,25 @@ final class Cindemir_SEO_Fixes {
 			. '</style>' . "\n";
 	}
 
-	/** Drop unused Google Identity Services on the public front-end (~98KB + console errors). */
+	/**
+	 * Print GA4 gtag early. PageSpeed cleanup previously stripped Site Kit / google_gtagjs
+	 * and killed Analytics collection for G-NLWQ6XLHDF.
+	 */
+	public static function inject_ga4_tag() {
+		if ( is_admin() ) {
+			return;
+		}
+		$id = self::GA4_MEASUREMENT_ID;
+		// data-nowprocket / nowprocket: WP Rocket Delay JS must not defer the tag.
+		echo "\n<!-- Google tag (gtag.js) " . esc_html( $id ) . " -->\n"
+			. '<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_attr( $id ) . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1"></script>' . "\n"
+			. '<script id="cindemir-ga4" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1">'
+			. 'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
+			. 'gtag("js",new Date());gtag("config",' . wp_json_encode( $id ) . ');'
+			. '</script>' . "\n";
+	}
+
+	/** Drop unused Google Identity Services / Ads / old GTM — keep Site Kit GA4. */
 	public static function pagespeed_dequeue_heavy() {
 		if ( is_admin() ) {
 			return;
@@ -1814,6 +1837,13 @@ final class Cindemir_SEO_Fixes {
 		foreach ( (array) $wp_scripts->registered as $handle => $obj ) {
 			$src = isset( $obj->src ) ? (string) $obj->src : '';
 			$hay = $src . '|' . (string) $handle;
+			// Never strip our GA4 measurement ID / Site Kit analytics.
+			if ( false !== strpos( $hay, self::GA4_MEASUREMENT_ID )
+				|| false !== strpos( $hay, 'googlesitekit-gtag' )
+				|| false !== strpos( $hay, 'google_gtagjs-js' )
+				|| ( false !== strpos( $hay, 'gtag/js?id=G-' ) ) ) {
+				continue;
+			}
 			if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
 				|| false !== strpos( $hay, 'gsi/client' )
 				|| false !== strpos( $hay, 'google-one-tap' )
@@ -1825,9 +1855,7 @@ final class Cindemir_SEO_Fixes {
 				|| false !== strpos( $hay, 'pagead/viewthroughconversion' )
 				|| false !== strpos( $hay, 'GTM-T6PQ95' )
 				|| ( false !== strpos( $hay, 'googletagmanager.com/gtm.js' ) )
-				|| false !== strpos( $hay, 'google_gtagjs' )
-				|| false !== strpos( $hay, 'GT-WV3LSZHW' )
-				|| false !== strpos( $hay, 'googlesitekit' ) ) {
+				|| false !== strpos( $hay, 'GT-WV3LSZHW' ) ) {
 				wp_dequeue_script( $handle );
 				wp_deregister_script( $handle );
 			}
@@ -1839,14 +1867,19 @@ final class Cindemir_SEO_Fixes {
 			return $tag;
 		}
 		$hay = (string) $src . (string) $handle . (string) $tag;
+		// Keep GA4 / Site Kit analytics tags.
+		if ( false !== strpos( $hay, self::GA4_MEASUREMENT_ID )
+			|| false !== strpos( $hay, 'gtag/js?id=G-' )
+			|| false !== strpos( $hay, 'cindemir-ga4' ) ) {
+			return $tag;
+		}
 		if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
 			|| false !== strpos( $hay, 'gsi/client' )
 			|| false !== strpos( $hay, 'AW-1027764587' )
 			|| false !== strpos( $hay, 'googleads.g.doubleclick.net' )
 			|| false !== strpos( $hay, 'GTM-T6PQ95' )
 			|| false !== strpos( $hay, 'googletagmanager.com/gtm.js' )
-			|| false !== strpos( $hay, 'GT-WV3LSZHW' )
-			|| false !== strpos( $hay, 'google_gtagjs' ) ) {
+			|| false !== strpos( $hay, 'GT-WV3LSZHW' ) ) {
 			return '';
 		}
 		return $tag;
@@ -1888,18 +1921,21 @@ final class Cindemir_SEO_Fixes {
 		// Drop broken relativedns prefetch remnants and Ads conversion scripts that
 		// set third-party cookies / deprecated APIs (crush Best Practices score).
 		$html = preg_replace( '#<link[^>]+href=[\"\']https?://cindemirlaw\.com/+www\.[^\"\']+[\"\'][^>]*>#i', '', $html );
-		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion|GTM-T6PQ95|googletagmanager\.com/gtm\.js|gtag/js\?id=GT-WV3LSZHW|google_gtagjs)[^>]*>.*?</script>#is', '', $html );
+		// Strip Ads / old GTM / Google tag GT- only — do NOT strip GA4 (G-NLWQ6XLHDF / google_gtagjs).
+		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion|GTM-T6PQ95|googletagmanager\.com/gtm\.js|gtag/js\?id=GT-WV3LSZHW)[^>]*>.*?</script>#is', '', $html );
 		$html = preg_replace( '#\(function\(w,d,s,l,i\)\{[\s\S]*?GTM-T6PQ95[\s\S]*?\}\)\(window,document,\'script\',\'dataLayer\',\'GTM-T6PQ95\'\);#', '', $html );
 		$html = preg_replace( '#<noscript>\s*<iframe[^>]+googletagmanager\.com/ns\.html\?id=GTM-T6PQ95[^>]*>[\s\S]*?</iframe>\s*</noscript>#i', '', $html );
 		$html = preg_replace( '#<!-- Google tag \(gtag\.js\) -->[\s\S]*?GT-WV3LSZHW[\s\S]*?</script>#i', '', $html );
 		$html = preg_replace( '#<!--\s*Global site tag \(gtag\.js\) - Google Ads:[\s\S]*?</script>#i', '', $html );
 		$html = preg_replace( '#<!--\s*Event snippet for[\s\S]*?</script>#i', '', $html );
-		$html = preg_replace( '#<!--\s*Google Tag Manager snippet added by Site Kit\s*-->[\s\S]*?</script>#i', '', $html );
+		// Keep Site Kit Analytics; only remove Site Kit GTM wrapper for the retired container.
+		$html = preg_replace( '#<!--\s*Google Tag Manager snippet added by Site Kit\s*-->[\s\S]*?GTM-T6PQ95[\s\S]*?</script>#i', '', $html );
 		$html = preg_replace( '#<!--\s*End Google Tag Manager[^>]*-->#i', '', $html );
 		// Debloat/Rocket often base64-encode Ads/GTM snippets — drop those script tags by decoded payload.
-		$html = preg_replace_callback(
+		$ga4_id = self::GA4_MEASUREMENT_ID;
+		$html   = preg_replace_callback(
 			'#<script\b([^>]*)>(.*?)</script>#is',
-			static function ( $m ) {
+			static function ( $m ) use ( $ga4_id ) {
 				$open = $m[1];
 				$inner = $m[2];
 				$blob  = $open . ' ' . $inner;
@@ -1913,6 +1949,9 @@ final class Cindemir_SEO_Fixes {
 					|| false !== strpos( $blob, 'cindemir-whatsapp-fallback' )
 					|| false !== strpos( $blob, 'cindemir-header-brand' )
 					|| false !== strpos( $blob, 'cindemir-lang-switch' )
+					|| false !== strpos( $blob, 'cindemir-ga4' )
+					|| false !== strpos( $blob, $ga4_id )
+					|| false !== strpos( $blob, 'gtag/js?id=G-' )
 					|| false !== strpos( $open, 'data-nowprocket' )
 					|| false !== strpos( $open, 'nowprocket' ) ) {
 					return $m[0];
@@ -3620,6 +3659,10 @@ public static function homepage_hero_styles() {
 		$exclude[] = 'cindemir-contact-form-fallback';
 		$exclude[] = 'cindemir-whatsapp-fallback';
 		$exclude[] = 'cindemir-privacy-form';
+		$exclude[] = 'cindemir-ga4';
+		$exclude[] = 'googletagmanager.com/gtag/js';
+		$exclude[] = 'G-NLWQ6XLHDF';
+		$exclude[] = 'google_gtagjs';
 		$exclude[] = 'stampLang';
 		$exclude[] = 'fixSwitcher';
 		$exclude[] = '__cindemirContactBound';
@@ -3638,6 +3681,10 @@ public static function homepage_hero_styles() {
 		$exclude[] = 'cindemir-header-brand-js';
 		$exclude[] = 'cindemir-lang-switch';
 		$exclude[] = 'cindemir-contact-form-fallback';
+		$exclude[] = 'cindemir-ga4';
+		$exclude[] = 'G-NLWQ6XLHDF';
+		$exclude[] = 'gtag(';
+		$exclude[] = 'dataLayer';
 		$exclude[] = '__cindemirContactBound';
 		$exclude[] = 'avia_ajax_form';
 		return $exclude;
