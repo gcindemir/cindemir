@@ -1,64 +1,54 @@
-# Rusya sinyali güçlendirme — Cindemir Hukuk Bürosu
+# Dil bazlı ülke sinyali — Cindemir Hukuk Bürosu
 
-WordPress canlı siteye uygulanacak GEO / schema paketi. Amaç: AI ve arama motorlarının “Türkiye’de Rusça bilen avukat / русскоязычный адвокат Стамбул” eşlemesini güçlendirmek.
+Kural: **her dil sürümü kendi pazarını işaretler; İngilizce globaldir.**
 
-## Ne değişiyor?
+| Dil | Sinyal pazarı | Anasayfa schema | Niyet landing |
+|-----|---------------|-----------------|---------------|
+| **TR** | Türkiye | `schema/homepage-tr-lawoffice.json` | (ana site TR) |
+| **RU** | Rusya Federasyonu + BDT | `schema/homepage-ru-lawoffice.json` | `pages/russkoyazychnyy-advokat.ru.html` |
+| **EN** | Global (Worldwide) | `schema/homepage-en-lawoffice.json` | `pages/international-lawyer.en.html` |
+| **ZH** | Çin / Çinli müvekkil | `schema/homepage-zh-lawoffice.json` | `pages/zhongwen-lushi.zh.html` |
 
-| Sinyal | Önce | Sonra |
-|--------|------|-------|
-| `areaServed` | Düz string (“Rusya ve BDT”) | `Country` entity: Rusya + BDT + İstanbul |
-| Dil | Sadece `availableLanguage` | + `knowsLanguage` (büro + Elena) |
-| Açıklama | Genel uluslararası | Rusça / RF / BDT / Elena açıkça |
-| Hizmet kataloğu | Genel | Rusça avukat + RF tenfiz + Rus şirket kuruluşu |
-| Person | İnce jobTitle | Elena: Moskova eğitimi, diller, baro; Matvey Levant |
-| FAQ | Yok | TR + RU FAQPage |
-| Niyet URL | `/rusca-bilen-avukat/` 404 | Landing TR + RU |
+NAP ve `@id` (`https://cindemir.av.tr/#lawoffice`) tüm dillerde aynı kalır. Değişen: `areaServed`, `audience`, `description`, `knowsAbout`, katalog ve Person vurgusu.
 
-## Dosyalar
+## İstisna (niş sayfa)
+
+`pages/rusca-bilen-avukat.tr.html` — **Türkçe dilde**, Rusya/BDT niyetli hizmet sayfası (TR SEO + AI prompt’ları için). TR **anasayfa** Türkiye sinyalidir; bu sayfa Rusya niyetidir.
+
+## Dosya haritası
 
 ```
-geo/schema/homepage-tr-lawoffice.json      → Anasayfa (mevcut @graph bloğunun yerine)
-geo/schema/homepage-ru-lawoffice.json      → /ru/homepage-ru/
-geo/schema/rusca-bilen-avukat-faq.json     → yeni TR landing
-geo/schema/russkoyazychnyy-advokat-faq.json→ yeni RU landing
-geo/schema/team-persons-russia.json        → /avukatlarimiz/ ve /ru/our-team-ru/
-geo/pages/rusca-bilen-avukat.tr.html       → sayfa içeriği TR
-geo/pages/russkoyazychnyy-advokat.ru.html  → sayfa içeriği RU
-geo/snippets/wp-jsonld-embed.html          → yapıştırma şablonu
+geo/schema/
+  homepage-tr-lawoffice.json      # Türkiye
+  homepage-ru-lawoffice.json      # Rusya
+  homepage-en-lawoffice.json      # Global
+  homepage-zh-lawoffice.json      # Çin
+  rusca-bilen-avukat-faq.json     # TR dil, RU niyet
+  russkoyazychnyy-advokat-faq.json
+  international-lawyer-en-faq.json
+  zhongwen-lushi-zh-faq.json
+  team-persons.json               # ortak Person (@id tutarlı)
+
+geo/pages/
+  rusca-bilen-avukat.tr.html
+  russkoyazychnyy-advokat.ru.html
+  international-lawyer.en.html
+  zhongwen-lushi.zh.html
 ```
 
-## WordPress uygulama sırası
+## WordPress uygulama
 
-1. **SASWP çakışmasını kapat**  
-   Schema & Structured Data (SASWP) anasayfada boş `Organization` basıyor (`#Organization`, `sameAs: []`). Ya kapatın ya da `#lawoffice` ile aynı entity’ye birleştirin. İki Organization = zayıf entity.
+1. **SASWP** boş ikinci `Organization`’ı kapat veya `#lawoffice` ile birleştir.
+2. Her dil anasayfasındaki `@graph` bloğunu ilgili `homepage-*-lawoffice.json` ile değiştir.
+3. Landing sayfalarını yayınla; hreflang: TR↔RU niyet sayfaları, EN global, ZH Çin.
+4. FAQ JSON-LD’yi ilgili landing `<head>` / body sonuna ekle.
+5. Ekip sayfalarında `team-persons.json` kullan (dil sürümünde isim/jobTitle lokalize edilebilir; `@id` aynı kalsın).
+6. Rich Results Test + dil bazlı AI prompt testi:
+   - TR: “İstanbul iyi avukat bürosu”
+   - RU: “русскоязычный адвокат Стамбул”
+   - EN: “international lawyer Turkey”
+   - ZH: “土耳其中文律师”
 
-2. **Anasayfa JSON-LD**  
-   Mevcut özel `@graph` bloğunu `homepage-tr-lawoffice.json` ile değiştirin (Insert Headers / tema özel kod / Rank Math custom schema).  
-   RU anasayfa için `homepage-ru-lawoffice.json`.
+## Geo notu
 
-3. **Yeni sayfalar**  
-   - TR: slug `rusca-bilen-avukat` — içerik `pages/rusca-bilen-avukat.tr.html`  
-   - RU: slug `russkoyazychnyy-advokat-stambul` under `/ru/` — içerik `pages/russkoyazychnyy-advokat.ru.html`  
-   Polylang/WPML ile hreflang bağlayın (`tr` ↔ `ru`).
-
-4. **FAQ şeması**  
-   İlgili sayfanın `<head>` veya body sonuna ilgili FAQ JSON-LD’yi ekleyin.
-
-5. **Ekip sayfası**  
-   Mevcut Person graph’ı `team-persons-russia.json` ile güncelleyin (Elena + Matvey Rusya sinyali).
-
-6. **İç linkler**  
-   Anasayfa “Çok dilli hizmet” ve hizmetler bölümünden `/rusca-bilen-avukat/` linki; RU menüden Rusça landing.
-
-7. **Doğrulama**  
-   - [Google Rich Results Test](https://search.google.com/test/rich-results)  
-   - schema.org Validator  
-   - ChatGPT / Perplexity: “Türkiye’de Rusça bilen avukat öner” (yayından ~1–2 hafta sonra tekrar)
-
-## Geo koordinat notu
-
-`geo` alanı Maltepe yaklaşık koordinatıdır; Google Business Profile ile birebir aynı lat/long kullanın.
-
-## Yapılmayanlar (bu repoda)
-
-Canlı WordPress’e otomatik deploy yok; dosyalar yapıştırılmak üzere hazırlandı.
+`geo` koordinatları Maltepe yaklaşık değeridir; Google Business Profile ile aynı lat/long kullanın.

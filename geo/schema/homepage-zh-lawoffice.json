@@ -1,0 +1,197 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cindemir.av.tr/#website",
+      "url": "https://cindemir.av.tr/zh/%e9%a6%96%e9%a1%b5/",
+      "name": "Cindemir 律师事务所",
+      "alternateName": ["Cindemir Law Office", "Cindemir Hukuk Bürosu"],
+      "inLanguage": ["zh-Hans", "tr", "en", "ru"],
+      "publisher": { "@id": "https://cindemir.av.tr/#lawoffice" }
+    },
+    {
+      "@type": ["LegalService", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Cindemir 律师事务所",
+      "alternateName": [
+        "Cindemir Law Office",
+        "土耳其中文律师",
+        "伊斯坦布尔中文律师事务所"
+      ],
+      "url": "https://cindemir.av.tr/zh/%e9%a6%96%e9%a1%b5/",
+      "description": "Cindemir律师事务所位于土耳其伊斯坦布尔，为来自中国的个人与企业提供法律服务。业务涵盖外国人法、居留与入籍、房地产（Tapu）、公司设立、婚姻继承、跨境争议及外国判决在土耳其的承认与执行。可提供中文、土耳其语与英语沟通支持。",
+      "foundingDate": "2004",
+      "image": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+        "width": 613,
+        "height": 220
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+        "postalCode": "34846",
+        "addressLocality": "Maltepe",
+        "addressRegion": "İstanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.9335,
+        "longitude": 29.1552
+      },
+      "telephone": "+90-216-550-6775",
+      "email": "cindemir@cindemir.av.tr",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "中国",
+          "alternateName": ["China", "People's Republic of China"],
+          "sameAs": "https://www.wikidata.org/wiki/Q148"
+        },
+        {
+          "@type": "Country",
+          "name": "土耳其",
+          "sameAs": "https://www.wikidata.org/wiki/Q43"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "伊斯坦布尔"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "香港",
+          "alternateName": "Hong Kong"
+        },
+        {
+          "@type": "Country",
+          "name": "台湾",
+          "alternateName": "Taiwan"
+        }
+      ],
+      "availableLanguage": [
+        { "@type": "Language", "name": "Chinese", "alternateName": "zh-Hans" },
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" },
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" }
+      ],
+      "knowsLanguage": ["zh-Hans", "tr", "en", "ru"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "中国公民、华语客户以及在土耳其经营的中资企业",
+        "geographicArea": {
+          "@type": "Country",
+          "name": "中国"
+        }
+      },
+      "sameAs": [
+        "https://cindemir.av.tr/",
+        "https://cindemir.av.tr/en/home-2/",
+        "https://cindemirlaw.com/",
+        "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+        "https://x.com/cindemirlegal"
+      ],
+      "knowsAbout": [
+        "土耳其中文律师",
+        "伊斯坦布尔中文律师",
+        "中国公民在土耳其的法律事务",
+        "外国人居留与入籍",
+        "土耳其房地产与产权",
+        "外国公司在土耳其设立",
+        "中国法院判决在土耳其的承认与执行",
+        "跨境婚姻与继承"
+      ],
+      "employee": [
+        { "@id": "https://cindemir.av.tr/#person-gokhan-cindemir" },
+        { "@id": "https://cindemir.av.tr/#person-melike-erarslan" },
+        { "@id": "https://cindemir.av.tr/#person-elena-zara" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Cindemir — 面向中国客户的服务",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/zh/services-zn/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "中文法律咨询（土耳其）",
+              "serviceType": "Chinese-language legal counsel in Turkey",
+              "areaServed": ["中国", "土耳其"],
+              "availableLanguage": ["zh-Hans", "tr", "en"],
+              "description": "为华语客户提供土耳其法律咨询与诉讼代理。"
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/enforcement-of-a-chinese-foreign-judgment-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "中国判决在土耳其的承认与执行",
+              "serviceType": "Recognition of Chinese judgments in Turkey",
+              "description": "中国法院判决在土耳其的承认与执行（tenfiz）程序。"
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "外国人购房与产权",
+              "serviceType": "Real estate for Chinese nationals",
+              "description": "中国公民在土耳其购买房产与产权过户法律支持。"
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/zh/services-zn/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "公司设立与投资",
+              "serviceType": "Company formation",
+              "description": "中资在土耳其设立公司与投资合规。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/zh/homepage/#webpage",
+      "url": "https://cindemir.av.tr/zh/%e9%a6%96%e9%a1%b5/",
+      "name": "Cindemir律师事务所 | 土耳其伊斯坦布尔中文律师",
+      "inLanguage": "zh-Hans",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "description": "伊斯坦布尔国际律师事务所，为中国公民与华语客户提供居留、房产、公司、婚姻继承及跨境争议法律服务。"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "高级合伙人、律师",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "律师",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "jobTitle": "律师",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "tr", "en"]
+    }
+  ]
+}

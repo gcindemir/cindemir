@@ -3,11 +3,20 @@
   "@graph": [
     {
       "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Senior Partner, Attorney at Law",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
       "@id": "https://cindemir.av.tr/#person-elena-zara",
       "name": "Elena Zara",
       "alternateName": ["Елена Зара", "Av. Elena Zara"],
       "jobTitle": "Attorney at Law — Russian and Turkish Lawyer",
-      "description": "İstanbul Barosu avukatı. Moskova'da hukuk eğitimi (2003), İstanbul Aydın Üniversitesi Hukuk Fakültesi mezunu. 2014'ten beri Türkiye–Rusya Federasyonu–BDT bağlantılı dosyalarda Rusça, Türkçe ve İngilizce danışmanlık.",
+      "description": "İstanbul Barosu avukatı. Moskova'da hukuk eğitimi, İstanbul Aydın Üniversitesi Hukuk Fakültesi. Türkiye–RF–BDT dosyaları; Rusça, Türkçe, İngilizce.",
       "url": "https://cindemir.av.tr/avukatlarimiz/",
       "image": "https://cindemir.av.tr/wp-content/uploads/2025/09/elena-240x300.jpg",
       "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
@@ -31,30 +40,18 @@
           "name": "İstanbul Aydın Üniversitesi Hukuk Fakültesi"
         }
       ],
-      "knowsAbout": [
-        "Rusça bilen avukat İstanbul",
-        "Русскоязычный адвокат Стамбул",
-        "Türkiye–Rusya uluslararası özel hukuk",
-        "Yabancılar hukuku",
-        "Aile ve miras hukuku"
-      ],
       "memberOf": {
         "@type": "Organization",
         "name": "İstanbul Barosu"
-      },
-      "homeLocation": {
-        "@type": "Place",
-        "name": "İstanbul, Türkiye"
       }
     },
     {
       "@type": "Person",
-      "@id": "https://cindemir.av.tr/avukatlarimiz/#gokhan-cindemir",
-      "name": "Gökhan Cindemir",
-      "jobTitle": "Senior Partner, Attorney at Law",
-      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "Attorney at Law",
       "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
-      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+      "knowsLanguage": ["tr", "en"]
     },
     {
       "@type": "Person",
@@ -62,10 +59,9 @@
       "name": "Matvey Levant",
       "alternateName": "Матвей Левант",
       "jobTitle": "Foreign Legal Consultant — Russian Law",
-      "description": "Moskova, Levant & Partners. Rus hukuku danışmanı; uluslararası özel hukuk, şirketler, gayrimenkul, tahkim.",
+      "description": "Moskova, Levant & Partners. Rus hukuku danışmanı.",
       "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
       "knowsLanguage": ["ru", "en"],
-      "knowsAbout": ["Rus hukuku", "Tahkim", "Şirketler hukuku"],
       "workLocation": {
         "@type": "Place",
         "address": {
@@ -74,13 +70,6 @@
           "addressCountry": "RU"
         }
       }
-    },
-    {
-      "@type": "Person",
-      "@id": "https://cindemir.av.tr/avukatlarimiz/#hakan-cindemir",
-      "name": "Hakan Cindemir",
-      "jobTitle": "Attorney at Law",
-      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" }
     }
   ]
 }
