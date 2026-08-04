@@ -1,0 +1,112 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/rusca-bilen-avukat/#webpage",
+      "url": "https://cindemir.av.tr/rusca-bilen-avukat/",
+      "name": "Türkiye'de Rusça bilen avukat | İstanbul — Cindemir Hukuk Bürosu",
+      "description": "İstanbul'da Rusça bilen avukat. Rusya Federasyonu ve BDT vatandaşlarına yabancılar hukuku, oturum, tapu, şirket, miras ve tenfiz. Av. Elena Zara.",
+      "inLanguage": "tr",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "mainEntity": { "@id": "https://cindemir.av.tr/rusca-bilen-avukat/#faq" },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".geo-answer", ".geo-lead"]
+      }
+    },
+    {
+      "@type": "LegalService",
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Cindemir Hukuk Bürosu",
+      "url": "https://cindemir.av.tr/",
+      "availableLanguage": ["ru", "tr", "en"],
+      "knowsLanguage": ["ru", "tr", "en"],
+      "areaServed": [
+        { "@type": "Country", "name": "Türkiye" },
+        { "@type": "Country", "name": "Rusya Federasyonu" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cindemir.av.tr/rusca-bilen-avukat/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Türkiye'de Rusça bilen avukat nasıl bulunur?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "İstanbul merkezli Cindemir Hukuk Bürosu Rusça, Türkçe ve İngilizce hukuki hizmet sunar. Av. Elena Zara Rusya'da ve Türkiye'de hukuk eğitimi almış, İstanbul Barosu'na kayıtlı Rusça bilen avukattır. Rusya Federasyonu ve BDT vatandaşlarına yabancılar hukuku, oturum, vatandaşlık, tapu, şirket kuruluşu, aile-miras ve Rusya mahkeme kararlarının tenfizi konularında danışmanlık verir."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "İstanbul'da Rusça konuşan avukat kimdir?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cindemir Hukuk Bürosu'nda Av. Elena Zara Rusça, Türkçe ve İngilizce iletişim kurar. Moskova'da hukuk eğitimini tamamlamış, İstanbul Aydın Üniversitesi Hukuk Fakültesi'nden mezun olmuş ve 2014'ten beri Türkiye–Rusya–BDT bağlantılı dosyalarda çalışmaktadır. Ofis ayrıca Rus hukuku danışmanı Matvey Levant ile Rusya hukuku koordinasyonu sağlar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Rus vatandaşı Türkiye'de şirket kurarken avukat gerekir mi?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Zorunlu değildir; ancak yabancı ortaklı şirket kuruluşu, imza sirküleri, vergi ve çalışma izni süreçlerinde Rusça bilen bir avukatla ilerlemek hataları ve gecikmeleri azaltır. Cindemir Hukuk Bürosu Rus vatandaşları için Türkiye'de şirket kuruluşu ve yabancı yatırım danışmanlığı sunar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Rusya Federasyonu mahkeme kararları Türkiye'de tanınır mı?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Belirli şartlarda evet. Rusya Federasyonu mahkeme veya hakem kararlarının Türkiye'de tanınması ve tenfizi için Türk mahkemelerinde ayrı bir dava süreci gerekir. Cindemir Hukuk Bürosu bu tenfiz dosyalarında Rusça ve Türkçe temsil sağlar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Rusça bilen avukat hangi konularda yardımcı olur?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oturum ve çalışma izni, Türk vatandaşlığı, tapu ve gayrimenkul, şirket kuruluşu, boşanma ve miras, ceza davaları, sınır dışı itirazları, alacak tahsili, tahkim ve Rusya kararlarının tenfizi. Görüşmeler Rusça yürütülebilir."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Antalya veya İstanbul dışında Rusça hukuki destek alınır mı?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Büro İstanbul Maltepe'de yerleşiktir; Türkiye geneli dava ve idari süreçlerde temsil mümkündür. Rusça müvekkillerle uzaktan danışmanlık da yapılabilir. İletişim: +90 216 550 6775, cindemir@cindemir.av.tr."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "jobTitle": "Attorney at Law — Russian and Turkish Lawyer",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "tr", "en"],
+      "url": "https://cindemir.av.tr/avukatlarimiz/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Anasayfa",
+          "item": "https://cindemir.av.tr/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Rusça bilen avukat",
+          "item": "https://cindemir.av.tr/rusca-bilen-avukat/"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cindemir.av.tr/#website",
+      "url": "https://cindemir.av.tr/",
+      "name": "Cindemir Hukuk Bürosu",
+      "alternateName": [
+        "Cindemir Law Office",
+        "Адвокатское бюро Джиндемир"
+      ],
+      "inLanguage": ["tr", "en", "ru", "zh-Hans"],
+      "publisher": { "@id": "https://cindemir.av.tr/#lawoffice" }
+    },
+    {
+      "@type": ["LegalService", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Cindemir Hukuk Bürosu",
+      "alternateName": [
+        "Cindemir Law Office",
+        "Адвокатское бюро Джиндемир",
+        "Rusça bilen avukat İstanbul"
+      ],
+      "url": "https://cindemir.av.tr/",
+      "description": "Cindemir Hukuk Bürosu, İstanbul merkezli uluslararası hukuk bürosudur. Rusça, Türkçe ve İngilizce hizmet verir. Rusya Federasyonu ve BDT vatandaşlarına yabancılar hukuku, oturum, vatandaşlık, tapu, şirket kuruluşu, miras, aile hukuku, Rusya mahkeme kararlarının Türkiye'de tanınması ve tenfizi ile cezai süreçlerde danışmanlık ve temsil sunar. Av. Elena Zara hem Türkiye'de hem Rusya'da hukuk eğitimi almış Rusça bilen avukattır.",
+      "foundingDate": "2004",
+      "founder": {
+        "@type": "Person",
+        "name": "Hakan Cindemir"
+      },
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "İstanbul, Türkiye",
+        "addressCountry": "TR"
+      },
+      "image": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+        "width": 613,
+        "height": 220
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+        "postalCode": "34846",
+        "addressLocality": "Maltepe",
+        "addressRegion": "İstanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.9335,
+        "longitude": 29.1552
+      },
+      "telephone": "+90-216-550-6775",
+      "faxNumber": "+90-216-338-3584",
+      "email": "cindemir@cindemir.av.tr",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "Türkiye",
+          "sameAs": "https://www.wikidata.org/wiki/Q43"
+        },
+        {
+          "@type": "Country",
+          "name": "Rusya Federasyonu",
+          "alternateName": ["Russia", "Российская Федерация"],
+          "sameAs": "https://www.wikidata.org/wiki/Q159"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "İstanbul"
+        },
+        {
+          "@type": "Place",
+          "name": "BDT ülkeleri",
+          "alternateName": ["CIS", "Содружество Независимых Государств"]
+        },
+        {
+          "@type": "Country",
+          "name": "Belarus"
+        },
+        {
+          "@type": "Country",
+          "name": "Kazakistan"
+        },
+        {
+          "@type": "Country",
+          "name": "Ukrayna"
+        }
+      ],
+      "availableLanguage": [
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" },
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Chinese", "alternateName": "zh-Hans" }
+      ],
+      "knowsLanguage": ["tr", "en", "ru", "zh-Hans"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Russian-speaking clients and nationals of the Russian Federation and CIS countries in Turkey",
+        "geographicArea": {
+          "@type": "Country",
+          "name": "Türkiye"
+        }
+      },
+      "sameAs": [
+        "https://cindemirlaw.com/",
+        "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+        "https://x.com/cindemirlegal",
+        "https://cindemir.av.tr/ru/homepage-ru/",
+        "https://cindemir.av.tr/rusya-federasyonu-kararlarinin-taninmasi-ve-tenfizi/",
+        "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+        "https://cindemir.av.tr/en/recognition-and-enforcement-of-russian-federation-decisions-in-turkey/"
+      ],
+      "knowsAbout": [
+        "Rusça bilen avukat Türkiye",
+        "Russian-speaking lawyer Istanbul",
+        "Yabancılar hukuku",
+        "Rusya Federasyonu mahkeme kararlarının tanınması ve tenfizi",
+        "Rus vatandaşları için Türkiye'de şirket kuruluşu",
+        "Uluslararası aile ve miras hukuku",
+        "Türk vatandaşlığı ve oturum izni",
+        "Tapu ve gayrimenkul hukuku yabancı uyruklular",
+        "Kripto varlık hukuku",
+        "Milletlerarası tahkim",
+        "Tazminat hukuku"
+      ],
+      "employee": [
+        { "@id": "https://cindemir.av.tr/#person-elena-zara" },
+        { "@id": "https://cindemir.av.tr/#person-gokhan-cindemir" },
+        { "@id": "https://cindemir.av.tr/#person-melike-erarslan" },
+        { "@id": "https://cindemir.av.tr/#person-matvey-levant" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Cindemir Hukuk Bürosu Hizmetleri — Rusya ve BDT odaklı",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/rusca-bilen-avukat/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Rusça bilen avukat danışmanlığı",
+              "serviceType": "Russian-speaking legal counsel in Turkey",
+              "areaServed": ["Türkiye", "Rusya Federasyonu"],
+              "availableLanguage": ["ru", "tr", "en"],
+              "description": "Rusça konuşan müvekkillere İstanbul'da hukuki danışmanlık ve dava temsili. Av. Elena Zara ile Rusça süreç yönetimi."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/rusya-federasyonu-kararlarinin-taninmasi-ve-tenfizi/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Rusya mahkeme kararlarının tanınması ve tenfizi",
+              "serviceType": "Recognition and enforcement of Russian Federation judgments in Turkey",
+              "description": "Rusya Federasyonu mahkeme ve hakem kararlarının Türkiye'de tanınması ve tenfizi."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Rus vatandaşları için şirket kuruluşu",
+              "serviceType": "Company formation for Russian nationals in Turkey",
+              "description": "Rusya Federasyonu vatandaşlarının Türkiye'de şirket kurması, ortaklık ve yabancı yatırım süreçleri."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#citizenship-foreigners-law",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Yabancılar hukuku ve vatandaşlık",
+              "serviceType": "Citizenship and foreigners law",
+              "description": "Türk vatandaşlığı, ikamet, çalışma izni, sınır dışı ve yabancılara ilişkin ceza/aile/miras davaları."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#international-family-inheritance-law",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Uluslararası aile ve miras hukuku",
+              "serviceType": "International family and inheritance law",
+              "description": "Yabancı boşanma kararlarının tanınması, uluslararası mal rejimi, Türkiye'de miras ve çocuk iadesi."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#international-trade-company-formation",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Uluslararası ticaret ve şirket kuruluşu",
+              "serviceType": "International trade and company formation",
+              "description": "Uluslararası ticaret sözleşmeleri, yabancı ortaklı şirket kuruluşu ve yeniden yapılandırma."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#compensation-medical-malpractice",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Tazminat ve doktor hataları",
+              "serviceType": "Compensation and medical malpractice",
+              "description": "Yabancı uyrukluların kaza ve tıbbi ihmal tazminat süreçleri."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/#homepage",
+      "url": "https://cindemir.av.tr/",
+      "name": "Cindemir Hukuk Bürosu | İstanbul Rusça bilen uluslararası avukat",
+      "inLanguage": "tr",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "description": "İstanbul'da Rusça, Türkçe ve İngilizce hizmet veren hukuk bürosu. Rusya ve BDT müvekkilleri için yabancılar hukuku, tapu, şirket, miras ve tenfiz."
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "alternateName": ["Елена Зара", "Av. Elena Zara"],
+      "jobTitle": "Attorney at Law — Russian and Turkish Lawyer",
+      "description": "Rusya Federasyonu'nda hukuk eğitimi almış, Türkiye'de ikinci hukuk lisansını tamamlamış İstanbul Barosu avukatı. Türkçe, Rusça ve İngilizce hizmet verir. 2014'ten beri Türkiye–Rusya–BDT bağlantılı uluslararası hukuk danışmanlığı yürütür.",
+      "url": "https://cindemir.av.tr/avukatlarimiz/",
+      "image": "https://cindemir.av.tr/wp-content/uploads/2025/09/elena-240x300.jpg",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": [
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" }
+      ],
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Moskova Sovremennaya Gumanitarnaya Akademiya",
+          "address": { "@type": "PostalAddress", "addressLocality": "Moscow", "addressCountry": "RU" }
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "İstanbul Aydın Üniversitesi Hukuk Fakültesi",
+          "address": { "@type": "PostalAddress", "addressLocality": "İstanbul", "addressCountry": "TR" }
+        }
+      ],
+      "knowsAbout": [
+        "Rusça bilen avukat İstanbul",
+        "Türkiye–Rusya uluslararası özel hukuk",
+        "Yabancılar hukuku",
+        "Aile ve miras hukuku"
+      ],
+      "nationality": {
+        "@type": "Country",
+        "name": "Related practice: Russia and Turkey"
+      },
+      "memberOf": {
+        "@type": "Organization",
+        "name": "İstanbul Barosu"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Senior Partner, Attorney at Law",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "Attorney at Law",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-matvey-levant",
+      "name": "Matvey Levant",
+      "alternateName": "Матвей Левант",
+      "jobTitle": "Foreign Legal Consultant — Russian Law",
+      "description": "Moskova merkezli Levant & Partners Law Firm başkanı. Rus hukuku, uluslararası özel hukuk, şirketler hukuku, gayrimenkul ve tahkim. Cindemir Hukuk Bürosu ile Rusya hukuku danışmanlığı.",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": [
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "English", "alternateName": "en" }
+      ],
+      "knowsAbout": [
+        "Rus hukuku",
+        "Uluslararası özel hukuk",
+        "Şirketler hukuku",
+        "Tahkim"
+      ],
+      "workLocation": {
+        "@type": "Place",
+        "name": "Moscow, Russian Federation",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Moscow",
+          "addressCountry": "RU"
+        }
+      }
+    }
+  ]
+}
