@@ -1,0 +1,64 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/avukatlarimiz/#gokhan-cindemir",
+        "name": "Gökhan Cindemir",
+        "jobTitle": "Attorney at Law",
+        "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        },
+        "knowsLanguage": [
+          "tr",
+          "en",
+          "fr",
+          "nl",
+          "ru"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/ru/our-team-ru/#elena-zara",
+        "name": "Elena Zara",
+        "jobTitle": "Attorney at Law",
+        "url": "https://cindemir.av.tr/ru/our-team-ru/",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        },
+        "knowsLanguage": [
+          "ru",
+          "tr",
+          "en"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/avukatlarimiz/#hakan-cindemir",
+        "name": "Hakan Cindemir",
+        "jobTitle": "Attorney at Law",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      }
+    ]
+  },
+  [
+    {
+      "@context": "https://schema.org/",
+      "@type": "Organization",
+      "@id": "https://cindemir.av.tr#Organization",
+      "name": "Cindemir Hukuk Bürosu",
+      "url": "https://cindemir.av.tr",
+      "sameAs": [],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/cropped-logoicon-1.jpg",
+        "width": "151",
+        "height": "185"
+      }
+    }
+  ]
+]

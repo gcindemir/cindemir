@@ -1,0 +1,18 @@
+[
+  [
+    {
+      "@context": "https://schema.org/",
+      "@type": "Organization",
+      "@id": "https://cindemir.av.tr#Organization",
+      "name": "Cindemir Hukuk Bürosu",
+      "url": "https://cindemir.av.tr",
+      "sameAs": [],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/cropped-logoicon-1.jpg",
+        "width": "151",
+        "height": "185"
+      }
+    }
+  ]
+]

@@ -1,0 +1,235 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cindemir.av.tr/#website",
+      "url": "https://cindemir.av.tr/ru/homepage-ru/",
+      "name": "Адвокатское бюро Джиндемир",
+      "alternateName": ["Cindemir Law Office", "Cindemir Hukuk Bürosu"],
+      "inLanguage": ["ru", "tr", "en", "zh-Hans"],
+      "publisher": { "@id": "https://cindemir.av.tr/#lawoffice" }
+    },
+    {
+      "@type": ["LegalService", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Адвокатское бюро Джиндемир",
+      "alternateName": [
+        "Cindemir Law Office",
+        "Cindemir Hukuk Bürosu",
+        "Русскоязычный адвокат в Стамбуле",
+        "Русскоязычный адвокат в Турции"
+      ],
+      "url": "https://cindemir.av.tr/ru/homepage-ru/",
+      "description": "Юридическая фирма Cindemir в Стамбуле для граждан Российской Федерации и СНГ. Русскоязычные адвокаты: ВНЖ, гражданство, недвижимость, компании в Турции, наследство, семейное право, признание и исполнение решений судов РФ. Адвокат Елена Зара ведёт дела на русском и турецком языках.",
+      "foundingDate": "2004",
+      "image": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+        "width": 613,
+        "height": 220
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+        "postalCode": "34846",
+        "addressLocality": "Maltepe",
+        "addressRegion": "İstanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.9335,
+        "longitude": 29.1552
+      },
+      "telephone": "+90-216-550-6775",
+      "email": "cindemir@cindemir.av.tr",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "Российская Федерация",
+          "alternateName": ["Russia", "Rusya Federasyonu"],
+          "sameAs": "https://www.wikidata.org/wiki/Q159"
+        },
+        {
+          "@type": "Country",
+          "name": "Турция",
+          "sameAs": "https://www.wikidata.org/wiki/Q43"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Стамбул"
+        },
+        {
+          "@type": "Place",
+          "name": "Страны СНГ",
+          "alternateName": ["CIS", "BDT"]
+        },
+        {
+          "@type": "Country",
+          "name": "Беларусь"
+        },
+        {
+          "@type": "Country",
+          "name": "Казахстан"
+        }
+      ],
+      "availableLanguage": [
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" }
+      ],
+      "knowsLanguage": ["ru", "tr", "en"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Граждане РФ и СНГ, русскоязычные клиенты с делами в Турции",
+        "geographicArea": {
+          "@type": "Country",
+          "name": "Российская Федерация"
+        }
+      },
+      "sameAs": [
+        "https://cindemir.av.tr/",
+        "https://cindemir.av.tr/rusya-federasyonu-kararlarinin-taninmasi-ve-tenfizi/",
+        "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+        "https://cindemirlaw.com/",
+        "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+        "https://x.com/cindemirlegal"
+      ],
+      "knowsAbout": [
+        "Русскоязычный адвокат в Турции",
+        "Русскоязычный адвокат в Стамбуле",
+        "Право иностранцев в Турции",
+        "Признание решений судов РФ в Турции",
+        "Регистрация компании в Турции для граждан РФ",
+        "ВНЖ и гражданство Турции",
+        "Недвижимость для иностранцев",
+        "Семейное и наследственное право"
+      ],
+      "employee": [
+        { "@id": "https://cindemir.av.tr/#person-elena-zara" },
+        { "@id": "https://cindemir.av.tr/#person-gokhan-cindemir" },
+        { "@id": "https://cindemir.av.tr/#person-matvey-levant" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Услуги для клиентов из РФ и СНГ",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/ru/russkoyazychnyy-advokat-stambul/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Русскоязычный адвокат в Стамбуле",
+              "serviceType": "Russian-speaking legal counsel in Turkey",
+              "areaServed": ["Российская Федерация", "Турция"],
+              "availableLanguage": ["ru", "tr", "en"],
+              "description": "Юридические консультации и представительство на русском языке."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/rusya-federasyonu-kararlarinin-taninmasi-ve-tenfizi/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Признание решений судов РФ",
+              "serviceType": "Recognition of Russian judgments in Turkey",
+              "description": "Признание и исполнение решений судов и арбитражей РФ в Турции."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Регистрация компании для граждан РФ",
+              "serviceType": "Company formation for Russian nationals",
+              "description": "Создание компаний и иностранные инвестиции в Турции."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/ru/services-ru/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "ВНЖ, гражданство, недвижимость",
+              "serviceType": "Immigration and property",
+              "description": "ВНЖ, гражданство Турции, сделки с недвижимостью для граждан РФ."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/ru/homepage-ru/#webpage",
+      "url": "https://cindemir.av.tr/ru/homepage-ru/",
+      "name": "Адвокатское бюро Джиндемир | Русскоязычный адвокат в Стамбуле",
+      "inLanguage": "ru",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "description": "Русскоязычные адвокаты в Стамбуле для граждан РФ и СНГ: ВНЖ, недвижимость, компании, наследство, признание решений судов РФ."
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Елена Зара",
+      "alternateName": ["Elena Zara", "Av. Elena Zara"],
+      "jobTitle": "Адвокат — российское и турецкое право",
+      "description": "Адвокат Стамбульской коллегии. Юридическое образование в России (Москва) и Турции. Дела РФ–Турция–СНГ на русском, турецком и английском.",
+      "url": "https://cindemir.av.tr/ru/our-team-ru/",
+      "image": "https://cindemir.av.tr/wp-content/uploads/2025/09/elena-240x300.jpg",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "tr", "en"],
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Современная Гуманитарная Академия",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Москва",
+            "addressCountry": "RU"
+          }
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Юридический факультет Стамбульского университета Айдын"
+        }
+      ],
+      "knowsAbout": [
+        "Русскоязычный адвокат Стамбул",
+        "Международное частное право Турция–Россия",
+        "Право иностранцев"
+      ],
+      "memberOf": {
+        "@type": "Organization",
+        "name": "Стамбульская коллегия адвокатов"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Старший партнёр, адвокат",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-matvey-levant",
+      "name": "Матвей Левант",
+      "alternateName": "Matvey Levant",
+      "jobTitle": "Иностранный юридический консультант — право РФ",
+      "description": "Руководитель Levant & Partners (Москва). Российское право, МЧП, корпоративное право, недвижимость, арбитраж.",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "en"],
+      "workLocation": {
+        "@type": "Place",
+        "name": "Москва, Российская Федерация"
+      }
+    }
+  ]
+}

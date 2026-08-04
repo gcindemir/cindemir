@@ -1,0 +1,239 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Cindemir Law Office",
+    "url": "https://cindemir.av.tr",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "width": 613,
+      "height": 220
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cindemir.av.tr/#website",
+        "url": "https://cindemir.av.tr/",
+        "name": "Cindemir Hukuk Bürosu",
+        "alternateName": "Cindemir Law Office",
+        "inLanguage": [
+          "tr",
+          "en",
+          "ru",
+          "zh-Hans"
+        ],
+        "publisher": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      },
+      {
+        "@type": [
+          "LegalService",
+          "LocalBusiness",
+          "ProfessionalService"
+        ],
+        "@id": "https://cindemir.av.tr/#lawoffice",
+        "name": "Cindemir Hukuk Bürosu",
+        "alternateName": "Cindemir Law Office",
+        "url": "https://cindemir.av.tr/",
+        "description": "Cindemir Hukuk Bürosu, İstanbul merkezli uluslararası bir hukuk bürosudur. Aile, miras, dijital ekonomi, kripto varlık, tahkim, tazminat, ceza, yabancılar hukuku ve şirket kuruluşu alanlarında hizmet sunmaktadır.",
+        "foundingDate": "2004",
+        "founder": {
+          "@type": "Person",
+          "name": "Hakan Cindemir"
+        },
+        "foundingLocation": {
+          "@type": "Place",
+          "name": "İstanbul, Türkiye"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+          "postalCode": "34846",
+          "addressLocality": "Maltepe",
+          "addressRegion": "İstanbul",
+          "addressCountry": "TR"
+        },
+        "telephone": "+90-216-550-6775",
+        "faxNumber": "+90-216-338-3584",
+        "email": "cindemir@cindemir.av.tr",
+        "areaServed": [
+          "Türkiye",
+          "Avrupa",
+          "Rusya ve BDT"
+        ],
+        "availableLanguage": [
+          "tr",
+          "en",
+          "ru",
+          "zh-Hans"
+        ],
+        "sameAs": [
+          "https://cindemirlaw.com/",
+          "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+          "https://x.com/cindemirlegal"
+        ],
+        "knowsAbout": [
+          "International family law",
+          "Inheritance law",
+          "Crypto asset regulation",
+          "International trade law",
+          "Arbitration",
+          "Citizenship law",
+          "Medical malpractice"
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Cindemir Hukuk Bürosu Hizmetleri",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#international-family-inheritance-law",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Uluslararası Aile ve Miras Hukuku",
+                "serviceType": "International family and inheritance law",
+                "description": "Yabancı boşanma kararlarının tanınması, uluslararası mal rejimi anlaşmaları, Türkiye’de miras davaları, çocuk kaçırma ve iade süreçleri."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#digital-economy-technology-law",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Dijital Ekonomi ve Teknoloji Hukuku",
+                "serviceType": "Digital economy and technology law",
+                "description": "Kripto varlık düzenlemeleri, NFT ve Metaverse uyuşmazlıkları, akıllı sözleşmeler ve dijital platform sözleşmeleri hakkında hukuki danışmanlık."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#debt-collection-arbitration",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Alacak Takibi ve Tahkim",
+                "serviceType": "Debt collection and arbitration",
+                "description": "Alacak tahsilatı, yabancı tahkim kararlarının tanınması ve tenfizi, tahkim süreçlerinde hukuki temsil."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#citizenship-foreigners-law",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Yabancılar Hukuku ve Vatandaşlık",
+                "serviceType": "Citizenship and foreigners law",
+                "description": "Türk vatandaşlığı başvuruları, yabancılara ilişkin ceza ve miras davaları, Türkiye’de ikamet ve çalışma izni işlemleri."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#compensation-medical-malpractice",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Tazminat ve Doktor Hataları",
+                "serviceType": "Compensation and medical malpractice",
+                "description": "Kazalardan doğan tazminat davaları, doktor hataları ve tıbbi ihmalden doğan tazminat süreçleri."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#international-trade-company-formation",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Uluslararası Ticaret ve Şirket Kuruluşu",
+                "serviceType": "International trade and company formation",
+                "description": "Uluslararası ticaret sözleşmeleri, yabancı ortaklı şirket kuruluşu, şirket birleşmeleri ve yeniden yapılandırma danışmanlığı."
+              }
+            },
+            {
+              "@type": "Offer",
+              "url": "https://cindemir.av.tr/#crypto-escrow-services",
+              "price": "Consultation-based",
+              "priceCurrency": "TRY",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Kripto Varlık ve Escrow Hizmetleri",
+                "serviceType": "Crypto asset and escrow services",
+                "description": "NFT ve blockchain danışmanlığı, kripto varlık transferleri için escrow hizmetleri, kripto varlık hukuku ve düzenleme danışmanlığı."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://cindemir.av.tr/#homepage",
+        "url": "https://cindemir.av.tr/",
+        "name": "Cindemir Hukuk Bürosu İstanbul Uluslararası Hukuk ve Danışmanlık",
+        "inLanguage": "tr",
+        "isPartOf": {
+          "@id": "https://cindemir.av.tr/#website"
+        },
+        "about": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        },
+        "description": "Cindemir Hukuk Bürosu, İstanbul merkezli uluslararası bir hukuk bürosudur. Aile, miras, ticaret, teknoloji ve yabancılar hukukunda uzman kadrosuyla danışmanlık hizmeti sunar."
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+        "name": "Gökhan Cindemir",
+        "jobTitle": "Senior Partner, Attorney at Law",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/#person-elena-zara",
+        "name": "Elena Zara",
+        "jobTitle": "Attorney at Law, Russian and Turkish Lawyer",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+        "name": "Melike Erarslan",
+        "jobTitle": "Attorney at Law",
+        "worksFor": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      }
+    ]
+  },
+  [
+    {
+      "@context": "https://schema.org/",
+      "@type": "Organization",
+      "@id": "https://cindemir.av.tr#Organization",
+      "name": "Cindemir Hukuk Bürosu",
+      "url": "https://cindemir.av.tr",
+      "sameAs": [],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/cropped-logoicon-1.jpg",
+        "width": "151",
+        "height": "185"
+      }
+    }
+  ]
+]
