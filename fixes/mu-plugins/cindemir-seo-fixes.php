@@ -1,14 +1,14 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.83 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + GA4_G_NLWQ6XLHDF_20260802 + GA4_ROCKET_UNDELAY_20260802 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.84 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.83
+ * Version: 1.9.84
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
- * GA4_G_NLWQ6XLHDF_20260802
- * GA4_ROCKET_UNDELAY_20260802
+ * AHREFS_AUG5_20260805
+ * GA4_DISABLE_INVALID_ID_20260805
  * Author: Cindemir Law Office
  */
 
@@ -178,12 +178,23 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.83';
+	const VERSION = '1.9.84';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = '69003c8';
+	const DEPLOY_COMMIT = 'REPLACE_AFTER_COMMIT';
 
-	/** Google Analytics 4 measurement ID (Site Kit / gtag). */
-	const GA4_MEASUREMENT_ID = 'G-NLWQ6XLHDF';
+	/**
+	 * Google Analytics 4 measurement ID.
+	 * Empty on purpose: G-NLWQ6XLHDF returns HTTP 404 from googletagmanager.com
+	 * (Ahrefs Aug 5: 320× broken JS). Set a valid G-XXXXXXXX ID via filter
+	 * `cindemir_ga4_measurement_id` or by defining CINDEMIR_GA4_MEASUREMENT_ID.
+	 */
+	const GA4_MEASUREMENT_ID = '';
+
+	/** Known-invalid IDs that must never be injected (Google 404). */
+	const GA4_INVALID_IDS = array( 'G-NLWQ6XLHDF' );
+
+	/** One-shot: compress oversized Ahrefs-flagged JPEG in uploads. */
+	const HUGE_IMAGE_SYNC_KEY = 'cindemir_huge_image_3s9a8705_20260805';
 
 	/** One-shot team photo refresh (remove departed colleague from group shot). */
 	const TEAM_PHOTO_SYNC_KEY = 'cindemir_team_photo_sync_20260718f';
@@ -279,6 +290,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'maybe_purge_caches_on_upgrade' ), 1 );
 		add_action( 'init', array( __CLASS__, 'ensure_local_badge_assets' ), 2 );
 		add_action( 'init', array( __CLASS__, 'sync_updated_team_photo' ), 2 );
+		add_action( 'init', array( __CLASS__, 'sync_compressed_huge_image' ), 2 );
 		add_action( 'init', array( __CLASS__, 'strip_yoast_press_redirects' ), 3 );
 		add_action( 'init', array( __CLASS__, 'ensure_wpml_query_lang_mode' ), 4 );
 		add_action( 'init', array( __CLASS__, 'ensure_uploads_slash_htaccess' ), 5 );
@@ -365,6 +377,7 @@ final class Cindemir_SEO_Fixes {
 		add_action( 'init', array( __CLASS__, 'apply_title_overrides_once' ), 22 );
 		add_filter( 'wpseo_canonical', array( __CLASS__, 'filter_canonical_url' ), 20 );
 		add_filter( 'get_canonical_url', array( __CLASS__, 'filter_canonical_url' ), 20 );
+		add_filter( 'wpseo_opengraph_url', array( __CLASS__, 'filter_opengraph_url' ), 20 );
 		add_filter( 'wpml_hreflangs', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
 		add_filter( 'wpseo_hreflang_links', array( __CLASS__, 'filter_hreflang_urls' ), 99 );
 		add_filter( 'wpseo_opengraph_image', array( __CLASS__, 'rewrite_media_url' ) );
@@ -625,6 +638,89 @@ final class Cindemir_SEO_Fixes {
 					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg',
 					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.webp',
 					'https://cindemirlaw.com/wp-content/uploads/2020/06/5295681199059.jpg.webp',
+				)
+			);
+		}
+	}
+
+	/**
+	 * Replace Ahrefs-flagged 8MB JPEG with a compressed web-ready copy from the repo.
+	 */
+	public static function sync_compressed_huge_image() {
+		if ( get_option( self::HUGE_IMAGE_SYNC_KEY ) ) {
+			return;
+		}
+		if ( get_transient( 'cindemir_huge_image_sync_lock' ) ) {
+			return;
+		}
+		set_transient( 'cindemir_huge_image_sync_lock', 1, 5 * MINUTE_IN_SECONDS );
+
+		$dir = WP_CONTENT_DIR . '/uploads/2026/06';
+		if ( ! is_dir( $dir ) && ! wp_mkdir_p( $dir ) ) {
+			return;
+		}
+
+		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
+		$bases  = array(
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/ahrefs-aug5/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $branch . '/fixes/media/ahrefs-aug5/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/media/ahrefs-aug5/',
+		);
+		$files  = array(
+			'3S9A8705.jpg'  => 40000,
+			'3S9A8705.webp' => 20000,
+		);
+		$ok = 0;
+		foreach ( $files as $name => $min ) {
+			$body = '';
+			foreach ( $bases as $base ) {
+				$response = wp_remote_get(
+					$base . $name . '?v=20260805',
+					array(
+						'timeout' => 60,
+						'headers' => array(
+							'User-Agent'    => 'CindemirHugeImage/' . self::VERSION,
+							'Cache-Control' => 'no-cache',
+						),
+					)
+				);
+				if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+					continue;
+				}
+				$tmp = (string) wp_remote_retrieve_body( $response );
+				if ( strlen( $tmp ) < $min || 0 === strpos( ltrim( $tmp ), '<' ) ) {
+					continue;
+				}
+				// Reject accidental re-download of the original 8MB file.
+				if ( '3S9A8705.jpg' === $name && strlen( $tmp ) > 1500000 ) {
+					continue;
+				}
+				$body = $tmp;
+				break;
+			}
+			if ( '' === $body ) {
+				continue;
+			}
+			if ( false !== file_put_contents( trailingslashit( $dir ) . $name, $body ) ) {
+				$ok++;
+			}
+		}
+		$main = trailingslashit( $dir ) . '3S9A8705.jpg';
+		if ( $ok < 1 || ! file_exists( $main ) || filesize( $main ) < 40000 || filesize( $main ) > 1500000 ) {
+			return;
+		}
+		update_option( self::HUGE_IMAGE_SYNC_KEY, 1, false );
+		if ( function_exists( 'wp_cache_flush' ) ) {
+			wp_cache_flush();
+		}
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( function_exists( 'rocket_clean_files' ) ) {
+			rocket_clean_files(
+				array(
+					'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705.jpg',
+					'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705.webp',
 				)
 			);
 		}
@@ -979,6 +1075,20 @@ final class Cindemir_SEO_Fixes {
 		$url = str_replace( '/contacts-2/', '/contacts/', $url );
 		$url = str_replace( '/contacts-2?', '/contacts?', $url );
 		return $url;
+	}
+
+	/**
+	 * Keep og:url aligned with canonical when Yoast emits both.
+	 * Final HTML pass in fix_og_tags_html copies the rendered canonical → og:url.
+	 *
+	 * @param string $url Open Graph URL from Yoast.
+	 * @return string
+	 */
+	public static function filter_opengraph_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return $url;
+		}
+		return self::filter_canonical_url( $url );
 	}
 
 	public static function filter_hreflang_urls( $hreflangs ) {
@@ -1811,14 +1921,43 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Print GA4 gtag early. PageSpeed cleanup previously stripped Site Kit / google_gtagjs
-	 * and killed Analytics collection for G-NLWQ6XLHDF.
+	 * Resolve a usable GA4 measurement ID, or empty string if none / invalid.
+	 *
+	 * @return string
+	 */
+	public static function ga4_measurement_id() {
+		$id = self::GA4_MEASUREMENT_ID;
+		if ( defined( 'CINDEMIR_GA4_MEASUREMENT_ID' ) ) {
+			$id = (string) CINDEMIR_GA4_MEASUREMENT_ID;
+		}
+		/**
+		 * Filter the GA4 measurement ID. Return a valid G-XXXXXXXX to enable the tag.
+		 *
+		 * @param string $id Measurement ID or empty.
+		 */
+		$id = apply_filters( 'cindemir_ga4_measurement_id', $id );
+		$id = is_string( $id ) ? strtoupper( trim( $id ) ) : '';
+		if ( '' === $id || ! preg_match( '/^G-[A-Z0-9]+$/', $id ) ) {
+			return '';
+		}
+		if ( in_array( $id, self::GA4_INVALID_IDS, true ) ) {
+			return '';
+		}
+		return $id;
+	}
+
+	/**
+	 * Print GA4 gtag early when a valid measurement ID is configured.
+	 * G-NLWQ6XLHDF is intentionally blocked (Google returns 404 → Ahrefs broken JS).
 	 */
 	public static function inject_ga4_tag() {
 		if ( is_admin() ) {
 			return;
 		}
-		$id = self::GA4_MEASUREMENT_ID;
+		$id = self::ga4_measurement_id();
+		if ( '' === $id ) {
+			return;
+		}
 		// data-nowprocket / nowprocket: WP Rocket Delay JS must not defer the tag.
 		echo "\n<!-- Google tag (gtag.js) " . esc_html( $id ) . " -->\n"
 			. '<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_attr( $id ) . '" data-nowprocket nowprocket data-no-minify="1" data-no-optimize="1" data-cfasync="false"></script>' . "\n"
@@ -1840,7 +1979,26 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		$id = self::GA4_MEASUREMENT_ID;
+		// Strip known-invalid GA4 loaders that 404 at Google (Ahrefs Error-JavaScript_broken).
+		foreach ( self::GA4_INVALID_IDS as $bad ) {
+			$html = preg_replace(
+				'#<!--\s*Google tag \(gtag\.js\)\s*' . preg_quote( $bad, '#' ) . '\s*-->\s*<script\b[^>]*>.*?</script>\s*<script\b[^>]*id=["\']cindemir-ga4["\'][^>]*>.*?</script>#is',
+				'',
+				$html
+			);
+			$html = preg_replace(
+				'#<script\b[^>]*(?:gtag/js\?id=' . preg_quote( $bad, '#' ) . '|' . preg_quote( $bad, '#' ) . ')[^>]*>.*?</script>#is',
+				'',
+				$html
+			);
+		}
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
+		$id = self::ga4_measurement_id();
+		if ( '' === $id ) {
+			return $html;
+		}
 
 		// Restore inline config script (#cindemir-ga4).
 		$next = preg_replace_callback(
@@ -1918,12 +2076,21 @@ final class Cindemir_SEO_Fixes {
 		foreach ( (array) $wp_scripts->registered as $handle => $obj ) {
 			$src = isset( $obj->src ) ? (string) $obj->src : '';
 			$hay = $src . '|' . (string) $handle;
-			// Never strip our GA4 measurement ID / Site Kit analytics.
-			if ( false !== strpos( $hay, self::GA4_MEASUREMENT_ID )
+			// Never strip a configured valid GA4 measurement ID / Site Kit analytics.
+			$ga4 = self::ga4_measurement_id();
+			if ( ( $ga4 && false !== strpos( $hay, $ga4 ) )
 				|| false !== strpos( $hay, 'googlesitekit-gtag' )
 				|| false !== strpos( $hay, 'google_gtagjs-js' )
-				|| ( false !== strpos( $hay, 'gtag/js?id=G-' ) ) ) {
+				|| ( $ga4 && false !== strpos( $hay, 'gtag/js?id=G-' ) ) ) {
 				continue;
+			}
+			// Drop the known-invalid measurement ID if Site Kit still enqueues it.
+			foreach ( self::GA4_INVALID_IDS as $bad ) {
+				if ( false !== strpos( $hay, $bad ) ) {
+					wp_dequeue_script( $handle );
+					wp_deregister_script( $handle );
+					continue 2;
+				}
 			}
 			if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
 				|| false !== strpos( $hay, 'gsi/client' )
@@ -1948,10 +2115,16 @@ final class Cindemir_SEO_Fixes {
 			return $tag;
 		}
 		$hay = (string) $src . (string) $handle . (string) $tag;
-		// Keep GA4 / Site Kit analytics tags.
-		if ( false !== strpos( $hay, self::GA4_MEASUREMENT_ID )
-			|| false !== strpos( $hay, 'gtag/js?id=G-' )
-			|| false !== strpos( $hay, 'cindemir-ga4' ) ) {
+		foreach ( self::GA4_INVALID_IDS as $bad ) {
+			if ( false !== strpos( $hay, $bad ) ) {
+				return '';
+			}
+		}
+		// Keep GA4 / Site Kit analytics tags when a valid ID is configured.
+		$ga4 = self::ga4_measurement_id();
+		if ( ( $ga4 && false !== strpos( $hay, $ga4 ) )
+			|| ( $ga4 && false !== strpos( $hay, 'gtag/js?id=G-' ) )
+			|| ( $ga4 && false !== strpos( $hay, 'cindemir-ga4' ) ) ) {
 			return $tag;
 		}
 		if ( false !== strpos( $hay, 'accounts.google.com/gsi' )
@@ -2002,8 +2175,22 @@ final class Cindemir_SEO_Fixes {
 		// Drop broken relativedns prefetch remnants and Ads conversion scripts that
 		// set third-party cookies / deprecated APIs (crush Best Practices score).
 		$html = preg_replace( '#<link[^>]+href=[\"\']https?://cindemirlaw\.com/+www\.[^\"\']+[\"\'][^>]*>#i', '', $html );
-		// Strip Ads / old GTM / Google tag GT- only — do NOT strip GA4 (G-NLWQ6XLHDF / google_gtagjs).
-		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion|GTM-T6PQ95|googletagmanager\.com/gtm\.js|gtag/js\?id=GT-WV3LSZHW)[^>]*>.*?</script>#is', '', $html );
+		// Istanbul Barosu logo: www → apex (Ahrefs Image_redirects on ~all pages).
+		$html = str_replace(
+			array(
+				'https://www.istanbulbarosu.org.tr/',
+				'http://www.istanbulbarosu.org.tr/',
+				'//www.istanbulbarosu.org.tr/',
+			),
+			array(
+				'https://istanbulbarosu.org.tr/',
+				'https://istanbulbarosu.org.tr/',
+				'//istanbulbarosu.org.tr/',
+			),
+			$html
+		);
+		// Strip Ads / old GTM / Google tag GT- / invalid GA4 ID — keep only a configured valid G- tag.
+		$html = preg_replace( '#<script\b[^>]*(?:gtag/js\?id=AW-|googleads\.g\.doubleclick\.net|pagead/viewthroughconversion|GTM-T6PQ95|googletagmanager\.com/gtm\.js|gtag/js\?id=GT-WV3LSZHW|gtag/js\?id=G-NLWQ6XLHDF|G-NLWQ6XLHDF)[^>]*>.*?</script>#is', '', $html );
 		$html = preg_replace( '#\(function\(w,d,s,l,i\)\{[\s\S]*?GTM-T6PQ95[\s\S]*?\}\)\(window,document,\'script\',\'dataLayer\',\'GTM-T6PQ95\'\);#', '', $html );
 		$html = preg_replace( '#<noscript>\s*<iframe[^>]+googletagmanager\.com/ns\.html\?id=GTM-T6PQ95[^>]*>[\s\S]*?</iframe>\s*</noscript>#i', '', $html );
 		$html = preg_replace( '#<!-- Google tag \(gtag\.js\) -->[\s\S]*?GT-WV3LSZHW[\s\S]*?</script>#i', '', $html );
@@ -2013,7 +2200,7 @@ final class Cindemir_SEO_Fixes {
 		$html = preg_replace( '#<!--\s*Google Tag Manager snippet added by Site Kit\s*-->[\s\S]*?GTM-T6PQ95[\s\S]*?</script>#i', '', $html );
 		$html = preg_replace( '#<!--\s*End Google Tag Manager[^>]*-->#i', '', $html );
 		// Debloat/Rocket often base64-encode Ads/GTM snippets — drop those script tags by decoded payload.
-		$ga4_id = self::GA4_MEASUREMENT_ID;
+		$ga4_id = self::ga4_measurement_id();
 		$html   = preg_replace_callback(
 			'#<script\b([^>]*)>(.*?)</script>#is',
 			static function ( $m ) use ( $ga4_id ) {
@@ -2026,13 +2213,16 @@ final class Cindemir_SEO_Fixes {
 						$blob .= ' ' . $decoded;
 					}
 				}
+				if ( false !== strpos( $blob, 'G-NLWQ6XLHDF' ) ) {
+					return '';
+				}
 				if ( false !== strpos( $blob, 'cindemir-contact-form-fallback' )
 					|| false !== strpos( $blob, 'cindemir-whatsapp-fallback' )
 					|| false !== strpos( $blob, 'cindemir-header-brand' )
 					|| false !== strpos( $blob, 'cindemir-lang-switch' )
-					|| false !== strpos( $blob, 'cindemir-ga4' )
-					|| false !== strpos( $blob, $ga4_id )
-					|| false !== strpos( $blob, 'gtag/js?id=G-' )
+					|| ( $ga4_id && false !== strpos( $blob, 'cindemir-ga4' ) )
+					|| ( $ga4_id && false !== strpos( $blob, $ga4_id ) )
+					|| ( $ga4_id && false !== strpos( $blob, 'gtag/js?id=G-' ) )
 					|| false !== strpos( $open, 'data-nowprocket' )
 					|| false !== strpos( $open, 'nowprocket' ) ) {
 					return $m[0];
@@ -4344,17 +4534,38 @@ public static function homepage_hero_styles() {
 	}
 
 	private static function ensure_missing_h1_html( $html ) {
-		if ( preg_match( '/<h1[\s>]/i', $html ) ) {
+		// Treat empty <h1></h1> as missing (Ahrefs H1_tag_missing_or_empty).
+		$html = preg_replace( '#<h1\b[^>]*>\s*</h1>#i', '', $html );
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
+		if ( preg_match( '/<h1\b[^>]*>\s*\S/i', $html ) ) {
 			return $html;
 		}
 		$title = '';
 		$id    = function_exists( 'get_queried_object_id' ) ? get_queried_object_id() : 0;
 		if ( $id && isset( self::$missing_h1[ $id ] ) ) {
 			$title = self::$missing_h1[ $id ];
-		} elseif ( is_singular() ) {
+		} elseif ( function_exists( 'is_singular' ) && is_singular() ) {
 			$title = wp_strip_all_tags( get_the_title( $id ) );
-		} elseif ( preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
-			$title = trim( preg_replace( '/\s*[-|].*$/', '', wp_strip_all_tags( $tm[1] ) ) );
+		}
+		if ( '' === trim( (string) $title ) && preg_match( '/<title>(.*?)<\/title>/is', $html, $tm ) ) {
+			$title = trim( preg_replace( '/\s*[-|].*$/u', '', wp_strip_all_tags( $tm[1] ) ) );
+		}
+		// Slug fallbacks for ZH/RU pages Ahrefs flagged with 0 H1.
+		if ( '' === trim( (string) $title ) ) {
+			$path = self::path();
+			$slug_h1 = array(
+				'/link20' => '土耳其能源法律和投资',
+				'/independent-certified-public-accountant-financial-consultant-taner-cevik-2' => '独立注册会计师及财务顾问 Taner Cevik',
+				'/our-articles-3' => '我们的服务',
+				'/gokhan-cindemir-attorney-at-law-2-2' => 'Gökhan Cindemir, Attorney at Law',
+				'/how-to-lift-entry-ban-to-turkey' => 'How to Lift the Entry Ban to Turkey',
+				'/hotel-elevator-accident-turkey-what-to-do' => 'Injured in a Hotel Elevator in Turkey: What to Do',
+			);
+			if ( isset( $slug_h1[ $path ] ) ) {
+				$title = $slug_h1[ $path ];
+			}
 		}
 		if ( ! $title ) {
 			return $html;
@@ -4364,6 +4575,7 @@ public static function homepage_hero_styles() {
 			'/(<main\b[^>]*>)/i',
 			'/(<div[^>]*id="main"[^>]*>)/i',
 			'/(<div[^>]*class="[^"]*\bcontainer\b[^"]*"[^>]*>)/i',
+			'/(<div[^>]*class="[^"]*\bavia-section\b[^"]*"[^>]*>)/i',
 			'/(<body\b[^>]*>)/i',
 		);
 		foreach ( $patterns as $pattern ) {
@@ -4636,7 +4848,16 @@ public static function homepage_hero_styles() {
 		if ( $id && isset( self::$page_metadesc[ $id ] ) ) {
 			$desc = self::$page_metadesc[ $id ];
 		}
-		if ( '' === $title && '' === $desc ) {
+		// Force og:url == canonical (Ahrefs Open_Graph_URL_not_matching_canonical).
+		$canon = '';
+		if ( preg_match( '/<link\b[^>]*\brel=(["\'])canonical\1[^>]*\bhref=(["\'])([^"\']+)\2/i', $html, $cm )
+			|| preg_match( '/<link\b[^>]*\bhref=(["\'])([^"\']+)\1[^>]*\brel=(["\'])canonical\3/i', $html, $cm2 ) ) {
+			$canon = isset( $cm[3] ) ? $cm[3] : ( isset( $cm2[2] ) ? $cm2[2] : '' );
+		}
+		if ( '' !== $canon ) {
+			$html = self::upsert_meta_tag( $html, 'property', 'og:url', esc_attr( $canon ) );
+		}
+		if ( '' === $title && '' === $desc && '' === $canon ) {
 			return $html;
 		}
 		if ( '' !== $title ) {
