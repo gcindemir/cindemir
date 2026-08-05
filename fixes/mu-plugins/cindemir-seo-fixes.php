@@ -369,7 +369,8 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
-		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'ensure_footer_socket_extras' ), 103 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 104 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -3761,6 +3762,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::strip_orphan_footer_nav( $html );
+		$html = self::ensure_footer_socket_extras( $html );
 		$html = self::fix_footer_badge_dimensions( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
@@ -4893,6 +4895,63 @@ public static function homepage_hero_styles() {
 			. '#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.95}'
 			. '@media (max-width:767px){#socket .container{padding-top:12px;padding-bottom:12px}#socket .cindemir-footer-meta{font-size:11px}}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Re-inject socket footer extras (baro + social + membership badges) when missing.
+	 * Badges include explicit width/height for CLS.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	public static function ensure_footer_socket_extras( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		if ( false === stripos( $html, "id='socket'" ) && false === stripos( $html, 'id="socket"' ) ) {
+			return $html;
+		}
+		if ( false !== strpos( $html, 'cindemir-footer-badges' ) ) {
+			return $html;
+		}
+		$block = self::footer_socket_extras_markup();
+		$next  = preg_replace_callback(
+			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)?/is',
+			static function ( $m ) use ( $block ) {
+				$tail = isset( $m[4] ) ? $m[4] : '';
+				return $m[1] . $block . $tail;
+			},
+			$html,
+			1,
+			$count
+		);
+		return ( is_string( $next ) && $count > 0 ) ? $next : $html;
+	}
+
+	/** Markup for socket extras with CLS-safe badge dimensions. */
+	private static function footer_socket_extras_markup() {
+		$baro = 'https://baronet.istanbulbarosu.org.tr/avukat/belge_dogrulama?lang=EN&onayno=HBE4U7ES3DM6C52&tck=58612509084';
+		$tbb  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/tbb_amblem_60.png';
+		return '<div class="cindemir-socket-extras" id="cindemir-socket-extras">'
+			. '<div id="cindemir-baro-verification-bar" class="cindemir-baro-verification-bar">'
+			. '<a href="' . esc_url( $baro ) . '" target="_blank" rel="noopener noreferrer">Avukat Baro Doğrulama için Tıklayınız</a>'
+			. '</div>'
+			. '<div class="cindemir-footer-badges" aria-label="Cindemir Law verification and membership badges">'
+			. '<a href="https://www.aeuropea.com/" target="_blank" rel="noopener noreferrer" title="AEuropea">'
+			. '<img src="https://www.aeuropea.com/wp-content/uploads/2025/09/aea-01v001-ILN-small.png" alt="AEuropea" width="64" height="48" loading="lazy" decoding="async" /></a>'
+			. '<a href="https://istanbulbarosu.org.tr/" target="_blank" rel="noopener noreferrer" title="İstanbul Barosu">'
+			. '<img src="https://istanbulbarosu.org.tr/images/baro_logo.png" alt="İstanbul Barosu" width="48" height="48" loading="lazy" decoding="async" /></a>'
+			. '<a href="https://www.barobirlik.org.tr/" target="_blank" rel="noopener noreferrer" title="Türkiye Barolar Birliği">'
+			. '<img src="' . esc_url( $tbb ) . '" alt="Türkiye Barolar Birliği" width="48" height="48" loading="lazy" decoding="async" /></a>'
+			. '</div>'
+			. '</div>'
+			. '<style id="cindemir-footer-badge-cls-css">'
+			. '#socket .cindemir-socket-extras{width:100%;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15);text-align:center}'
+			. '#socket .cindemir-baro-verification-bar{margin-bottom:12px;text-align:center}'
+			. '#socket .cindemir-baro-verification-bar a{color:inherit;text-decoration:underline;font-size:14px}'
+			. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}'
+			. '#socket .cindemir-footer-badges img{height:48px;width:auto;max-height:48px;display:block;object-fit:contain;border:0}'
+			. '</style>';
 	}
 
 	/**
