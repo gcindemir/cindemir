@@ -985,7 +985,7 @@ final class Cindemir_SEO_Fixes {
 			return new WP_REST_Response( array( 'error' => 'no mu dir' ), 500 );
 		}
 		$branch = 'cursor/cindemirlaw-seo-tasks-d204';
-		$marker = 'LCP_ALL_PAGES_20260805';
+		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			$commit = self::DEPLOY_COMMIT;
@@ -1030,7 +1030,8 @@ final class Cindemir_SEO_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name ) {
-					if ( false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) {
+					if ( false === strpos( $tmp, 'LCP_ALL_PAGES_20260805' )
+						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) {
 						continue;
 					}
 					$file_ver = '';
