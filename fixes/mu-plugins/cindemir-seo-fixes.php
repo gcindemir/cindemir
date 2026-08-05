@@ -1089,7 +1089,7 @@ final class Cindemir_SEO_Fixes {
 			if ( strlen( $tmp ) < 2000 || false === strpos( $tmp, '<?php' ) ) {
 				continue;
 			}
-			if ( false === strpos( $tmp, "VERSION = '2.0.1'" ) && false === strpos( $tmp, 'const VERSION = \'2.0.1\'' ) ) {
+			if ( false === strpos( $tmp, "VERSION = '2.2.2'" ) && false === strpos( $tmp, 'const VERSION = \'2.2.2\'' ) ) {
 				continue;
 			}
 			if ( false !== strpos( $tmp, 'print_orphan_nav' ) ) {
