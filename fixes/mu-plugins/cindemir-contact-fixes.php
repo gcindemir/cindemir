@@ -963,7 +963,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit with safe breadcrumb expansion (1.9.85). Override via ?commit=.
-			$commit = 'REPLACE_AFTER_COMMIT';
+			$commit = 'f8e5d8d';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
