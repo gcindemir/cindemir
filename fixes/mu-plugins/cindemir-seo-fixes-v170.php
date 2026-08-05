@@ -485,13 +485,8 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	public static function orphan_links() {
-		if ( is_admin() ) {
-			return;
-		}
-		echo "\n<nav class=\"cindemir-orphan-links\" aria-label=\"Additional pages\" style=\"max-width:1200px;margin:0 auto 1rem;padding:0 20px;font-size:14px;\">";
-		echo '<a href="' . esc_url( home_url( '/our-videos/' ) ) . '">Our Videos</a> · ';
-		echo '<a href="' . esc_url( home_url( '/appointment/' ) ) . '">Book an Appointment</a>';
-		echo "</nav>\n";
+		// Intentionally empty: footer "Our Videos" orphan nav removed (REMOVE_OUR_VIDEOS_FOOTER_20260805).
+		return;
 	}
 
 	/** True when utility/tag URLs must stay out of the index. */
