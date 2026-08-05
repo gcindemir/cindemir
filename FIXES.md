@@ -21,3 +21,6 @@ Install in WordPress admin (zip upload) or WP-CLI to apply on production.
 - Semrush “Unknown host” / inflated broken-link counts  
 - Mass title-length cleanup across 1600+ pages  
 - YouTube lazyload JS `ID` placeholder (runtime template, not a real img)
+
+## CLS (cindemirlaw.com)
+See `wp-plugin/cindemir-geo-fixes/CLS.md`. Paste-ready CSS: `assets/cls-fix-enfold.css`. Plugin v1.2 includes `class-cls-fix.php`.

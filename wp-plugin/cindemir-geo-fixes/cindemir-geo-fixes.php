@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CINDEMIR_GEO_VERSION', '1.1.0' );
+define( 'CINDEMIR_GEO_VERSION', '1.2.0' );
 define( 'CINDEMIR_GEO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CINDEMIR_GEO_URL', plugin_dir_url( __FILE__ ) );
 
@@ -21,6 +21,7 @@ require_once CINDEMIR_GEO_DIR . 'includes/class-schema.php';
 require_once CINDEMIR_GEO_DIR . 'includes/class-alt-fix.php';
 require_once CINDEMIR_GEO_DIR . 'includes/class-meta.php';
 require_once CINDEMIR_GEO_DIR . 'includes/class-landings.php';
+require_once CINDEMIR_GEO_DIR . 'includes/class-cls-fix.php';
 
 final class Cindemir_GEO_Fixes {
 	public static function init() {
@@ -28,6 +29,7 @@ final class Cindemir_GEO_Fixes {
 		Cindemir_GEO_Alt_Fix::init();
 		Cindemir_GEO_Meta::init();
 		Cindemir_GEO_Landings::init();
+		Cindemir_GEO_Cls_Fix::init();
 	}
 
 	public static function activate() {

@@ -13,6 +13,7 @@
 | Zayıf OG/meta description (anasayfa) | Dil bazlı güçlü açıklama |
 | Polylang bayraklarında boş `alt` | Dil adı ile doldurulur |
 | Eksik niyet sayfaları | Aktivasyonda 4 landing + FAQ schema |
+| CLS ~0.239 (logo lazy, `::after`, font) | Critical CSS + eager logo + reserved brand slot (`CLS.md`) |
 
 **Bilerek dokunulmayanlar:** Audit’teki “20k broken link / Unknown host” (crawl false positive), YouTube `vi/ID` JS şablonu, site geneli title uzunluğu (içerik editörü işi).
 

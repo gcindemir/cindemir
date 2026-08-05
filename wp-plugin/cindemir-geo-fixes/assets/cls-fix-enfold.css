@@ -1,0 +1,81 @@
+/* Paste into: Enfold → Theme Options → General Styling → Quick CSS
+   OR Appearance → Customize → Additional CSS
+   Site: cindemirlaw.com (CLS ~0.239 → target <0.1)
+
+   Culprits addressed:
+   1) Header logo lazy + 300x100 vs 300x300 mismatch
+   2) span.logo a::after brand text reflow
+   3) Oversized contain-intrinsic-size
+*/
+
+#top #header #header_main,
+#top #header #header_main .container,
+#top #header #header_main .inner-container {
+  min-height: 64px !important;
+  height: 64px !important;
+  box-sizing: border-box !important;
+}
+
+#top #header .logo,
+span.logo.avia-standard-logo {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  max-width: min(300px, 42vw) !important;
+}
+
+#top #header .logo a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 44px !important;
+  height: 44px !important;
+}
+
+#top #header .logo img,
+#top #header .logo picture {
+  display: block !important;
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: contain !important;
+  flex: 0 0 44px !important;
+}
+
+#top #header .logo a::after,
+#header .logo a::after {
+  content: "Cindemir Law Office" !important;
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: min(200px, 30vw) !important;
+  min-width: min(180px, 28vw) !important;
+  max-width: min(220px, 30vw) !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  color: #244f4f !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+@media (max-width: 767px) {
+  #top #header .logo a::after {
+    content: "" !important;
+    width: 0 !important;
+    min-width: 0 !important;
+  }
+}
+
+img:is([sizes="auto" i], [sizes^="auto," i]) {
+  contain-intrinsic-size: 800px 450px !important;
+}
+
+.entry-content img[width][height] {
+  height: auto;
+  max-width: 100%;
+}
