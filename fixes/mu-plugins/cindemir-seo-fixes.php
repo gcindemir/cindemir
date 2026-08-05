@@ -1029,12 +1029,18 @@ final class Cindemir_SEO_Fixes {
 				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
-				if ( false === strpos( $tmp, $marker ) ) {
-					continue;
-				}
-				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
-						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) ) {
+				if ( 'cindemir-seo-fixes.php' === $name ) {
+					if ( false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) {
+						continue;
+					}
+					$file_ver = '';
+					if ( preg_match( '/\bVersion:\s*([0-9.]+)/', $tmp, $vm ) ) {
+						$file_ver = $vm[1];
+					}
+					if ( '' === $file_ver || version_compare( $file_ver, self::VERSION, '<' ) ) {
+						continue;
+					}
+				} elseif ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
 				$body = $tmp;
