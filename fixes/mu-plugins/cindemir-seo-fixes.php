@@ -4074,10 +4074,12 @@ JS;
 			'#<img\b([^>]*cropped-logoicon-1-1[^>]*)>#i',
 			static function ( $m ) use ( $logo ) {
 				$attrs = $m[1];
-				$attrs = preg_replace( '/\s(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\1/i', '', $attrs );
+				$attrs = preg_replace( '/\s(?:src|data-lazy-src|data-src|alt)=(["\'])[^"\']*\1/i', '', $attrs );
 				$attrs = preg_replace( '/\s(?:width|height|loading|fetchpriority|decoding)=(["\']?)[^"\'\s>]*\1/i', '', $attrs );
 				$attrs = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|lazyloaded|avia-img-lazy-loading[^\s]*)\b([^"\']*)\1/i', ' class="$2$3"', $attrs );
-				return '<img src="' . $logo . '" width="44" height="44" alt="Cindemir Law Office" decoding="async" fetchpriority="high" loading="eager"' . $attrs . '>';
+				$attrs = preg_replace( '/\s+/', ' ', trim( $attrs ) );
+				$extra = ( is_string( $attrs ) && '' !== $attrs ) ? ' ' . $attrs : '';
+				return '<img src="' . $logo . '" width="44" height="44" alt="Cindemir Law Office" decoding="async" fetchpriority="high" loading="eager"' . $extra . '>';
 			},
 			$html
 		);
