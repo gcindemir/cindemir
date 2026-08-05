@@ -1,0 +1,54 @@
+{
+  "ig": {
+    "modal_visible": true,
+    "modal_click": {
+      "ok": true,
+      "text": "Onayla",
+      "tag": "DIV",
+      "role": "button",
+      "total": -47234.856823694136
+    },
+    "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915",
+    "still_approve": true,
+    "still_disconnected": true,
+    "modal_still": true,
+    "first_click": {
+      "ok": true,
+      "text": "Erişimi onayla",
+      "tag": "DIV",
+      "role": "button",
+      "total": -45625.142053513264
+    }
+  },
+  "wa": {
+    "phone_modal": true,
+    "needs_phone_app_scan": true,
+    "url": "https://business.facebook.com/latest/inbox/instagram_direct?asset_id=336218871992&business_id=1161971660662915&ir_qe_exposed=1",
+    "shows_setup_landing": false,
+    "shows_basla": false,
+    "snip": "Gelen Kutusu Mesajlara yanıt ver, otomasyonları ayarla ve daha fazlasını yap. Otomasyonlar Mesajlaşma reklamı oluştur ​ Mesajlaşma istatistikleri ​ Müsaitlik durumu ​ Müsait Mesaj Ayarları ​ Tüm mesajlar Messenger Instagram Erişimi onayla Bağlantı kesildi WhatsApp Yeni Yeni Facebook yorumları Instagram yorumları Confirm Instagram message access Instagram messages are unavailable in Inbox until you confirm that people who manage your Facebook Page can also manage your Instagram messages. Learn More Erişimi onayla Meta Business Suite Bağlantılar Ana Sayfa Ana Sayfa Bildirimler Bildirimler Reklam Yöneticisi Reklam Yöneticisi Gelen Kutusu Gelen Kutusu İçerik İçerik Bağlantılar İçerik üreticisi pazar yeri İçerik üreticisi pazar yeri Planlayıcı Planlayıcı Reklamlar Reklamlar İstatistikler İstatistikler Tüm Araçlar Tüm Araçlar Para Kazanma Para Kazanma Düzenle Oluştur Oluştur Ara Ara Bağlantılar Ayarlar Ayarlar Yardım Yardım Cannot Add Phone Number Telefon numarasının uygunluğu kontrol edilemedi. Tamam"
+  },
+  "updated": "2026-07-18T10:05:51Z",
+  "wa_clicks": [
+    {
+      "ok": true,
+      "text": "Devam",
+      "tag": "DIV",
+      "role": "button",
+      "total": -47218.856608375645
+    },
+    {
+      "ok": true,
+      "text": "Erişimi onayla",
+      "tag": "DIV",
+      "role": "",
+      "total": 1242.4127197265625
+    }
+  ],
+  "final": {
+    "ig_approve_btn": true,
+    "ig_disconnected": true,
+    "wa_landing": false,
+    "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE"
+  }
+}
