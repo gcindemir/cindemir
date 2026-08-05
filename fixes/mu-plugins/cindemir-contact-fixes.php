@@ -963,8 +963,8 @@ final class Cindemir_Contact_Fixes {
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
-			// Known-good commit with safe breadcrumb expansion (1.9.85). Override via ?commit=.
-			$commit = '6c0770a';
+			// Known-good commit with breadcrumb quality fix (1.9.86). Override via ?commit=.
+			$commit = '9f73b68';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
@@ -993,7 +993,7 @@ final class Cindemir_Contact_Fixes {
 					array(
 						'timeout' => 90,
 						'headers' => array(
-							'User-Agent'    => 'CindemirPull/1.3.22',
+							'User-Agent'    => 'CindemirPull/1.3.23',
 							'Cache-Control' => 'no-cache',
 							'Pragma'        => 'no-cache',
 						),
@@ -1010,10 +1010,9 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.85' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.86' )
+						|| false === strpos( $tmp, 'BREADCRUMB_QUALITY_FIX_20260805' )
 						|| false === strpos( $tmp, 'AHREFS_AUG5_20260805' )
-						|| false === strpos( $tmp, 'BREADCRUMB_SAFE_EXPAND_20260805' )
-						|| false === strpos( $tmp, 'GA4_DISABLE_INVALID_ID_20260805' )
 						|| false === strpos( $tmp, 'AHREFS_AUG2026' ) ) ) {
 					continue;
 				}
