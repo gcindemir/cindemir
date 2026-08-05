@@ -2034,7 +2034,7 @@ final class Cindemir_SEO_Fixes {
 						break;
 					}
 				}
-				if ( ! $is_lcp && ! $lcp_set && ! $is_home && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
+				if ( ! $is_lcp && ! $lcp_set && ! $is_home && ! $is_team_page && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
 					if ( ! preg_match( '/\b(?:width|height)=(["\'])(?:1[0-8]|[1-9])\1/i', $tag ) ) {
 						$is_lcp = true;
 					}
