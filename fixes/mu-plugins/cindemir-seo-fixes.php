@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.87 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.87
+ * Version: 1.9.88
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -12,6 +12,7 @@
  * BREADCRUMB_SAFE_EXPAND_20260805
  * BREADCRUMB_QUALITY_FIX_20260805
  * LCP_HELPERS_RESTORE_20260805
+ * HEADER_BRAND_FIT_20260805
  * Author: Cindemir Law Office
  */
 
@@ -181,7 +182,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.87';
+	const VERSION = '1.9.88';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = 'b355702';
 
@@ -4013,9 +4014,32 @@ JS;
 	}
 
 	private static function header_brand_label() {
-		// Keep a stable Latin brand in the header so RU/ZH labels do not inflate
-		// the logo row and shove the menu/banner around.
+		$lang = self::front_lang();
+		if ( 'ru' === $lang ) {
+			return 'Юридическая фирма Cindemir';
+		}
+		if ( in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
+			return '辛德米尔律师事务所';
+		}
+		if ( 'tr' === $lang ) {
+			return 'Cindemir Hukuk Bürosu';
+		}
 		return 'Cindemir Law Office';
+	}
+
+	/**
+	 * CSS content: value for .logo a::after (may include \\A line breaks).
+	 */
+	private static function header_brand_css_content() {
+		$lang = self::front_lang();
+		if ( 'ru' === $lang ) {
+			// Two lines so the full Russian brand fits without "фирм..." ellipsis.
+			return 'Юридическая фирма\\A Cindemir';
+		}
+		if ( in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
+			return '辛德米尔\\A 律师事务所';
+		}
+		return self::header_brand_label();
 	}
 
 	/**
@@ -4132,7 +4156,9 @@ public static function homepage_hero_styles() {
 		if ( is_admin() ) {
 			return;
 		}
-		$label = esc_attr( self::header_brand_label() );
+		$label = str_replace( '"', '\\"', self::header_brand_css_content() );
+		$lang  = self::front_lang();
+		$long  = in_array( $lang, array( 'ru', 'zh-hans', 'zh', 'tr' ), true );
 		// Theme "Additional CSS" contains `.logo{display:none !important}` which collapses
 		// the mobile header (and hides the burger). Force logo/burger/header back.
 		echo '<style id="cindemir-header-brand">'
@@ -4143,18 +4169,22 @@ public static function homepage_hero_styles() {
 			. '#top #header .logo{'
 			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
 			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
-			. 'z-index:50;align-items:center;flex:0 1 auto;max-width:min(280px,34vw)!important}'
+			. 'z-index:50;align-items:center;flex:0 1 auto;max-width:min(300px,36vw)!important}'
 			. '#top #header .logo a{'
 			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
 			. 'text-decoration:none!important;max-height:none!important;height:auto!important;min-width:0!important}'
 			. '#top #header .logo img,#top #header .logo picture{'
 			. 'display:inline-block!important;max-height:44px!important;width:auto!important;'
 			. 'height:auto!important;opacity:1!important;visibility:visible!important;flex:0 0 auto}'
-			. '#top #header .logo a::after{'
+			/* Full brand text — no ellipsis. RU/ZH wrap to 2 lines via \\A. */
+			. '#top #header .logo a::after,'
+			. '#header .logo a::after{'
 			. 'content:"' . $label . '"!important;display:inline-block!important;'
-			. 'font-family:Georgia,"Times New Roman",serif!important;font-size:18px!important;font-weight:700!important;'
-			. 'line-height:1.15!important;color:#244f4f!important;white-space:nowrap;'
-			. 'overflow:hidden;text-overflow:ellipsis;max-width:min(200px,26vw)!important}'
+			. 'font-family:Georgia,"Times New Roman",serif!important;'
+			. 'font-size:' . ( $long ? '15px' : '18px' ) . '!important;font-weight:700!important;'
+			. 'line-height:1.15!important;color:#244f4f!important;'
+			. 'white-space:pre-line!important;overflow:visible!important;text-overflow:clip!important;'
+			. 'width:max-content!important;max-width:min(220px,30vw)!important}'
 			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '#top #header .av-burger-menu-main{'
 			. 'display:block!important;visibility:visible!important;opacity:1!important;'
@@ -4184,8 +4214,11 @@ public static function homepage_hero_styles() {
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
 			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
-			. 'flex-wrap:nowrap!important;overflow:hidden}'
-			. '#top #header .logo a::after{font-size:18px!important;max-width:min(220px,22vw)!important}'
+			. 'flex-wrap:nowrap!important;overflow:visible}'
+			. '#top #header .logo{max-width:min(280px,32vw)!important;flex:0 0 auto}'
+			. '#top #header .logo a::after,#header .logo a::after{'
+			. 'font-size:' . ( $long ? '15px' : '17px' ) . '!important;'
+			. 'max-width:min(240px,28vw)!important;overflow:visible!important;text-overflow:clip!important}'
 			. '#top #header .main_menu{'
 			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
 			. 'margin-left:auto!important;flex:1 1 auto;min-width:0;text-align:right!important}'
@@ -4194,8 +4227,10 @@ public static function homepage_hero_styles() {
 			. '#top #header .av-main-nav > li{flex:0 0 auto}'
 			. '}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .logo a::after{font-size:14px!important;max-width:min(150px,42vw)!important}'
-			. '#top #header .logo{max-width:min(200px,58vw)!important}'
+			. '#top #header .logo a::after,#header .logo a::after{'
+			. 'font-size:13px!important;max-width:min(180px,48vw)!important;'
+			. 'overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important}'
+			. '#top #header .logo{max-width:min(240px,62vw)!important}'
 			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			/* Enfold forces #header {position:relative} under .responsive — restore sticky so the burger follows scroll. */
