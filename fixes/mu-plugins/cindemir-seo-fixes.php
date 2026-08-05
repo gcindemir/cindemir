@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.86 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.87 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.86
+ * Version: 1.9.87
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -11,6 +11,7 @@
  * GA4_DISABLE_INVALID_ID_20260805
  * BREADCRUMB_SAFE_EXPAND_20260805
  * BREADCRUMB_QUALITY_FIX_20260805
+ * LCP_HELPERS_RESTORE_20260805
  * Author: Cindemir Law Office
  */
 
@@ -1981,6 +1982,49 @@ final class Cindemir_SEO_Fixes {
 		return null;
 	}
 
+	/**
+	 * Pick WebP when the file exists on disk, otherwise fall back to JPEG.
+	 *
+	 * @param string $rel_without_ext Path under wp-content, without extension.
+	 * @return array{url:string,type:string}|null
+	 */
+	private static function preferred_upload_image( $rel_without_ext ) {
+		$rel_without_ext = ltrim( (string) $rel_without_ext, '/' );
+		$webp_abs        = WP_CONTENT_DIR . '/' . $rel_without_ext . '.webp';
+		if ( file_exists( $webp_abs ) ) {
+			return array(
+				'url'  => content_url( $rel_without_ext . '.webp' ),
+				'type' => 'image/webp',
+			);
+		}
+		$jpg_abs = WP_CONTENT_DIR . '/' . $rel_without_ext . '.jpg';
+		if ( file_exists( $jpg_abs ) ) {
+			return array(
+				'url'  => content_url( $rel_without_ext . '.jpg' ),
+				'type' => 'image/jpeg',
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * @param string $url Image URL.
+	 * @return string MIME type or empty.
+	 */
+	private static function image_mime_from_url( $url ) {
+		$path = (string) parse_url( $url, PHP_URL_PATH );
+		if ( preg_match( '/\.webp$/i', $path ) ) {
+			return 'image/webp';
+		}
+		if ( preg_match( '/\.png$/i', $path ) ) {
+			return 'image/png';
+		}
+		if ( preg_match( '/\.(jpe?g)$/i', $path ) ) {
+			return 'image/jpeg';
+		}
+		return '';
+	}
+
 	private static function lcp_image_needles() {
 		$needles = array();
 		$lcp     = self::lcp_preload_image();
@@ -2068,6 +2112,43 @@ final class Cindemir_SEO_Fixes {
 			return '';
 		}
 		return $html;
+	}
+
+	/**
+	 * Promote data-lazy-src / data-src to src and drop Rocket lazy placeholders.
+	 *
+	 * @param string $tag Single img tag.
+	 * @return string
+	 */
+	private static function unlazy_img_tag( $tag ) {
+		if ( ! is_string( $tag ) || '' === $tag ) {
+			return $tag;
+		}
+		$real = '';
+		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src' ) as $attr ) {
+			if ( preg_match( '/\b' . preg_quote( $attr, '/' ) . '=(["\'])([^"\']+)\1/i', $tag, $m ) ) {
+				$real = $m[2];
+				break;
+			}
+		}
+		if ( '' !== $real && preg_match( '/\bsrc=(["\'])/i', $tag ) ) {
+			$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( $real ) . '"', $tag, 1 );
+		} elseif ( '' !== $real ) {
+			$tag = preg_replace( '/<img\b/i', '<img src="' . esc_attr( $real ) . '"', $tag, 1 );
+		}
+		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src', 'data-lazy-srcset', 'data-lazy-sizes' ) as $attr ) {
+			$tag = preg_replace( '/\s' . preg_quote( $attr, '/' ) . '=(["\'])[^"\']*\1/i', '', $tag );
+		}
+		if ( preg_match( '/\bsrcset=(["\'])/i', $tag ) ) {
+			// keep srcset when already present
+		} elseif ( preg_match( '/\bdata-lazy-srcset=(["\'])([^"\']+)\1/i', $tag, $sm ) ) {
+			$tag = preg_replace( '/<img\b/i', '<img srcset="' . esc_attr( $sm[2] ) . '"', $tag, 1 );
+		}
+		if ( ! preg_match( '/\bsizes=/i', $tag ) && preg_match( '/\bdata-lazy-sizes=(["\'])([^"\']+)\1/i', $tag, $sz ) ) {
+			$tag = preg_replace( '/<img\b/i', '<img sizes="' . esc_attr( $sz[2] ) . '"', $tag, 1 );
+		}
+		$tag = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|avia-img-lazy-loading[^\s]*|wp-image-lazy)\b([^"\']*)\1/i', ' class="$2$3"', $tag );
+		return $tag;
 	}
 
 	public static function inject_ga4_tag() {
