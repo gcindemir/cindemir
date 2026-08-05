@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Contact & WhatsApp Fixes
  * Description: Reliable Enfold contact form submit + Joinchat/WhatsApp fallback when Debloat delays JS.
- * Version: 1.3.24
+ * Version: 1.3.25
  * SERVICES_BLANK_FIX_20260715
  * ELENA_ZARA_RU_BIO_20260718
  * BACKUP_WP_CRON_20260719
@@ -13,6 +13,7 @@
  * BREADCRUMB_SAFE_EXPAND_20260805
  * BREADCRUMB_QUALITY_FIX_20260805
  * LCP_HELPERS_RESTORE_20260805
+ * HEADER_BRAND_FIT_20260805
  * Author: Cindemir Law Office
  */
 
@@ -964,8 +965,8 @@ final class Cindemir_Contact_Fixes {
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
-			// Known-good commit: breadcrumb quality + restored LCP helpers. Override via ?commit=.
-			$commit = '45d0d89';
+			// Known-good commit: header brand fit 1.9.88. Override via ?commit=.
+			$commit = 'PLACEHOLDER_COMMIT';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
@@ -976,12 +977,13 @@ final class Cindemir_Contact_Fixes {
 			'https://github.com/gcindemir/cindemir/raw/' . $branch . '/fixes/mu-plugins/',
 		);
 		$files  = array(
-			'cindemir-seo-fixes.php'         => 155000,
-			'cindemir-contact-fixes.php'     => 20000,
-			'cindemir-expose-yoast-meta.php' => 2000,
-			'cindemir-purge-cache.php'       => 500,
-			'cindemir-services-page.php'     => 10000,
-			'cindemir-backup.php'            => 8000,
+			'cindemir-seo-fixes.php'              => 155000,
+			'cindemir-contact-fixes.php'          => 20000,
+			'cindemir-expose-yoast-meta.php'      => 2000,
+			'cindemir-purge-cache.php'            => 500,
+			'cindemir-services-page.php'          => 10000,
+			'cindemir-backup.php'                 => 8000,
+			'cindemir-mobile-header-branding.php' => 400,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -994,7 +996,7 @@ final class Cindemir_Contact_Fixes {
 					array(
 						'timeout' => 90,
 						'headers' => array(
-							'User-Agent'    => 'CindemirPull/1.3.24',
+							'User-Agent'    => 'CindemirPull/1.3.25',
 							'Cache-Control' => 'no-cache',
 							'Pragma'        => 'no-cache',
 						),
@@ -1007,11 +1009,20 @@ final class Cindemir_Contact_Fixes {
 				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
+				if ( 'cindemir-mobile-header-branding.php' === $name ) {
+					if ( false === strpos( $tmp, 'CINDEMIR_SEO_FIXES_LOADED' ) ) {
+						continue;
+					}
+					$body = $tmp;
+					$src  = $base_url;
+					break;
+				}
 				if ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.87' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.88' )
+						|| false === strpos( $tmp, 'HEADER_BRAND_FIT_20260805' )
 						|| false === strpos( $tmp, 'BREADCRUMB_QUALITY_FIX_20260805' )
 						|| false === strpos( $tmp, 'LCP_HELPERS_RESTORE_20260805' )
 						|| false === strpos( $tmp, 'function preferred_upload_image' )
