@@ -964,8 +964,8 @@ final class Cindemir_Contact_Fixes {
 		$marker = 'ELENA_ZARA_RU_BIO_20260718';
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
-			// Known-good commit with breadcrumb quality + restored LCP helpers (1.9.87). Override via ?commit=.
-			$commit = 'PLACEHOLDER_COMMIT';
+			// Known-good commit: breadcrumb quality + restored LCP helpers. Override via ?commit=.
+			$commit = '6f61010';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
