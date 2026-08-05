@@ -2016,7 +2016,11 @@ final class Cindemir_SEO_Fixes {
 				if ( preg_match( '/\bcindemir-lang-flag\b/i', $tag ) ) {
 					return $tag;
 				}
-				if ( preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*(?:sitepress|/flags/|res/flags)[^"\']*\1/i', $tag ) ) {
+				if ( preg_match( '#\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*(?:sitepress|/flags/|res/flags|uploads/flags/)[^"\']*\1#i', $tag ) ) {
+					$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
+					if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+						$tag = preg_replace( '/<img\b/i', '<img loading="lazy"', $tag, 1 );
+					}
 					return $tag;
 				}
 				$is_logo = (bool) preg_match( '/\b(?:logo|cropped-logoicon|cindemir-site-brand)\b/i', $tag );
