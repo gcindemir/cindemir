@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -14,6 +14,7 @@
  * LCP_HELPERS_RESTORE_20260805
  * HEADER_BRAND_FIT_20260805
  * REMOVE_OUR_VIDEOS_FOOTER_20260805
+ * FOOTER_BADGE_CLS_20260805
  * Author: Cindemir Law Office
  */
 
@@ -368,6 +369,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -1011,6 +1013,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-purge-cache.php'       => 500,
 			'cindemir-services-page.php'     => 10000,
 			'cindemir-backup.php'            => 8000,
+			'cindemir-footer-rocket.php'     => 4000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -1041,7 +1044,12 @@ final class Cindemir_SEO_Fixes {
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'REMOVE_OUR_VIDEOS_FOOTER_20260805' ) ) ) {
+						|| false === strpos( $tmp, 'FOOTER_BADGE_CLS_20260805' ) ) ) {
+					continue;
+				}
+				if ( 'cindemir-footer-rocket.php' === $name
+					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
+						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -3753,6 +3761,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::strip_orphan_footer_nav( $html );
+		$html = self::fix_footer_badge_dimensions( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
 		$html = self::undelay_ga4_scripts( $html );
@@ -4884,6 +4893,69 @@ public static function homepage_hero_styles() {
 			. '#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.95}'
 			. '@media (max-width:767px){#socket .container{padding-top:12px;padding-bottom:12px}#socket .cindemir-footer-meta{font-size:11px}}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Ensure footer membership badges have explicit width+height (PageSpeed CLS).
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	public static function fix_footer_badge_dimensions( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		if ( false === stripos( $html, 'cindemir-footer-badges' )
+			&& false === stripos( $html, 'AEuropea' )
+			&& false === stripos( $html, 'tbb_amblem' )
+			&& false === stripos( $html, 'baro_logo' ) ) {
+			return $html;
+		}
+
+		$widths = array(
+			'aea-01v001'     => 64,
+			'aeuropea.com'   => 64,
+			'tbb_amblem'     => 48,
+			'baro_logo'      => 48,
+			'istanbulbarosu' => 48,
+		);
+
+		$next = preg_replace_callback(
+			'#<img\b[^>]*>#i',
+			static function ( $m ) use ( $widths ) {
+				$tag = $m[0];
+				$hay = strtolower( $tag );
+				$match_w = 0;
+				foreach ( $widths as $needle => $w ) {
+					if ( false !== strpos( $hay, $needle ) ) {
+						$match_w = (int) $w;
+						break;
+					}
+				}
+				if ( ! $match_w ) {
+					return $tag;
+				}
+				if ( false === strpos( $hay, 'aeuropea' )
+					&& false === strpos( $hay, 'barosu' )
+					&& false === strpos( $hay, 'barolar' )
+					&& false === strpos( $hay, 'tbb_amblem' )
+					&& false === strpos( $hay, 'baro_logo' ) ) {
+					return $tag;
+				}
+				if ( ! preg_match( '/\bheight=/i', $tag ) ) {
+					$tag = preg_replace( '/<img\b/i', '<img height="48"', $tag, 1 );
+				}
+				if ( preg_match( '/\bwidth=(["\'])?\s*\1/i', $tag ) || ! preg_match( '/\bwidth=/i', $tag ) ) {
+					$tag = preg_replace( '/\swidth=(["\'])[^"\']*\1/i', '', $tag );
+					$tag = preg_replace( '/<img\b/i', '<img width="' . $match_w . '"', $tag, 1 );
+				}
+				$tag = preg_replace( "#viewBox='0 0 0 48'#i", "viewBox='0 0 " . $match_w . " 48'", $tag );
+				$tag = preg_replace( '#viewBox="0 0 0 48"#i', 'viewBox="0 0 ' . $match_w . ' 48"', $tag );
+				return $tag;
+			},
+			$html
+		);
+		return is_string( $next ) ? $next : $html;
 	}
 
 	/**
