@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -16,6 +16,7 @@
  * REMOVE_OUR_VIDEOS_FOOTER_20260805
  * FOOTER_BADGE_CLS_20260805
  * LCP_ABOUT_TEAM_UNLAZY_20260806
+ * PSI_ABOUT_CLS_20260806
  * Author: Cindemir Law Office
  */
 
@@ -369,6 +370,7 @@ final class Cindemir_SEO_Fixes {
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 999 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
@@ -1045,7 +1047,7 @@ final class Cindemir_SEO_Fixes {
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'FOOTER_BADGE_CLS_20260805' ) ) ) {
+						|| false === strpos( $tmp, 'PSI_ABOUT_CLS_20260806' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
@@ -2184,14 +2186,14 @@ final class Cindemir_SEO_Fixes {
 				}
 
 				$is_logo = (bool) preg_match( '/\b(?:logo|cropped-logoicon|cindemir-site-brand)\b/i', $blob );
-				// On home/about/team the logo must never steal LCP from the hero/team photo.
+				// On home/about/team the logo must never steal LCP from the hero/team photo,
+				// but it MUST still be unlazied + sized (SVG 300×100 → real square = CLS).
 				if ( $is_logo && ( $is_home || $is_team_page ) ) {
-					$is_logo = false;
-					$tag     = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
-					if ( ! preg_match( '/\bloading=/i', $tag ) ) {
-						$tag = preg_replace( '/<img\b/i', '<img loading="eager"', $tag, 1 );
-					}
-					return $tag . ( $noscript_img ? '<noscript>' . $noscript_img . '</noscript>' : '' );
+					$tag = Cindemir_SEO_Fixes::unlazy_img_tag( $tag, $noscript_img );
+					$tag = preg_replace( '/\s(?:width|height|loading|fetchpriority)=(["\']?)[^"\'\s>]*\1/i', '', $tag );
+					$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( Cindemir_SEO_Fixes::HEADER_LOGO ) . '"', $tag, 1 );
+					$tag = preg_replace( '/<img\b/i', '<img width="44" height="44" loading="eager" decoding="async"', $tag, 1 );
+					return $tag;
 				}
 
 				$is_lcp = false;
@@ -3841,6 +3843,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::strip_orphan_footer_nav( $html );
 		$html = self::fix_footer_badge_dimensions( $html );
+		$html = self::pagespeed_optimize_lcp_html( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
 		$html = self::undelay_ga4_scripts( $html );
@@ -4132,7 +4135,50 @@ JS;
 			'/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg',
 			$html
 		);
-		return $html;
+		// Rocket SVG / 300×100 attrs in the logo slot → real 44×44 (CLS).
+		$logo_img = '<img src="' . $logo . '" width="44" height="44" alt="Cindemir Law Office" decoding="async" loading="eager">';
+		$next     = preg_replace(
+			'#(<span[^>]*\bclass=([\'"])[^\'"]*\blogo\b[^\'"]*\2[^>]*>\s*<a\b[^>]*>)\s*<img\b[^>]*>\s*(?:<noscript>\s*<img\b[^>]*>\s*</noscript>)?#is',
+			'$1' . $logo_img,
+			$html,
+			1,
+			$count
+		);
+		if ( is_string( $next ) && $count > 0 ) {
+			$html = $next;
+		}
+		$html = preg_replace_callback(
+			'#<img\b([^>]*cropped-logoicon-1-1[^>]*)>#i',
+			static function ( $m ) use ( $logo ) {
+				$attrs = $m[1];
+				$attrs = preg_replace( '/\s(?:src|data-lazy-src|data-src|alt)=(["\'])[^"\']*\1/i', '', $attrs );
+				$attrs = preg_replace( '/\s(?:width|height|loading|fetchpriority|decoding)=(["\']?)[^"\'\s>]*\1/i', '', $attrs );
+				$attrs = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|lazyloaded|avia-img-lazy-loading[^\s]*)\b([^"\']*)\1/i', ' class="$2$3"', $attrs );
+				$attrs = preg_replace( '/\s+/', ' ', trim( $attrs ) );
+				$extra = ( is_string( $attrs ) && '' !== $attrs ) ? ' ' . $attrs : '';
+				return '<img src="' . $logo . '" width="44" height="44" alt="Cindemir Law Office" decoding="async" loading="eager"' . $extra . '>';
+			},
+			$html
+		);
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
+		if ( false === strpos( $html, 'class="cindemir-logo-text"' )
+			&& false === strpos( $html, "class='cindemir-logo-text'" ) ) {
+			$label = esc_html( self::header_brand_label() );
+			$span  = '<span class="cindemir-logo-text">' . $label . '</span>';
+			$next  = preg_replace(
+				'#(<span[^>]*\bclass=([\'"])[^\'"]*\blogo\b[^\'"]*\2[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is',
+				'$1$3' . $span . '$4',
+				$html,
+				1,
+				$count
+			);
+			if ( is_string( $next ) && $count > 0 ) {
+				$html = $next;
+			}
+		}
+		return is_string( $html ) ? $html : '';
 	}
 
 	/**
@@ -4313,29 +4359,50 @@ public static function homepage_hero_styles() {
 		// Theme "Additional CSS" contains `.logo{display:none !important}` which collapses
 		// the mobile header (and hides the burger). Force logo/burger/header back.
 		echo '<style id="cindemir-header-brand">'
+			/* Meta bar is hidden — lock header to 64px. Competing cls-fix CSS uses 98px +
+			 * height:auto here was the PSI .av-logo-container CLS 0.102 culprit. */
+			. 'html{--cindemir-header-h:64px}'
+			. '#top #header{'
+			. 'min-height:64px!important;height:64px!important;max-height:64px!important;'
+			. 'box-sizing:border-box!important}'
 			. '#top #header #header_main,'
 			. '#top #header #header_main .container,'
+			. '#top #header #header_main .container.av-logo-container,'
 			. '#top #header #header_main .inner-container{'
-			. 'min-height:64px!important;height:auto!important;max-height:none}'
+			. 'min-height:64px!important;height:64px!important;max-height:64px!important;'
+			. 'box-sizing:border-box!important;overflow:hidden!important}'
 			. '#top #header .logo{'
 			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
 			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
-			. 'z-index:50;align-items:center;flex:0 1 auto;max-width:min(300px,36vw)!important}'
+			. 'z-index:50;align-items:center;flex:0 1 auto;max-width:min(300px,36vw)!important;'
+			. 'min-height:44px!important;height:44px!important;max-height:44px!important}'
 			. '#top #header .logo a{'
 			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
-			. 'text-decoration:none!important;max-height:none!important;height:auto!important;min-width:0!important}'
+			. 'text-decoration:none!important;min-height:44px!important;height:44px!important;'
+			. 'max-height:44px!important;min-width:0!important}'
 			. '#top #header .logo img,#top #header .logo picture{'
-			. 'display:inline-block!important;max-height:44px!important;width:auto!important;'
-			. 'height:auto!important;opacity:1!important;visibility:visible!important;flex:0 0 auto}'
-			/* Full brand text — no ellipsis. RU/ZH wrap to 2 lines via \\A. */
+			. 'display:block!important;width:44px!important;height:44px!important;max-width:44px!important;'
+			. 'max-height:44px!important;aspect-ratio:1/1!important;object-fit:contain!important;'
+			. 'opacity:1!important;visibility:visible!important;flex:0 0 44px!important}'
+			. '#top #header .logo .cindemir-logo-text{'
+			. 'display:inline-block!important;'
+			. 'font-family:Georgia,"Times New Roman",serif!important;'
+			. 'font-size:' . ( $long ? '15px' : '18px' ) . '!important;font-weight:700!important;'
+			. 'line-height:1.15!important;color:#244f4f!important;'
+			. 'white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;'
+			. 'max-width:min(220px,30vw)!important;flex:0 1 auto}'
+			. '#top #header .logo a:not(:has(.cindemir-logo-text)){'
+			. 'min-width:min(260px,70vw)!important}'
 			. '#top #header .logo a::after,'
 			. '#header .logo a::after{'
 			. 'content:"' . $label . '"!important;display:inline-block!important;'
 			. 'font-family:Georgia,"Times New Roman",serif!important;'
 			. 'font-size:' . ( $long ? '15px' : '18px' ) . '!important;font-weight:700!important;'
 			. 'line-height:1.15!important;color:#244f4f!important;'
-			. 'white-space:pre-line!important;overflow:visible!important;text-overflow:clip!important;'
+			. 'white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;'
 			. 'width:max-content!important;max-width:min(220px,30vw)!important}'
+			. '#top #header .logo a:has(.cindemir-logo-text)::after,'
+			. '#header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '#top #header .av-burger-menu-main{'
 			. 'display:block!important;visibility:visible!important;opacity:1!important;'
@@ -4365,11 +4432,13 @@ public static function homepage_hero_styles() {
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
 			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
-			. 'flex-wrap:nowrap!important;overflow:visible}'
+			. 'flex-wrap:nowrap!important;overflow:hidden}'
 			. '#top #header .logo{max-width:min(280px,32vw)!important;flex:0 0 auto}'
+			. '#top #header .logo .cindemir-logo-text,'
 			. '#top #header .logo a::after,#header .logo a::after{'
 			. 'font-size:' . ( $long ? '15px' : '17px' ) . '!important;'
-			. 'max-width:min(240px,28vw)!important;overflow:visible!important;text-overflow:clip!important}'
+			. 'max-width:min(240px,28vw)!important;overflow:hidden!important;text-overflow:ellipsis!important}'
+			. '#top #header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .main_menu{'
 			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
 			. 'margin-left:auto!important;flex:1 1 auto;min-width:0;text-align:right!important}'
@@ -4378,11 +4447,15 @@ public static function homepage_hero_styles() {
 			. '#top #header .av-main-nav > li{flex:0 0 auto}'
 			. '}'
 			. '@media only screen and (max-width:989px){'
+			. '#top #header .logo .cindemir-logo-text,'
 			. '#top #header .logo a::after,#header .logo a::after{'
 			. 'font-size:13px!important;max-width:min(180px,48vw)!important;'
-			. 'overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important}'
+			. 'overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}'
+			. '#top #header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .logo{max-width:min(240px,62vw)!important}'
-			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
+			. '#top #header .logo img,#top #header .logo picture{'
+			. 'width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important;'
+			. 'aspect-ratio:1/1!important;flex:0 0 34px!important}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			/* Enfold forces #header {position:relative} under .responsive — restore sticky so the burger follows scroll. */
 			. '.responsive.html_header_sticky #top #wrap_all #header,'
@@ -4390,10 +4463,11 @@ public static function homepage_hero_styles() {
 			. 'html.responsive #top #wrap_all #header{'
 			. 'position:fixed!important;top:0!important;left:0!important;right:0!important;'
 			. 'width:100%!important;float:none!important;z-index:1001!important;margin:0!important;'
+			. 'height:64px!important;min-height:64px!important;max-height:64px!important;'
 			. 'background-color:#fff!important;box-shadow:0 1px 0 rgba(0,0,0,.06)}'
 			. '.responsive.html_header_sticky #top #main,'
 			. 'html.responsive #top #main{'
-			. 'padding-top:var(--cindemir-header-h,82px)!important;margin-top:0!important}'
+			. 'padding-top:var(--cindemir-header-h,64px)!important;margin-top:0!important}'
 			. '.html_av-overlay-active .cindemir-lang-item,'
 			. '#av-burger-menu-ul .cindemir-lang-item{'
 			. 'display:block!important;border-top:1px solid rgba(0,0,0,.08);margin-top:8px;padding-top:4px}'
@@ -4456,13 +4530,7 @@ public static function homepage_hero_styles() {
 			. '},true);'
 			. 'if(document.readyState!=="loading")cindemirEnsureBurgerLangs();'
 			. 'else document.addEventListener("DOMContentLoaded",cindemirEnsureBurgerLangs);'
-			. 'function cindemirSyncHeaderH(){'
-			. 'try{var hdr=document.querySelector("#header");if(!hdr)return;'
-			. 'document.documentElement.style.setProperty("--cindemir-header-h",Math.round(hdr.getBoundingClientRect().height||82)+"px");}catch(e){}'
-			. '}'
-			. 'cindemirSyncHeaderH();'
-			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",cindemirSyncHeaderH);'
-			. 'window.addEventListener("resize",cindemirSyncHeaderH);'
+			/* Header height is CSS-fixed (--cindemir-header-h:64px). Do not measure/rewrite after paint. */
 			. '</script>' . "\n";
 	}
 
@@ -4532,18 +4600,8 @@ public static function homepage_hero_styles() {
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>\';'
 			. 'inner.insertBefore(a,inner.firstChild);'
 			. '}'
-			. 'function syncHeaderHeight(){'
-			. 'try{'
-			. 'var hdr=document.querySelector("#header");'
-			. 'if(!hdr)return;'
-			. 'var h=Math.round(hdr.getBoundingClientRect().height)||82;'
-			. 'document.documentElement.style.setProperty("--cindemir-header-h",h+"px");'
-			. '}catch(e){}'
-			. '}'
-			. 'function run(){fixSwitcher();stampLang();runBrand();syncHeaderHeight();}'
+			. 'function run(){fixSwitcher();stampLang();runBrand();}'
 			. 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run);else run();'
-			. 'window.addEventListener("resize",syncHeaderHeight);'
-			. 'window.addEventListener("orientationchange",syncHeaderHeight);'
 			. 'document.addEventListener("click",function(ev){'
 			. 'var li=ev.target&&ev.target.closest&&ev.target.closest("li[class*=\\"language_\\"],li[class*=\\"wpml-ls-item-\\"]");'
 			. 'if(li){'
