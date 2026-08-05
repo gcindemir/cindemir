@@ -965,7 +965,7 @@ final class Cindemir_Contact_Fixes {
 		$commit = $request->get_param( 'commit' );
 		if ( ! is_string( $commit ) || ! preg_match( '/^[a-f0-9]{7,40}$/', $commit ) ) {
 			// Known-good commit: breadcrumb quality + restored LCP helpers. Override via ?commit=.
-			$commit = '0cc81bf';
+			$commit = '45d0d89';
 		}
 		// Commit-pinned CDNs first: Bluehost often sees a stale raw.githubusercontent branch tip.
 		$bases  = array(
