@@ -1,15 +1,16 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.85 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.86 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.85
+ * Version: 1.9.86
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
  * AHREFS_AUG5_20260805
  * GA4_DISABLE_INVALID_ID_20260805
  * BREADCRUMB_SAFE_EXPAND_20260805
+ * BREADCRUMB_QUALITY_FIX_20260805
  * Author: Cindemir Law Office
  */
 
@@ -179,9 +180,9 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.85';
+	const VERSION = '1.9.86';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = '6c0770a';
+	const DEPLOY_COMMIT = 'REPLACE_AFTER_COMMIT';
 
 	/**
 	 * Google Analytics 4 measurement ID.
@@ -2474,6 +2475,9 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( 'SiteNavigationElement', $types, true ) ) {
 			$node = self::normalize_nav_schema( $node );
 		}
+		if ( in_array( 'BreadcrumbList', $types, true ) ) {
+			$node = self::normalize_breadcrumb_schema( $node );
+		}
 		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) || in_array( 'VideoObject', $types, true ) ) {
 			if ( isset( $node['author'] ) ) {
 				$node['author'] = self::normalize_schema_node( $node['author'] );
@@ -2681,39 +2685,177 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Add a minimal BreadcrumbList on singular pages when missing.
-	 * This is intentionally conservative: Home + real parent/category + current page.
+	 * Ensure one clean BreadcrumbList:
+	 * - fix Yoast junk (/home/, /glavnaya/, name=URL)
+	 * - dedupe multiple BreadcrumbList nodes
+	 * - add a minimal factual trail when missing on singular pages
 	 *
 	 * @param array $graph Schema graph pieces.
 	 * @return array
 	 */
 	private static function ensure_breadcrumb_in_graph( $graph ) {
-		foreach ( $graph as $node ) {
+		$bc_indexes = array();
+		foreach ( $graph as $i => $node ) {
 			if ( ! is_array( $node ) ) {
 				continue;
 			}
 			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
 			$types = is_array( $type ) ? $type : array( $type );
 			if ( in_array( 'BreadcrumbList', $types, true ) ) {
-				return $graph;
+				$bc_indexes[] = $i;
 			}
 		}
 
-		if ( ! ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) ) {
-			return $graph;
+		$clean_items = self::build_breadcrumb_list_items();
+		$can_replace = count( $clean_items ) >= 2;
+
+		if ( $bc_indexes ) {
+			$keep = $bc_indexes[0];
+			$node = self::normalize_breadcrumb_schema( $graph[ $keep ] );
+			// If Yoast trail is still broken/thin, replace with our factual trail.
+			if ( $can_replace && self::breadcrumb_needs_rebuild( $node ) ) {
+				$node = array(
+					'@type'           => 'BreadcrumbList',
+					'@id'             => untrailingslashit( $clean_items[ count( $clean_items ) - 1 ]['item'] ) . '/#breadcrumb',
+					'itemListElement' => $clean_items,
+				);
+			}
+			$graph[ $keep ] = $node;
+			for ( $j = count( $bc_indexes ) - 1; $j >= 1; $j-- ) {
+				unset( $graph[ $bc_indexes[ $j ] ] );
+			}
+			return array_values( $graph );
 		}
 
-		$items = self::build_breadcrumb_list_items();
-		if ( count( $items ) < 2 ) {
+		if ( ! $can_replace ) {
+			return $graph;
+		}
+		if ( ! ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) ) {
 			return $graph;
 		}
 
 		$graph[] = array(
 			'@type'           => 'BreadcrumbList',
-			'@id'             => untrailingslashit( $items[ count( $items ) - 1 ]['item'] ) . '/#breadcrumb',
-			'itemListElement' => $items,
+			'@id'             => untrailingslashit( $clean_items[ count( $clean_items ) - 1 ]['item'] ) . '/#breadcrumb',
+			'itemListElement' => $clean_items,
 		);
 		return $graph;
+	}
+
+	/**
+	 * @param array $node BreadcrumbList node.
+	 * @return bool
+	 */
+	private static function breadcrumb_needs_rebuild( $node ) {
+		$items = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) ? $node['itemListElement'] : array();
+		if ( count( $items ) < 2 ) {
+			return true;
+		}
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				return true;
+			}
+			$name = isset( $item['name'] ) ? (string) $item['name'] : '';
+			$url  = isset( $item['item'] ) ? (string) $item['item'] : '';
+			if ( '' !== $name && preg_match( '#^https?://#i', $name ) ) {
+				return true;
+			}
+			if ( $url && preg_match( '#/(?:home|glavnaya|shouye)(/|$|\?)#i', $url ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Repair a single BreadcrumbList node in place (names/URLs only).
+	 *
+	 * @param array $node BreadcrumbList node.
+	 * @return array
+	 */
+	private static function normalize_breadcrumb_schema( $node ) {
+		if ( ! is_array( $node ) ) {
+			return $node;
+		}
+		$lang = self::front_lang();
+		$home = 'https://cindemirlaw.com/';
+		if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) ) {
+			$home = 'https://cindemirlaw.com/?lang=' . rawurlencode( $lang );
+		}
+		$items = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) ? $node['itemListElement'] : array();
+		$out   = array();
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$name = isset( $item['name'] ) ? trim( wp_strip_all_tags( (string) $item['name'] ) ) : '';
+			$url  = '';
+			if ( isset( $item['item'] ) ) {
+				if ( is_string( $item['item'] ) ) {
+					$url = $item['item'];
+				} elseif ( is_array( $item['item'] ) && isset( $item['item']['@id'] ) ) {
+					$url = (string) $item['item']['@id'];
+				}
+			}
+			// Yoast sometimes puts the URL in name and /home/ in item.
+			if ( '' !== $name && preg_match( '#^https?://#i', $name ) && ( '' === $url || preg_match( '#/(?:home|glavnaya|shouye)(/|$|\?)#i', $url ) ) ) {
+				$url  = $name;
+				$name = ( 0 === $i ) ? 'Home' : $name;
+			}
+			$url = self::normalize_breadcrumb_url( $url, $home );
+			if ( 0 === $i ) {
+				$name = 'Home';
+				$url  = $home;
+			} elseif ( '' === $name || preg_match( '#^https?://#i', $name ) ) {
+				$name = 'Page';
+			}
+			$fixed = array(
+				'@type'    => 'ListItem',
+				'position' => count( $out ) + 1,
+				'name'     => $name,
+			);
+			if ( '' !== $url ) {
+				$fixed['item'] = $url;
+			}
+			$out[] = $fixed;
+		}
+		if ( $out ) {
+			$last = count( $out ) - 1;
+			if ( empty( $out[ $last ]['item'] ) ) {
+				$canon = '';
+				if ( function_exists( 'wp_get_canonical_url' ) ) {
+					$canon = (string) wp_get_canonical_url();
+				}
+				$canon = self::normalize_breadcrumb_url( $canon, $home );
+				if ( '' !== $canon ) {
+					$out[ $last ]['item'] = $canon;
+				}
+			}
+			$node['itemListElement'] = $out;
+			if ( ! empty( $out[ $last ]['item'] ) ) {
+				$node['@id'] = untrailingslashit( $out[ $last ]['item'] ) . '/#breadcrumb';
+			}
+		}
+		return $node;
+	}
+
+	/**
+	 * @param string $url Candidate URL.
+	 * @param string $home Canonical home for current language.
+	 * @return string
+	 */
+	private static function normalize_breadcrumb_url( $url, $home ) {
+		$url = is_string( $url ) ? trim( $url ) : '';
+		if ( '' === $url ) {
+			return '';
+		}
+		$url = self::filter_canonical_url( $url );
+		$path = (string) ( wp_parse_url( $url, PHP_URL_PATH ) ?: '/' );
+		$path = untrailingslashit( rawurldecode( $path ) );
+		if ( in_array( $path, array( '', '/', '/home', '/glavnaya', '/shouye', '/index' ), true ) ) {
+			return $home;
+		}
+		return $url;
 	}
 
 	/**
