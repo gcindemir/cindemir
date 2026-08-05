@@ -181,9 +181,9 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.86';
+	const VERSION = '1.9.87';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = '7a9f2dd';
+	const DEPLOY_COMMIT = 'b355702';
 
 	/**
 	 * Google Analytics 4 measurement ID.
@@ -2963,6 +2963,23 @@ final class Cindemir_SEO_Fixes {
 				return true;
 			}
 		}
+		// Front-page style duplicate crumbs (same URL twice).
+		$urls = array();
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$u = '';
+			if ( isset( $item['item'] ) ) {
+				$u = is_string( $item['item'] ) ? $item['item'] : ( is_array( $item['item'] ) && isset( $item['item']['@id'] ) ? (string) $item['item']['@id'] : '' );
+			}
+			if ( '' !== $u ) {
+				$urls[] = untrailingslashit( strtok( $u, '?' ) );
+			}
+		}
+		if ( count( $urls ) >= 2 && count( array_unique( $urls ) ) === 1 ) {
+			return true;
+		}
 		return false;
 	}
 
@@ -3017,6 +3034,23 @@ final class Cindemir_SEO_Fixes {
 				$fixed['item'] = $url;
 			}
 			$out[] = $fixed;
+		}
+		// Drop consecutive duplicates (common on front page: Home > Home).
+		if ( count( $out ) > 1 ) {
+			$dedup = array();
+			foreach ( $out as $fixed ) {
+				$url = isset( $fixed['item'] ) ? (string) $fixed['item'] : '';
+				if ( $dedup ) {
+					$prev = $dedup[ count( $dedup ) - 1 ];
+					$prev_url = isset( $prev['item'] ) ? (string) $prev['item'] : '';
+					if ( '' !== $url && $url === $prev_url ) {
+						continue;
+					}
+				}
+				$fixed['position'] = count( $dedup ) + 1;
+				$dedup[]           = $fixed;
+			}
+			$out = $dedup;
 		}
 		if ( $out ) {
 			$last = count( $out ) - 1;
@@ -3122,7 +3156,10 @@ final class Cindemir_SEO_Fixes {
 			$current_url = (string) get_permalink( $id );
 		}
 		$current_url = self::filter_canonical_url( $current_url );
-		if ( '' !== $current_url ) {
+		// Front page is already "Home" — do not append a duplicate crumb.
+		$is_front = ( function_exists( 'is_front_page' ) && is_front_page() )
+			|| ( function_exists( 'is_page' ) && is_page( 15 ) );
+		if ( '' !== $current_url && ! $is_front ) {
 			$current_title = wp_strip_all_tags( (string) get_the_title( $id ) );
 			if ( '' === $current_title ) {
 				$current_title = 'Page';
