@@ -4092,7 +4092,7 @@ JS;
 			$label = esc_html( self::header_brand_label() );
 			$span  = '<span class="cindemir-logo-text">' . $label . '</span>';
 			$next  = preg_replace(
-				"#(<span[^>]*\bclass=(['\"])[^'\"]*\blogo\b[^'\"]*\2[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is",
+				'#(<span[^>]*\bclass=([\'"])[^\'"]*\blogo\b[^\'"]*\2[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is',
 				'$1$3' . $span . '$4',
 				$html,
 				1,
