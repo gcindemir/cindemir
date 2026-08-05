@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Cindemir Index Hygiene
- * Description: Ahrefs cleanup: noindex utilities, hreflang fixes, language-switcher repair, canonical self-consistency, footer/baro link rewrites.
- * Version: 2.0.1
+ * Description: Ahrefs cleanup: noindex, hreflang, switcher, canonical, baro links, P0 hub links, lang-query href cleanup, safe cluster redirects.
+ * Version: 2.2.2
  * Author: Cindemir Law Office
  */
 
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class Cindemir_Index_Hygiene {
-	const VERSION = '2.0.1';
+	const VERSION = '2.2.2';
 
 	const NOINDEX_SLUGS = array(
 		'appointment',
@@ -51,10 +51,14 @@ final class Cindemir_Index_Hygiene {
 		'http://www.barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
 		'http://barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
 		'https://barobirlik.org.tr/' => 'https://www.barobirlik.org.tr/',
+		// Canonical Facebook page (replace legacy page id in footer/widgets).
+		'https://www.facebook.com/Cindemir-Hukuk-Brosu-Cindemir-Law-Office-336218871992/' => 'https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/',
+		'http://www.facebook.com/Cindemir-Hukuk-Brosu-Cindemir-Law-Office-336218871992/' => 'https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/',
 	);
 
 	public static function init() {
 		add_action('template_redirect', array(__CLASS__, 'maybe_send_noindex_header'), 0);
+		add_action('template_redirect', array(__CLASS__, 'maybe_cluster_redirect'), 1);
 		add_filter('wp_robots', array(__CLASS__, 'filter_wp_robots'), 99);
 		add_action('wp_head', array(__CLASS__, 'print_noindex_meta'), 1);
 
@@ -71,7 +75,142 @@ final class Cindemir_Index_Hygiene {
 
 		// Always buffer front-end HTML for hreflang / switcher / external link cleanup.
 		add_action('template_redirect', array(__CLASS__, 'start_buffer'), 0);
+		add_filter('the_content', array(__CLASS__, 'append_p0_hub_links'), 25);
 		add_action('wp_footer', array(__CLASS__, 'print_version_marker'), 99);
+	}
+
+	/**
+	 * Thin / near-duplicate URLs → P0 (or clearer hub) 301s.
+	 * Path without trailing slash => target path without trailing slash.
+	 */
+	const CLUSTER_REDIRECTS = array(
+		'/obtaining-a-criminal-record-certificate-in-turkey-a-step-by-step-guide' => '/getting-criminal-record-in-turkey',
+		'/debt-collection-service' => '/debt-recovery-in-turkey',
+		'/establishing-a-commercial-enterprise-in-turkey' => '/opening-a-company-in-turkey-for-foreigners',
+		'/methods-of-debt-collection-in-the-light-of-turkish-law' => '/debt-recovery-in-turkey',
+	);
+
+	public static function maybe_cluster_redirect() {
+		if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || (defined('DOING_AJAX') && DOING_AJAX)) {
+			return;
+		}
+		$path = self::current_path();
+		if (!isset(self::CLUSTER_REDIRECTS[$path])) {
+			return;
+		}
+		$target = home_url(self::CLUSTER_REDIRECTS[$path] . '/');
+		// Preserve only non-lang query noise carefully — drop lang so equity lands on EN P0.
+		wp_safe_redirect($target, 301);
+		exit;
+	}
+
+	/**
+	 * Money-page (P0) guides — push internal equity off the homepage/hubs.
+	 * Paths without trailing slash.
+	 */
+	const P0_GUIDES = array(
+		'/opening-a-company-in-turkey-for-foreigners' => 'Company formation for foreigners',
+		'/consensual-divorce-in-turkey-uncontested-divorce' => 'Uncontested divorce in Turkey',
+		'/deportation-law-in-turkey' => 'Deportation law in Turkey',
+		'/debt-recovery-in-turkey' => 'Debt recovery in Turkey',
+		'/getting-criminal-record-in-turkey' => 'Criminal record certificate in Turkey',
+	);
+
+	/** Hubs that should list all P0 guides. */
+	const P0_HUB_SLUGS = array(
+		'services',
+		'about-us',
+		'nashiyurist',
+		'onas',
+	);
+
+	/**
+	 * Related single posts: slug => subset of P0 paths to cross-link.
+	 */
+	const P0_RELATED = array(
+		'can-russian-establish-a-company-in-turkey' => array(
+			'/opening-a-company-in-turkey-for-foreigners',
+		),
+		'starting-a-company-in-turkey-a-comprehensive-guide-for-entrepreneurs' => array(
+			'/opening-a-company-in-turkey-for-foreigners',
+		),
+		'how-to-divorce-in-turkey' => array(
+			'/consensual-divorce-in-turkey-uncontested-divorce',
+		),
+		'consequences-of-a-divorce-decision-in-turkey' => array(
+			'/consensual-divorce-in-turkey-uncontested-divorce',
+		),
+		'methods-of-debt-collection-in-the-light-of-turkish-law' => array(
+			'/debt-recovery-in-turkey',
+		),
+		'debt-collection-service' => array(
+			'/debt-recovery-in-turkey',
+		),
+		'obtaining-a-criminal-record-certificate-in-turkey-a-step-by-step-guide' => array(
+			'/getting-criminal-record-in-turkey',
+		),
+		'criminal-record-deletion-in-turkey-for-foreign-nationals' => array(
+			'/getting-criminal-record-in-turkey',
+		),
+		'principle-of-family-unity-deportation-procedures-and-protection-of-family-unity-for-deportees' => array(
+			'/deportation-law-in-turkey',
+		),
+	);
+
+	public static function append_p0_hub_links($content) {
+		if (is_admin() || !is_singular() || (function_exists('is_feed') && is_feed())) {
+			return $content;
+		}
+		if (strpos($content, 'cindemir-p0-hub-links') !== false) {
+			return $content;
+		}
+
+		$post = get_post();
+		if (!$post) {
+			return $content;
+		}
+		$slug = $post->post_name;
+
+		$paths = array();
+		if (in_array($slug, self::P0_HUB_SLUGS, true)) {
+			$paths = array_keys(self::P0_GUIDES);
+		} elseif (isset(self::P0_RELATED[$slug])) {
+			$paths = self::P0_RELATED[$slug];
+		} else {
+			return $content;
+		}
+
+		$items = '';
+		foreach ($paths as $path) {
+			if (!isset(self::P0_GUIDES[$path])) {
+				continue;
+			}
+			// Skip if this page already links to the target in body.
+			if (strpos($content, $path) !== false) {
+				continue;
+			}
+			$url = home_url($path . '/');
+			// Always point equity at clean EN P0 URLs (no ?lang= from Polylang context).
+			$url = preg_replace('#\?.*$#', '', $url);
+			$label = self::P0_GUIDES[$path];
+			$items .= '<li><a href="' . esc_url($url) . '">' . esc_html($label) . '</a></li>';
+		}
+		if ($items === '') {
+			return $content;
+		}
+
+		$heading = in_array($slug, self::P0_HUB_SLUGS, true)
+			? 'Key practice guides'
+			: 'Related guides';
+
+		$block = "\n"
+			. '<!-- cindemir-p0-hub-links -->'
+			. '<aside class="cindemir-p0-hub-links" style="margin:1.5rem 0;padding:1rem 0;border-top:1px solid #ddd;">'
+			. '<p style="margin:0 0 .5rem;font-weight:600;">' . esc_html($heading) . '</p>'
+			. '<ul style="margin:0;padding-left:1.25rem;">' . $items . '</ul>'
+			. '</aside>' . "\n";
+
+		return $content . $block;
 	}
 
 	private static function current_path() {
@@ -196,6 +335,9 @@ final class Cindemir_Index_Hygiene {
 				return false;
 			}
 		}
+		if (isset(self::CLUSTER_REDIRECTS[$path])) {
+			return false;
+		}
 		return $url;
 	}
 
@@ -274,9 +416,109 @@ final class Cindemir_Index_Hygiene {
 
 		$html = self::rewrite_external_hrefs($html);
 		$html = self::fix_language_switcher_anchors($html);
+		$html = self::rewrite_lang_query_hrefs($html);
 		$html = self::rebuild_hreflang_tags($html);
+		$html = self::inject_p0_hub_into_html($html);
 
 		return $html;
+	}
+
+	/**
+	 * Rewrite internal ?lang=ru / ?lang=zh-hans hrefs toward dedicated RU paths when paired,
+	 * and stop funneling everything at /?lang=ru|zh-hans.
+	 */
+	private static function rewrite_lang_query_hrefs($html) {
+		$host = wp_parse_url(home_url('/'), PHP_URL_HOST);
+		if (!$host) {
+			return $html;
+		}
+		$host_re = preg_quote($host, '#');
+
+		return preg_replace_callback(
+			'#href=(["\'])(https?://' . $host_re . '[^"\']*|/[^\s"\']*)\1#i',
+			function ($m) {
+				$quote = $m[1];
+				$url = html_entity_decode($m[2], ENT_QUOTES, 'UTF-8');
+				$parts = wp_parse_url($url);
+				if ($parts === false) {
+					return $m[0];
+				}
+				$query = array();
+				if (!empty($parts['query'])) {
+					parse_str($parts['query'], $query);
+				}
+				if (empty($query['lang'])) {
+					return $m[0];
+				}
+				$lang = strtolower((string) $query['lang']);
+				$path = isset($parts['path']) ? untrailingslashit($parts['path']) : '/';
+				if ($path === '') {
+					$path = '/';
+				}
+
+				$new = null;
+				if ($lang === 'ru') {
+					// Paired cornerstone: use dedicated RU URL.
+					foreach (self::HREFLANG_PAIRS as $en => $ru) {
+						if (self::path_matches_prefix($path, $en)) {
+							$new = home_url($ru . '/');
+							break;
+						}
+						if (self::path_matches_prefix($path, $ru)) {
+							$new = home_url($ru . '/');
+							break;
+						}
+					}
+					// Homepage RU stays ?lang=ru (no dedicated RU home path).
+					if ($new === null && ($path === '/' || $path === '')) {
+						$new = home_url('/?lang=ru');
+					}
+					// Other pages: keep self-path ?lang=ru (canonical consistency) — no change needed.
+				} elseif ($lang === 'zh-hans' || $lang === 'zh') {
+					// No dedicated ZH paths — keep query on same path (not homepage-only funnel).
+					if ($path === '/' || $path === '') {
+						$new = home_url('/?lang=zh-hans');
+					}
+				}
+
+				if ($new === null) {
+					return $m[0];
+				}
+				return 'href=' . $quote . esc_url($new) . $quote;
+			},
+			$html
+		);
+	}
+
+	/**
+	 * Elementor / cached hubs may not expose the_content; inject before </body> by path.
+	 */
+	private static function inject_p0_hub_into_html($html) {
+		if (strpos($html, 'cindemir-p0-hub-links') !== false) {
+			return $html;
+		}
+		$path = self::current_path();
+		$hub_paths = array('/services', '/about-us', '/nashiyurist', '/onas');
+		if (!in_array($path, $hub_paths, true)) {
+			return $html;
+		}
+
+		$items = '';
+		foreach (self::P0_GUIDES as $guide_path => $label) {
+			$url = preg_replace('#\?.*$#', '', home_url($guide_path . '/'));
+			$items .= '<li><a href="' . esc_url($url) . '">' . esc_html($label) . '</a></li>';
+		}
+		$block = "\n"
+			. '<!-- cindemir-p0-hub-links -->'
+			. '<aside class="cindemir-p0-hub-links" style="max-width:1200px;margin:1.5rem auto;padding:1rem 20px;border-top:1px solid #ddd;">'
+			. '<p style="margin:0 0 .5rem;font-weight:600;">Key practice guides</p>'
+			. '<ul style="margin:0;padding-left:1.25rem;">' . $items . '</ul>'
+			. '</aside>' . "\n";
+
+		if (stripos($html, '</body>') !== false) {
+			return preg_replace('/<\/body>/i', $block . '</body>', $html, 1);
+		}
+		return $html . $block;
 	}
 
 	private static function rewrite_external_hrefs($html) {
