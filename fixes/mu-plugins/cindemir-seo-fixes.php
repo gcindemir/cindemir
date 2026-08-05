@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -13,6 +13,7 @@
  * BREADCRUMB_QUALITY_FIX_20260805
  * LCP_HELPERS_RESTORE_20260805
  * HEADER_BRAND_FIT_20260805
+ * REMOVE_OUR_VIDEOS_FOOTER_20260805
  * Author: Cindemir Law Office
  */
 
@@ -366,6 +367,7 @@ final class Cindemir_SEO_Fixes {
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -1038,7 +1040,8 @@ final class Cindemir_SEO_Fixes {
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
-						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' ) ) ) {
+						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
+						|| false === strpos( $tmp, 'REMOVE_OUR_VIDEOS_FOOTER_20260805' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -1056,6 +1059,65 @@ final class Cindemir_SEO_Fixes {
 			}
 			$out[ $name ] = array( 'ok' => true, 'bytes' => strlen( $body ), 'src' => $src );
 		}
+
+		// Update regular plugin that prints footer "Our Videos" orphan nav (stop at source).
+		$hygiene_name = 'cindemir-index-hygiene.php';
+		$hygiene_body = '';
+		$hygiene_src  = '';
+		$hygiene_bases = array(
+			'https://cdn.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/wp-plugin/cindemir-index-hygiene/',
+			'https://fastly.jsdelivr.net/gh/gcindemir/cindemir@' . $commit . '/fixes/wp-plugin/cindemir-index-hygiene/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $commit . '/fixes/wp-plugin/cindemir-index-hygiene/',
+			'https://raw.githubusercontent.com/gcindemir/cindemir/' . $branch . '/fixes/wp-plugin/cindemir-index-hygiene/',
+		);
+		foreach ( $hygiene_bases as $base ) {
+			$response = wp_remote_get(
+				$base . $hygiene_name . '?v=' . rawurlencode( 'REMOVE_OUR_VIDEOS_FOOTER_20260805' ),
+				array(
+					'timeout' => 60,
+					'headers' => array(
+						'User-Agent'    => 'CindemirPull/' . self::VERSION,
+						'Cache-Control' => 'no-cache',
+						'Pragma'        => 'no-cache',
+					),
+				)
+			);
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				continue;
+			}
+			$tmp = (string) wp_remote_retrieve_body( $response );
+			if ( strlen( $tmp ) < 2000 || false === strpos( $tmp, '<?php' ) ) {
+				continue;
+			}
+			if ( false === strpos( $tmp, "VERSION = '2.0.1'" ) && false === strpos( $tmp, 'const VERSION = \'2.0.1\'' ) ) {
+				continue;
+			}
+			if ( false !== strpos( $tmp, 'print_orphan_nav' ) ) {
+				continue;
+			}
+			$hygiene_body = $tmp;
+			$hygiene_src  = $base;
+			break;
+		}
+		if ( '' !== $hygiene_body && defined( 'WP_PLUGIN_DIR' ) ) {
+			$dir = trailingslashit( WP_PLUGIN_DIR ) . 'cindemir-index-hygiene';
+			if ( ! is_dir( $dir ) ) {
+				wp_mkdir_p( $dir );
+			}
+			$dest = trailingslashit( $dir ) . $hygiene_name;
+			if ( is_dir( $dir ) ) {
+				file_put_contents( $dest, $hygiene_body );
+				if ( function_exists( 'opcache_invalidate' ) ) {
+					@opcache_invalidate( $dest, true );
+				}
+				$out[ $hygiene_name ] = array( 'ok' => true, 'bytes' => strlen( $hygiene_body ), 'src' => $hygiene_src );
+			} else {
+				$out[ $hygiene_name ] = array( 'ok' => false, 'error' => 'no-plugin-dir' );
+			}
+		} elseif ( '' === $hygiene_body ) {
+			$out[ $hygiene_name ] = array( 'ok' => false, 'error' => 'no-fresh-hygiene' );
+		}
+
 		delete_option( 'cindemir_seo_fixes_version' );
 		wp_cache_flush();
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -3690,6 +3752,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::fix_hreflang_html( $html );
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
+		$html = self::strip_orphan_footer_nav( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
 		$html = self::undelay_ga4_scripts( $html );
@@ -4821,6 +4884,32 @@ public static function homepage_hero_styles() {
 			. '#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.95}'
 			. '@media (max-width:767px){#socket .container{padding-top:12px;padding-bottom:12px}#socket .cindemir-footer-meta{font-size:11px}}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Remove footer "Our Videos" orphan nav injected by cindemir-index-hygiene.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	public static function strip_orphan_footer_nav( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		if ( false === stripos( $html, 'cindemir-orphan-links' ) && false === stripos( $html, 'our-videos' ) ) {
+			return $html;
+		}
+		$next = preg_replace( '#<nav\b[^>]*\bcindemir-orphan-links\b[^>]*>[\s\S]*?</nav>#i', '', $html );
+		if ( is_string( $next ) ) {
+			$html = $next;
+		}
+		// Any leftover lone Our Videos footer anchors (hygiene / v170 leftovers).
+		$next = preg_replace(
+			'#(?:\s*[·•|]\s*)?<a\b[^>]*href=["\'][^"\']*/our-videos/?["\'][^>]*>\s*Our Videos\s*</a>(?:\s*[·•|]\s*)?#i',
+			'',
+			$html
+		);
+		return is_string( $next ) ? $next : $html;
 	}
 
 	/** Compact footer row inside theme socket — KVKK link + short note only. */
