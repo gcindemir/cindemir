@@ -4087,15 +4087,20 @@ JS;
 			return '';
 		}
 		// Real text node instead of ::after — reserves space on first paint (CLS).
-		if ( false === strpos( $html, 'cindemir-logo-text' ) ) {
+		if ( false === strpos( $html, 'class="cindemir-logo-text"' )
+			&& false === strpos( $html, "class='cindemir-logo-text'" ) ) {
 			$label = esc_html( self::header_brand_label() );
 			$span  = '<span class="cindemir-logo-text">' . $label . '</span>';
-			$html  = preg_replace(
-				'#(<(?:span|div)[^>]*\blogo\b[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is',
-				'$1$2' . $span . '$3',
+			$next  = preg_replace(
+				"#(<span[^>]*\bclass=(['\"])[^'\"]*\blogo\b[^'\"]*\2[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is",
+				'$1$3' . $span . '$4',
 				$html,
-				1
+				1,
+				$count
 			);
+			if ( is_string( $next ) && $count > 0 ) {
+				$html = $next;
+			}
 		}
 		return is_string( $html ) ? $html : '';
 	}
