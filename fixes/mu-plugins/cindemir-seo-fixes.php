@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.88 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + CLS_LAYOUT_SHIFT_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.88
+ * Version: 1.9.89
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -15,7 +15,7 @@
  * HEADER_BRAND_FIT_20260805
  * REMOVE_OUR_VIDEOS_FOOTER_20260805
  * FOOTER_BADGE_CLS_20260805
- * CLS_LAYOUT_SHIFT_20260805
+ * LCP_ABOUT_TEAM_UNLAZY_20260806
  * Author: Cindemir Law Office
  */
 
@@ -185,9 +185,9 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.88';
+	const VERSION = '1.9.89';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = 'b944104';
+	const DEPLOY_COMMIT = '1db58cc';
 
 	/**
 	 * Google Analytics 4 measurement ID.
@@ -370,8 +370,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
-		add_filter( 'rocket_buffer', array( __CLASS__, 'ensure_footer_socket_extras' ), 103 );
-		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 104 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -1040,18 +1039,18 @@ final class Cindemir_SEO_Fixes {
 				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
-				if ( 'cindemir-footer-rocket.php' === $name ) {
-					if ( false === strpos( $tmp, 'Version: 1.0.4' )
-						|| false === strpos( $tmp, 'width="64" height="48"' ) ) {
-						continue;
-					}
-				} elseif ( false === strpos( $tmp, $marker ) ) {
+				if ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'CLS_LAYOUT_SHIFT_20260805' ) ) ) {
+						|| false === strpos( $tmp, 'FOOTER_BADGE_CLS_20260805' ) ) ) {
+					continue;
+				}
+				if ( 'cindemir-footer-rocket.php' === $name
+					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
+						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -2014,16 +2013,13 @@ final class Cindemir_SEO_Fixes {
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
 		echo '<link rel="dns-prefetch" href="https://www.googletagmanager.com">' . "\n";
 		echo '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' . "\n";
-		// Preload header logo so it is never an unsized/lazy CLS culprit.
-		echo '<link rel="preload" as="image" href="' . esc_url( self::HEADER_LOGO ) . '" fetchpriority="high">' . "\n";
 		$lcp = self::lcp_preload_image();
-		if ( is_array( $lcp ) && ! empty( $lcp['url'] ) && self::HEADER_LOGO !== $lcp['url'] ) {
+		if ( is_array( $lcp ) && ! empty( $lcp['url'] ) ) {
 			$type = ! empty( $lcp['type'] ) ? ' type="' . esc_attr( $lcp['type'] ) . '"' : '';
 			echo '<link rel="preload" as="image" href="' . esc_url( $lcp['url'] ) . '"' . $type . ' fetchpriority="high">' . "\n";
 		}
-		// optional = no late font swap CLS (PSI Layout shift / Web fonts).
-		echo '<style id="cindemir-font-display">@font-face{font-display:optional!important}'
-			. '.avia-font-entypo-fontello,.av-icon-char{font-display:optional}'
+		echo '<style id="cindemir-font-display">@font-face{font-display:swap!important}'
+			. '.avia-font-entypo-fontello,.av-icon-char{font-display:swap}'
 			. '</style>' . "\n";
 	}
 
@@ -2032,9 +2028,12 @@ final class Cindemir_SEO_Fixes {
 			return self::preferred_upload_image( 'uploads/2020/10/540664430' );
 		}
 		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
-			$team = self::preferred_upload_image( 'uploads/2026/06/3S9A8705-240x300' );
-			if ( $team ) {
-				return $team;
+			// Preload the size actually used in content (PSI LCP), not the 240px thumb.
+			foreach ( array( 'uploads/2026/06/3S9A8705-824x1030', 'uploads/2026/06/3S9A8705-768x960', 'uploads/2026/06/3S9A8705-240x300' ) as $rel ) {
+				$team = self::preferred_upload_image( $rel );
+				if ( $team ) {
+					return $team;
+				}
 			}
 		}
 		if ( function_exists( 'is_singular' ) && is_singular( 'post' ) ) {
@@ -2101,8 +2100,10 @@ final class Cindemir_SEO_Fixes {
 		return '';
 	}
 
-	private static function lcp_image_needles() {
+	private static function lcp_image_needles( $html = '' ) {
 		$needles = array();
+		$is_home = self::request_is_home_page( $html );
+		$is_team = self::request_is_team_about_page( $html );
 		$lcp     = self::lcp_preload_image();
 		if ( is_array( $lcp ) && ! empty( $lcp['url'] ) ) {
 			$base = basename( (string) parse_url( $lcp['url'], PHP_URL_PATH ) );
@@ -2114,83 +2115,116 @@ final class Cindemir_SEO_Fixes {
 				}
 			}
 		}
-		if ( is_front_page() || is_page( 15 ) ) {
+		if ( $is_home ) {
 			$needles[] = '540664430';
 		}
-		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
+		if ( $is_team ) {
 			$needles[] = '3S9A8705';
-		} elseif ( ! is_front_page() && ! ( function_exists( 'is_page' ) && is_page( 15 ) ) ) {
+			$needles[] = 'wp-image-900045';
+		} elseif ( ! $is_home ) {
 			$needles[] = 'cropped-logoicon-1-1';
 		}
-		$needles     = array_values( array_unique( array_filter( $needles ) ) );
-		return $needles;
+		return array_values( array_unique( array_filter( $needles ) ) );
+	}
+
+	/** @param string $html Optional HTML for body-class fallback. */
+	private static function request_is_home_page( $html = '' ) {
+		if ( ( function_exists( 'is_front_page' ) && is_front_page() ) || ( function_exists( 'is_page' ) && is_page( 15 ) ) ) {
+			return true;
+		}
+		return is_string( $html ) && (bool) preg_match( '/\b(?:home|page-id-15)\b/', $html );
+	}
+
+	/** About / team pages where the group photo is LCP. */
+	private static function request_is_team_about_page( $html = '' ) {
+		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
+			return true;
+		}
+		return is_string( $html ) && (bool) preg_match( '/\bpage-id-(?:19|2427|16|2)\b/', $html );
 	}
 
 	public static function pagespeed_optimize_lcp_html( $html ) {
 		if ( is_admin() || ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		$needles      = self::lcp_image_needles();
-		$is_home      = ( function_exists( 'is_front_page' ) && is_front_page() ) || ( function_exists( 'is_page' ) && is_page( 15 ) );
-		$is_team_page = function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) );
+		// Ensure a single LCP winner even if this runs twice (ob + rocket_buffer).
+		$html = preg_replace( '/\sfetchpriority=(["\'])high\1/i', '', $html );
+		if ( ! is_string( $html ) ) {
+			return '';
+		}
+
+		$needles      = self::lcp_image_needles( $html );
+		$is_home      = self::request_is_home_page( $html );
+		$is_team_page = self::request_is_team_about_page( $html );
 		$lcp_set      = false;
 
 		$html = preg_replace_callback(
-			'#<img\b[^>]*>#i',
+			'#<img\b[^>]*>(?:\s*<noscript>\s*<img\b[^>]*>\s*</noscript>)?#i',
 			static function ( $m ) use ( &$lcp_set, $needles, $is_home, $is_team_page ) {
-				$tag = $m[0];
-				if ( preg_match( '/\bcindemir-lang-flag\b/i', $tag ) ) {
-					return $tag;
+				$full = $m[0];
+				if ( ! preg_match( '#<img\b[^>]*>#i', $full, $im ) ) {
+					return $full;
 				}
-				if ( preg_match( '#\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*(?:sitepress|/flags/|res/flags|uploads/flags/)[^"\']*\1#i', $tag ) ) {
+				$tag = $im[0];
+				$noscript_img = '';
+				if ( preg_match( '#<noscript>\s*(<img\b[^>]*>)\s*</noscript>#i', $full, $nm ) ) {
+					$noscript_img = $nm[1];
+				}
+				$blob = $tag . ' ' . $noscript_img;
+
+				if ( preg_match( '/\bcindemir-lang-flag\b/i', $blob ) ) {
+					return $full;
+				}
+				if ( preg_match( '#\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*(?:sitepress|/flags/|res/flags|uploads/flags/)[^"\']*\1#i', $blob ) ) {
 					$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
 					if ( ! preg_match( '/\bloading=/i', $tag ) ) {
 						$tag = preg_replace( '/<img\b/i', '<img loading="lazy"', $tag, 1 );
 					}
-					return $tag;
+					return $tag . ( $noscript_img ? '<noscript>' . $noscript_img . '</noscript>' : '' );
 				}
-				$is_logo = (bool) preg_match( '/\b(?:logo|cropped-logoicon|cindemir-site-brand)\b/i', $tag );
-				if ( $is_logo ) {
-					$tag = Cindemir_SEO_Fixes::unlazy_img_tag( $tag );
-					$tag = preg_replace( '/\sloading=(["\'])[^"\']*\1/i', '', $tag );
-					$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
-					$tag = preg_replace( '/\swidth=(["\']?)[^"\'\s>]*\1/i', '', $tag );
-					$tag = preg_replace( '/\sheight=(["\']?)[^"\'\s>]*\1/i', '', $tag );
-					$tag = preg_replace( '/<img\b/i', '<img width="44" height="44" fetchpriority="high" loading="eager"', $tag, 1 );
-					if ( ! $lcp_set && ( $is_home || $is_team_page ) ) {
-						// Home/team keep hero as LCP; logo still eager+sized.
-						return $tag;
+
+				$is_logo = (bool) preg_match( '/\b(?:logo|cropped-logoicon|cindemir-site-brand)\b/i', $blob );
+				// On home/about/team the logo must never steal LCP from the hero/team photo.
+				if ( $is_logo && ( $is_home || $is_team_page ) ) {
+					$is_logo = false;
+					$tag     = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
+					if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+						$tag = preg_replace( '/<img\b/i', '<img loading="eager"', $tag, 1 );
 					}
-					if ( ! $lcp_set ) {
-						$lcp_set = true;
-					}
-					return $tag;
+					return $tag . ( $noscript_img ? '<noscript>' . $noscript_img . '</noscript>' : '' );
 				}
-				$is_lcp  = false;
+
+				$is_lcp = false;
 				foreach ( $needles as $needle ) {
-					if ( false !== stripos( $tag, $needle ) ) {
+					if ( false !== stripos( $blob, $needle ) ) {
 						$is_lcp = true;
 						break;
 					}
 				}
-				if ( ! $is_lcp && ! $lcp_set && ! $is_home && ! $is_team_page && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
-					if ( ! preg_match( '/\b(?:width|height)=(["\'])(?:1[0-8]|[1-9])\1/i', $tag ) ) {
+				if ( ! $is_lcp && ! $lcp_set && ! $is_home && ! $is_team_page && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $blob ) ) {
+					if ( ! preg_match( '/\b(?:width|height)=(["\'])(?:1[0-8]|[1-9])\1/i', $blob ) ) {
 						$is_lcp = true;
 					}
 				}
+				if ( $is_logo ) {
+					$is_lcp = true;
+				}
+
 				if ( $is_lcp && ! $lcp_set ) {
-					$tag     = Cindemir_SEO_Fixes::unlazy_img_tag( $tag );
-					$tag     = preg_replace( '/\sloading=(["\'])[^"\']*\1/i', '', $tag );
-					$tag     = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
-					$tag     = preg_replace( '/<img\b/i', '<img fetchpriority="high" loading="eager"', $tag, 1 );
+					$tag = Cindemir_SEO_Fixes::unlazy_img_tag( $tag, $noscript_img );
+					$tag = preg_replace( '/\sloading=(["\'])[^"\']*\1/i', '', $tag );
+					$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
+					$tag = preg_replace( '/<img\b/i', '<img fetchpriority="high" loading="eager"', $tag, 1 );
 					$lcp_set = true;
+					// Drop noscript twin — image is no longer lazy-loaded.
 					return $tag;
 				}
+
 				$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
-				if ( ! preg_match( '/\bloading=/i', $tag ) && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
+				if ( ! preg_match( '/\bloading=/i', $tag ) && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $blob ) ) {
 					$tag = preg_replace( '/<img\b/i', '<img loading="lazy"', $tag, 1 );
 				}
-				return $tag;
+				return $tag . ( $noscript_img ? '<noscript>' . $noscript_img . '</noscript>' : '' );
 			},
 			$html
 		);
@@ -2201,37 +2235,67 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Promote data-lazy-src / data-src to src and drop Rocket lazy placeholders.
+	 * Promote data-lazy-src / data-src / noscript twin to src and drop Rocket lazy placeholders.
 	 *
-	 * @param string $tag Single img tag.
+	 * @param string $tag          Single img tag.
+	 * @param string $noscript_img Optional <img> from following <noscript>.
 	 * @return string
 	 */
-	private static function unlazy_img_tag( $tag ) {
+	private static function unlazy_img_tag( $tag, $noscript_img = '' ) {
 		if ( ! is_string( $tag ) || '' === $tag ) {
 			return $tag;
 		}
-		$real = '';
+		$real    = '';
+		$srcset  = '';
+		$sizes   = '';
 		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src' ) as $attr ) {
-			if ( preg_match( '/\b' . preg_quote( $attr, '/' ) . '=(["\'])([^"\']+)\1/i', $tag, $m ) ) {
-				$real = $m[2];
+			if ( preg_match( '/\b' . preg_quote( $attr, '/' ) . '="([^"]*)"/i', $tag, $m )
+				|| preg_match( '/\b' . preg_quote( $attr, '/' ) . "='([^']*)'/i", $tag, $m ) ) {
+				$real = $m[1];
 				break;
 			}
 		}
-		if ( '' !== $real && preg_match( '/\bsrc=(["\'])/i', $tag ) ) {
-			$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( $real ) . '"', $tag, 1 );
-		} elseif ( '' !== $real ) {
-			$tag = preg_replace( '/<img\b/i', '<img src="' . esc_attr( $real ) . '"', $tag, 1 );
+		if ( '' === $real && is_string( $noscript_img ) && '' !== $noscript_img ) {
+			if ( preg_match( '/\bsrc="([^"]*)"/i', $noscript_img, $m )
+				|| preg_match( "/\bsrc='([^']*)'/i", $noscript_img, $m ) ) {
+				$real = $m[1];
+			}
+			if ( preg_match( '/\bsrcset="([^"]*)"/i', $noscript_img, $m )
+				|| preg_match( "/\bsrcset='([^']*)'/i", $noscript_img, $m ) ) {
+				$srcset = $m[1];
+			}
+			if ( preg_match( '/\bsizes="([^"]*)"/i', $noscript_img, $m )
+				|| preg_match( "/\bsizes='([^']*)'/i", $noscript_img, $m ) ) {
+				$sizes = $m[1];
+			}
+		}
+		// Placeholder SVG/data URI left behind after Rocket lazy — replace with real URL.
+		if ( '' !== $real ) {
+			if ( preg_match( '/\bsrc="/i', $tag ) ) {
+				$tag = preg_replace( '/\bsrc="[^"]*"/i', 'src="' . esc_attr( $real ) . '"', $tag, 1 );
+			} elseif ( preg_match( "/\bsrc='/i", $tag ) ) {
+				$tag = preg_replace( "/\bsrc='[^']*'/i", "src='" . esc_attr( $real ) . "'", $tag, 1 );
+			} else {
+				$tag = preg_replace( '/<img\b/i', '<img src="' . esc_attr( $real ) . '"', $tag, 1 );
+			}
 		}
 		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src', 'data-lazy-srcset', 'data-lazy-sizes' ) as $attr ) {
-			$tag = preg_replace( '/\s' . preg_quote( $attr, '/' ) . '=(["\'])[^"\']*\1/i', '', $tag );
+			$tag = preg_replace( '/\s' . preg_quote( $attr, '/' ) . '="[^"]*"/i', '', $tag );
+			$tag = preg_replace( '/\s' . preg_quote( $attr, '/' ) . "='[^']*'/i", '', $tag );
 		}
-		if ( preg_match( '/\bsrcset=(["\'])/i', $tag ) ) {
-			// keep srcset when already present
-		} elseif ( preg_match( '/\bdata-lazy-srcset=(["\'])([^"\']+)\1/i', $tag, $sm ) ) {
-			$tag = preg_replace( '/<img\b/i', '<img srcset="' . esc_attr( $sm[2] ) . '"', $tag, 1 );
+		if ( ! preg_match( '/\bsrcset=/i', $tag ) ) {
+			if ( '' !== $srcset ) {
+				$tag = preg_replace( '/<img\b/i', '<img srcset="' . esc_attr( $srcset ) . '"', $tag, 1 );
+			} elseif ( preg_match( '/\bdata-lazy-srcset="([^"]*)"/i', $tag, $sm ) || preg_match( "/\bdata-lazy-srcset='([^']*)'/i", $tag, $sm ) ) {
+				$tag = preg_replace( '/<img\b/i', '<img srcset="' . esc_attr( $sm[1] ) . '"', $tag, 1 );
+			}
 		}
-		if ( ! preg_match( '/\bsizes=/i', $tag ) && preg_match( '/\bdata-lazy-sizes=(["\'])([^"\']+)\1/i', $tag, $sz ) ) {
-			$tag = preg_replace( '/<img\b/i', '<img sizes="' . esc_attr( $sz[2] ) . '"', $tag, 1 );
+		if ( ! preg_match( '/\bsizes=/i', $tag ) ) {
+			if ( '' !== $sizes ) {
+				$tag = preg_replace( '/<img\b/i', '<img sizes="' . esc_attr( $sizes ) . '"', $tag, 1 );
+			} elseif ( preg_match( '/\bdata-lazy-sizes="([^"]*)"/i', $tag, $sz ) || preg_match( "/\bdata-lazy-sizes='([^']*)'/i", $tag, $sz ) ) {
+				$tag = preg_replace( '/<img\b/i', '<img sizes="' . esc_attr( $sz[1] ) . '"', $tag, 1 );
+			}
 		}
 		$tag = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|avia-img-lazy-loading[^\s]*|wp-image-lazy)\b([^"\']*)\1/i', ' class="$2$3"', $tag );
 		return $tag;
@@ -3776,7 +3840,6 @@ final class Cindemir_SEO_Fixes {
 		$html = self::filter_post_entries_by_lang( $html );
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::strip_orphan_footer_nav( $html );
-		$html = self::ensure_footer_socket_extras( $html );
 		$html = self::fix_footer_badge_dimensions( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
@@ -4069,40 +4132,7 @@ JS;
 			'/wp-content/uploads/2020/06/cropped-logoicon-1-1-300x300.jpg',
 			$html
 		);
-		// Square logo file is 300×300; HTML often claims 300×100 → CLS. Force display box 44×44, eager.
-		$html = preg_replace_callback(
-			'#<img\b([^>]*cropped-logoicon-1-1[^>]*)>#i',
-			static function ( $m ) use ( $logo ) {
-				$attrs = $m[1];
-				$attrs = preg_replace( '/\s(?:src|data-lazy-src|data-src|alt)=(["\'])[^"\']*\1/i', '', $attrs );
-				$attrs = preg_replace( '/\s(?:width|height|loading|fetchpriority|decoding)=(["\']?)[^"\'\s>]*\1/i', '', $attrs );
-				$attrs = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|lazyloaded|avia-img-lazy-loading[^\s]*)\b([^"\']*)\1/i', ' class="$2$3"', $attrs );
-				$attrs = preg_replace( '/\s+/', ' ', trim( $attrs ) );
-				$extra = ( is_string( $attrs ) && '' !== $attrs ) ? ' ' . $attrs : '';
-				return '<img src="' . $logo . '" width="44" height="44" alt="Cindemir Law Office" decoding="async" fetchpriority="high" loading="eager"' . $extra . '>';
-			},
-			$html
-		);
-		if ( ! is_string( $html ) ) {
-			return '';
-		}
-		// Real text node instead of ::after — reserves space on first paint (CLS).
-		if ( false === strpos( $html, 'class="cindemir-logo-text"' )
-			&& false === strpos( $html, "class='cindemir-logo-text'" ) ) {
-			$label = esc_html( self::header_brand_label() );
-			$span  = '<span class="cindemir-logo-text">' . $label . '</span>';
-			$next  = preg_replace(
-				'#(<span[^>]*\bclass=([\'"])[^\'"]*\blogo\b[^\'"]*\2[^>]*>\s*<a\b[^>]*>)(.*?)(</a>)#is',
-				'$1$3' . $span . '$4',
-				$html,
-				1,
-				$count
-			);
-			if ( is_string( $next ) && $count > 0 ) {
-				$html = $next;
-			}
-		}
-		return is_string( $html ) ? $html : '';
+		return $html;
 	}
 
 	/**
@@ -4116,7 +4146,7 @@ JS;
 		$logo  = esc_url( self::HEADER_LOGO );
 		$home  = esc_url( home_url( '/' ) );
 		$brand = '<a class="cindemir-site-brand" href="' . $home . '" aria-label="' . esc_attr( $label ) . '">'
-			. '<img src="' . $logo . '" width="44" height="44" alt="' . esc_attr( $label ) . '" decoding="async" fetchpriority="high" loading="eager" />'
+			. '<img src="' . $logo . '" width="48" height="48" alt="' . esc_attr( $label ) . '" decoding="async" />'
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>'
 			. '</a>';
 
@@ -4295,20 +4325,9 @@ public static function homepage_hero_styles() {
 			. 'display:inline-flex!important;align-items:center!important;gap:10px!important;'
 			. 'text-decoration:none!important;max-height:none!important;height:auto!important;min-width:0!important}'
 			. '#top #header .logo img,#top #header .logo picture{'
-			. 'display:block!important;width:44px!important;height:44px!important;max-width:44px!important;'
-			. 'max-height:44px!important;aspect-ratio:1/1!important;object-fit:contain!important;'
-			. 'opacity:1!important;visibility:visible!important;flex:0 0 44px!important}'
-			/* Prefer real HTML brand text (reserves space); disable ::after when present. */
-			. '#top #header .logo .cindemir-logo-text{'
-			. 'display:inline-block!important;'
-			. 'font-family:Georgia,"Times New Roman",serif!important;'
-			. 'font-size:' . ( $long ? '15px' : '18px' ) . '!important;font-weight:700!important;'
-			. 'line-height:1.15!important;color:#244f4f!important;'
-			. 'white-space:pre-line!important;overflow:visible!important;text-overflow:clip!important;'
-			. 'max-width:min(220px,30vw)!important;flex:0 1 auto}'
-			/* Fallback ::after when span missing — still size-reserved via min-width on the anchor. */
-			. '#top #header .logo a:not(:has(.cindemir-logo-text)){'
-			. 'min-width:min(260px,70vw)!important}'
+			. 'display:inline-block!important;max-height:44px!important;width:auto!important;'
+			. 'height:auto!important;opacity:1!important;visibility:visible!important;flex:0 0 auto}'
+			/* Full brand text — no ellipsis. RU/ZH wrap to 2 lines via \\A. */
 			. '#top #header .logo a::after,'
 			. '#header .logo a::after{'
 			. 'content:"' . $label . '"!important;display:inline-block!important;'
@@ -4317,8 +4336,6 @@ public static function homepage_hero_styles() {
 			. 'line-height:1.15!important;color:#244f4f!important;'
 			. 'white-space:pre-line!important;overflow:visible!important;text-overflow:clip!important;'
 			. 'width:max-content!important;max-width:min(220px,30vw)!important}'
-			. '#top #header .logo a:has(.cindemir-logo-text)::after,'
-			. '#header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '#top #header .av-burger-menu-main{'
 			. 'display:block!important;visibility:visible!important;opacity:1!important;'
@@ -4350,11 +4367,9 @@ public static function homepage_hero_styles() {
 			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
 			. 'flex-wrap:nowrap!important;overflow:visible}'
 			. '#top #header .logo{max-width:min(280px,32vw)!important;flex:0 0 auto}'
-			. '#top #header .logo .cindemir-logo-text,'
 			. '#top #header .logo a::after,#header .logo a::after{'
 			. 'font-size:' . ( $long ? '15px' : '17px' ) . '!important;'
 			. 'max-width:min(240px,28vw)!important;overflow:visible!important;text-overflow:clip!important}'
-			. '#top #header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .main_menu{'
 			. 'position:relative!important;left:auto!important;right:auto!important;float:none!important;'
 			. 'margin-left:auto!important;flex:1 1 auto;min-width:0;text-align:right!important}'
@@ -4363,15 +4378,11 @@ public static function homepage_hero_styles() {
 			. '#top #header .av-main-nav > li{flex:0 0 auto}'
 			. '}'
 			. '@media only screen and (max-width:989px){'
-			. '#top #header .logo .cindemir-logo-text,'
 			. '#top #header .logo a::after,#header .logo a::after{'
 			. 'font-size:13px!important;max-width:min(180px,48vw)!important;'
 			. 'overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important}'
-			. '#top #header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .logo{max-width:min(240px,62vw)!important}'
-			. '#top #header .logo img,#top #header .logo picture{'
-			. 'width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important;'
-			. 'aspect-ratio:1/1!important;flex:0 0 34px!important}'
+			. '#top #header .logo img{max-height:34px!important;max-width:34px!important}'
 			. '#top #header .av-main-nav > li.cindemir-lang-item{display:none!important}'
 			/* Enfold forces #header {position:relative} under .responsive — restore sticky so the burger follows scroll. */
 			. '.responsive.html_header_sticky #top #wrap_all #header,'
@@ -4961,63 +4972,6 @@ public static function homepage_hero_styles() {
 			. '#socket .cindemir-footer-meta .cindemir-footer-note{opacity:.95}'
 			. '@media (max-width:767px){#socket .container{padding-top:12px;padding-bottom:12px}#socket .cindemir-footer-meta{font-size:11px}}'
 			. '</style>' . "\n";
-	}
-
-	/**
-	 * Re-inject socket footer extras (baro + social + membership badges) when missing.
-	 * Badges include explicit width/height for CLS.
-	 *
-	 * @param string $html Full page HTML.
-	 * @return string
-	 */
-	public static function ensure_footer_socket_extras( $html ) {
-		if ( ! is_string( $html ) || '' === $html ) {
-			return $html;
-		}
-		if ( false === stripos( $html, "id='socket'" ) && false === stripos( $html, 'id="socket"' ) ) {
-			return $html;
-		}
-		if ( false !== strpos( $html, 'cindemir-footer-badges' ) ) {
-			return $html;
-		}
-		$block = self::footer_socket_extras_markup();
-		$next  = preg_replace_callback(
-			'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)?/is',
-			static function ( $m ) use ( $block ) {
-				$tail = isset( $m[4] ) ? $m[4] : '';
-				return $m[1] . $block . $tail;
-			},
-			$html,
-			1,
-			$count
-		);
-		return ( is_string( $next ) && $count > 0 ) ? $next : $html;
-	}
-
-	/** Markup for socket extras with CLS-safe badge dimensions. */
-	private static function footer_socket_extras_markup() {
-		$baro = 'https://baronet.istanbulbarosu.org.tr/avukat/belge_dogrulama?lang=EN&onayno=HBE4U7ES3DM6C52&tck=58612509084';
-		$tbb  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/tbb_amblem_60.png';
-		return '<div class="cindemir-socket-extras" id="cindemir-socket-extras">'
-			. '<div id="cindemir-baro-verification-bar" class="cindemir-baro-verification-bar">'
-			. '<a href="' . esc_url( $baro ) . '" target="_blank" rel="noopener noreferrer">Avukat Baro Doğrulama için Tıklayınız</a>'
-			. '</div>'
-			. '<div class="cindemir-footer-badges" aria-label="Cindemir Law verification and membership badges">'
-			. '<a href="https://www.aeuropea.com/" target="_blank" rel="noopener noreferrer" title="AEuropea">'
-			. '<img src="https://www.aeuropea.com/wp-content/uploads/2025/09/aea-01v001-ILN-small.png" alt="AEuropea" width="64" height="48" loading="lazy" decoding="async" /></a>'
-			. '<a href="https://istanbulbarosu.org.tr/" target="_blank" rel="noopener noreferrer" title="İstanbul Barosu">'
-			. '<img src="https://istanbulbarosu.org.tr/images/baro_logo.png" alt="İstanbul Barosu" width="48" height="48" loading="lazy" decoding="async" /></a>'
-			. '<a href="https://www.barobirlik.org.tr/" target="_blank" rel="noopener noreferrer" title="Türkiye Barolar Birliği">'
-			. '<img src="' . esc_url( $tbb ) . '" alt="Türkiye Barolar Birliği" width="48" height="48" loading="lazy" decoding="async" /></a>'
-			. '</div>'
-			. '</div>'
-			. '<style id="cindemir-footer-badge-cls-css">'
-			. '#socket .cindemir-socket-extras{width:100%;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15);text-align:center}'
-			. '#socket .cindemir-baro-verification-bar{margin-bottom:12px;text-align:center}'
-			. '#socket .cindemir-baro-verification-bar a{color:inherit;text-decoration:underline;font-size:14px}'
-			. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}'
-			. '#socket .cindemir-footer-badges img{height:48px;width:auto;max-height:48px;display:block;object-fit:contain;border:0}'
-			. '</style>';
 	}
 
 	/**
