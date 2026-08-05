@@ -2963,6 +2963,23 @@ final class Cindemir_SEO_Fixes {
 				return true;
 			}
 		}
+		// Front-page style duplicate crumbs (same URL twice).
+		$urls = array();
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$u = '';
+			if ( isset( $item['item'] ) ) {
+				$u = is_string( $item['item'] ) ? $item['item'] : ( is_array( $item['item'] ) && isset( $item['item']['@id'] ) ? (string) $item['item']['@id'] : '' );
+			}
+			if ( '' !== $u ) {
+				$urls[] = untrailingslashit( strtok( $u, '?' ) );
+			}
+		}
+		if ( count( $urls ) >= 2 && count( array_unique( $urls ) ) === 1 ) {
+			return true;
+		}
 		return false;
 	}
 
