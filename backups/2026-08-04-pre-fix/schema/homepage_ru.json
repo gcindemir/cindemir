@@ -1,0 +1,91 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Cindemir Law Office",
+    "url": "https://cindemir.av.tr",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "width": 613,
+      "height": 220
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cindemir.av.tr/#website",
+        "url": "https://cindemir.av.tr/ru/",
+        "name": "Адвокатское бюро Джиндемир",
+        "alternateName": "Cindemir Law Office",
+        "inLanguage": [
+          "tr",
+          "en",
+          "ru",
+          "zh-Hans"
+        ],
+        "publisher": {
+          "@id": "https://cindemir.av.tr/#lawoffice"
+        }
+      },
+      {
+        "@type": [
+          "LegalService",
+          "LocalBusiness",
+          "ProfessionalService"
+        ],
+        "@id": "https://cindemir.av.tr/#lawoffice",
+        "name": "Адвокатское бюро Джиндемир",
+        "alternateName": "Cindemir Law Office",
+        "url": "https://cindemir.av.tr/ru/",
+        "description": "Юридическая фирма Cindemir в Стамбуле. Международное частное право, семейное и наследственное право, криптоактивы, корпоративное право и право иностранцев.",
+        "foundingDate": "2004",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+          "postalCode": "34846",
+          "addressLocality": "Maltepe",
+          "addressRegion": "İstanbul",
+          "addressCountry": "TR"
+        },
+        "telephone": "+90-216-550-6775",
+        "email": "cindemir@cindemir.av.tr",
+        "availableLanguage": [
+          "tr",
+          "en",
+          "ru",
+          "zh-Hans"
+        ],
+        "sameAs": [
+          "https://cindemirlaw.com/",
+          "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+          "https://x.com/cindemirlegal"
+        ],
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+          "width": 613,
+          "height": 220
+        }
+      }
+    ]
+  },
+  [
+    {
+      "@context": "https://schema.org/",
+      "@type": "Organization",
+      "@id": "https://cindemir.av.tr#Organization",
+      "name": "Cindemir Hukuk Bürosu",
+      "url": "https://cindemir.av.tr",
+      "sameAs": [],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/cropped-logoicon-1.jpg",
+        "width": "151",
+        "height": "185"
+      }
+    }
+  ]
+]

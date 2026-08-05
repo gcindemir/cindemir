@@ -1,0 +1,70 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/ru/russkoyazychnyy-advokat-stambul/#webpage",
+      "url": "https://cindemir.av.tr/ru/russkoyazychnyy-advokat-stambul/",
+      "name": "Русскоязычный адвокат в Турции | Стамбул — Cindemir",
+      "description": "Русскоязычный адвокат в Стамбуле для граждан РФ и СНГ: ВНЖ, гражданство, недвижимость, компании, наследство, признание решений судов РФ.",
+      "inLanguage": "ru",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "mainEntity": { "@id": "https://cindemir.av.tr/ru/russkoyazychnyy-advokat-stambul/#faq" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cindemir.av.tr/ru/russkoyazychnyy-advokat-stambul/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Где найти русскоязычного адвоката в Турции?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Адвокатское бюро Cindemir в Стамбуле оказывает юридические услуги на русском, турецком и английском языках. Адвокат Елена Зара имеет юридическое образование в России и Турции и состоит в Стамбульской коллегии адвокатов."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Кто такой русскоязычный адвокат в Стамбуле Елена Зара?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Елена Зара — адвокат бюро Cindemir. Окончила юридическое образование в Москве, затем юридический факультет в Стамбуле. С 2014 года ведёт дела, связанные с Турцией, РФ и странами СНГ, на русском и турецком языках."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Нужен ли адвокат гражданину РФ для открытия компании в Турции?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Не всегда обязательно, но рекомендуется. Бюро Cindemir сопровождает граждан РФ при регистрации компаний, иностранных инвестициях и связанных разрешениях в Турции."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Признаются ли решения судов РФ в Турции?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "При соблюдении условий — да, через процедуру признания и исполнения (tenfiz) в турецких судах. Бюро ведёт такие дела с русскоязычным сопровождением."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "По каким вопросам помогает русскоязычный адвокат?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ВНЖ и гражданство, недвижимость, создание компаний, семейные и наследственные дела, уголовные дела, депортация, взыскание долгов, арбитраж и признание решений судов РФ."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Елена Зара",
+      "jobTitle": "Адвокат — российское и турецкое право",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "tr", "en"]
+    }
+  ]
+}

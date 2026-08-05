@@ -1,0 +1,71 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/en/international-lawyer-turkey/#webpage",
+      "url": "https://cindemir.av.tr/en/international-lawyer-turkey/",
+      "name": "International lawyer in Turkey | English-speaking law firm Istanbul",
+      "description": "Istanbul international law firm for clients worldwide. English-speaking lawyers for corporate, immigration, real estate, family, arbitration and foreign judgments in Turkey.",
+      "inLanguage": "en",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "mainEntity": { "@id": "https://cindemir.av.tr/en/international-lawyer-turkey/#faq" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cindemir.av.tr/en/international-lawyer-turkey/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Where can I find an English-speaking lawyer in Turkey?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cindemir Law Office in Istanbul provides legal services in English, Turkish, Russian and Chinese for international clients. The firm handles corporate, immigration, real estate, family, arbitration and cross-border disputes under Turkish law."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Cindemir Law Office serve clients outside Turkey?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The firm is Istanbul-based and serves clients worldwide with Turkish law and cross-border matters, including company formation, property, citizenship and recognition of foreign judgments in Turkey."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What international matters do you handle?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Private international law, foreign company setup, FDI, residence and citizenship, tapu/real estate for foreigners, cross-border family and inheritance, arbitration, and recognition/enforcement of foreign court or arbitral awards in Turkey."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which languages are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "English, Turkish, Russian and Chinese. Contact +90 216 550 6775 or cindemir@cindemir.av.tr."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://cindemir.av.tr/en/home-2/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "International lawyer Turkey",
+          "item": "https://cindemir.av.tr/en/international-lawyer-turkey/"
+        }
+      ]
+    }
+  ]
+}

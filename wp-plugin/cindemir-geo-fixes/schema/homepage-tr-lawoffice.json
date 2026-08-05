@@ -1,0 +1,192 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cindemir.av.tr/#website",
+      "url": "https://cindemir.av.tr/",
+      "name": "Cindemir Hukuk Bürosu",
+      "alternateName": "Cindemir Law Office",
+      "inLanguage": ["tr", "en", "ru", "zh-Hans"],
+      "publisher": { "@id": "https://cindemir.av.tr/#lawoffice" }
+    },
+    {
+      "@type": ["LegalService", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Cindemir Hukuk Bürosu",
+      "alternateName": ["Cindemir Law Office", "İstanbul avukatlık bürosu"],
+      "url": "https://cindemir.av.tr/",
+      "description": "Cindemir Hukuk Bürosu, İstanbul merkezli Türk hukuk bürosudur. Ticaret, şirketler, miras, aile, yabancılar hukuku, tazminat, ceza, gayrimenkul, tahkim ve kripto varlık alanlarında Türkiye'de danışmanlık ve dava temsili sunar. 2004'ten beri faaliyet gösterir.",
+      "foundingDate": "2004",
+      "founder": { "@type": "Person", "name": "Hakan Cindemir" },
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "İstanbul, Türkiye",
+        "addressCountry": "TR"
+      },
+      "image": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+        "width": 613,
+        "height": 220
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+        "postalCode": "34846",
+        "addressLocality": "Maltepe",
+        "addressRegion": "İstanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.9335,
+        "longitude": 29.1552
+      },
+      "telephone": "+90-216-550-6775",
+      "faxNumber": "+90-216-338-3584",
+      "email": "cindemir@cindemir.av.tr",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "Türkiye",
+          "sameAs": "https://www.wikidata.org/wiki/Q43"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "İstanbul"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Ankara"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Antalya"
+        }
+      ],
+      "availableLanguage": [
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" },
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Chinese", "alternateName": "zh-Hans" }
+      ],
+      "knowsLanguage": ["tr", "en", "ru", "zh-Hans"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Türkiye'deki gerçek ve tüzel kişiler",
+        "geographicArea": {
+          "@type": "Country",
+          "name": "Türkiye"
+        }
+      },
+      "sameAs": [
+        "https://cindemirlaw.com/",
+        "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+        "https://x.com/cindemirlegal"
+      ],
+      "knowsAbout": [
+        "Türk hukuku",
+        "İstanbul avukat",
+        "Ticaret ve şirketler hukuku",
+        "Miras hukuku",
+        "Aile hukuku",
+        "Yabancılar hukuku",
+        "Tazminat hukuku",
+        "Ceza hukuku",
+        "Gayrimenkul hukuku",
+        "Tahkim",
+        "Kripto varlık hukuku"
+      ],
+      "employee": [
+        { "@id": "https://cindemir.av.tr/#person-gokhan-cindemir" },
+        { "@id": "https://cindemir.av.tr/#person-elena-zara" },
+        { "@id": "https://cindemir.av.tr/#person-melike-erarslan" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Cindemir Hukuk Bürosu — Türkiye hizmetleri",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/hizmetlerimiz/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Ticaret ve şirketler hukuku",
+              "areaServed": "Türkiye",
+              "description": "Şirket kuruluşu, ortaklık, birleşme ve ticari uyuşmazlıklar."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#international-family-inheritance-law",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Aile ve miras hukuku",
+              "areaServed": "Türkiye",
+              "description": "Boşanma, mal rejimi, veraset ve miras süreçleri."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#citizenship-foreigners-law",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Yabancılar hukuku ve vatandaşlık",
+              "areaServed": "Türkiye",
+              "description": "İkamet, çalışma izni, vatandaşlık ve yabancılara ilişkin davalar."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/#compensation-medical-malpractice",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Tazminat hukuku",
+              "areaServed": "Türkiye",
+              "description": "Kaza ve tıbbi ihmal tazminat davaları."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/#homepage",
+      "url": "https://cindemir.av.tr/",
+      "name": "Cindemir Hukuk Bürosu | İstanbul avukatlık bürosu",
+      "inLanguage": "tr",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "description": "İstanbul merkezli hukuk bürosu. Türkiye'de ticaret, miras, aile, yabancılar hukuku, tazminat ve ceza davalarında danışmanlık."
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Kıdemli Ortak, Avukat",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "jobTitle": "Avukat",
+      "url": "https://cindemir.av.tr/avukatlarimiz/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "ru", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "Avukat",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en"]
+    }
+  ]
+}

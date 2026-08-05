@@ -1,0 +1,54 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/zh/zhongwen-lushi-tuerqi/#webpage",
+      "url": "https://cindemir.av.tr/zh/zhongwen-lushi-tuerqi/",
+      "name": "土耳其中文律师 | 伊斯坦布尔 — Cindemir律师事务所",
+      "description": "伊斯坦布尔中文律师服务：为中国公民提供居留、入籍、房产、公司设立、婚姻继承及中国判决在土耳其的承认与执行。",
+      "inLanguage": "zh-Hans",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "mainEntity": { "@id": "https://cindemir.av.tr/zh/zhongwen-lushi-tuerqi/#faq" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cindemir.av.tr/zh/zhongwen-lushi-tuerqi/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "在土耳其哪里可以找到中文律师？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cindemir律师事务所位于伊斯坦布尔，为华语客户提供土耳其法律咨询与代理，沟通可支持中文、土耳其语与英语。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "中国公民在土耳其购房需要律师吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "建议聘请律师协助产权（Tapu）审查、合同与过户，以降低外国人购房限制与交易风险。本所提供相关服务。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "中国法院判决能否在土耳其承认与执行？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "在符合条件时，可通过土耳其法院的承认与执行（tenfiz）程序办理。本所代理此类跨境案件。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "中文律师可以处理哪些业务？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "居留与工作许可、入籍、房地产、公司设立、婚姻继承、商事争议、仲裁及外国判决执行。"
+          }
+        }
+      ]
+    }
+  ]
+}

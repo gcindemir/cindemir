@@ -1,0 +1,232 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cindemir.av.tr/#website",
+      "url": "https://cindemir.av.tr/en/home-2/",
+      "name": "Cindemir Law Office",
+      "alternateName": ["Cindemir Hukuk Bürosu", "Адвокатское бюро Джиндемир", "Cindemir 律师事务所"],
+      "inLanguage": ["en", "tr", "ru", "zh-Hans"],
+      "publisher": { "@id": "https://cindemir.av.tr/#lawoffice" }
+    },
+    {
+      "@type": ["LegalService", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://cindemir.av.tr/#lawoffice",
+      "name": "Cindemir Law Office",
+      "alternateName": [
+        "Cindemir Hukuk Bürosu",
+        "International law firm Istanbul",
+        "English-speaking lawyers in Turkey"
+      ],
+      "url": "https://cindemir.av.tr/en/home-2/",
+      "description": "Cindemir Law Office is an Istanbul-based international law firm serving clients worldwide. Cross-border private international law, corporate and company formation, immigration and citizenship, real estate for foreign nationals, family and inheritance, arbitration, recognition of foreign judgments, compensation and crypto-asset matters. Services in English, Turkish, Russian and Chinese.",
+      "foundingDate": "2004",
+      "founder": { "@type": "Person", "name": "Hakan Cindemir" },
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Istanbul, Turkey",
+        "addressCountry": "TR"
+      },
+      "image": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cindemir.av.tr/wp-content/uploads/2020/01/logocd.webp",
+        "width": 613,
+        "height": 220
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Al Mazaya İstanbul Ritim Residences, Cevizli Mahallesi, Zuhal Caddesi No:44, B Blok Daire 18",
+        "postalCode": "34846",
+        "addressLocality": "Maltepe",
+        "addressRegion": "Istanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.9335,
+        "longitude": 29.1552
+      },
+      "telephone": "+90-216-550-6775",
+      "faxNumber": "+90-216-338-3584",
+      "email": "cindemir@cindemir.av.tr",
+      "priceRange": "$$",
+      "areaServed": [
+        {
+          "@type": "Place",
+          "name": "Worldwide",
+          "alternateName": "Global"
+        },
+        {
+          "@type": "Country",
+          "name": "Turkey",
+          "sameAs": "https://www.wikidata.org/wiki/Q43"
+        },
+        {
+          "@type": "Place",
+          "name": "Europe"
+        },
+        {
+          "@type": "Place",
+          "name": "Middle East"
+        },
+        {
+          "@type": "Country",
+          "name": "Russian Federation",
+          "sameAs": "https://www.wikidata.org/wiki/Q159"
+        },
+        {
+          "@type": "Country",
+          "name": "China",
+          "sameAs": "https://www.wikidata.org/wiki/Q148"
+        },
+        {
+          "@type": "Place",
+          "name": "CIS countries"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Istanbul"
+        }
+      ],
+      "availableLanguage": [
+        { "@type": "Language", "name": "English", "alternateName": "en" },
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Chinese", "alternateName": "zh-Hans" }
+      ],
+      "knowsLanguage": ["en", "tr", "ru", "zh-Hans"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "International individuals, companies and investors with matters in Turkey or cross-border Turkish law issues"
+      },
+      "sameAs": [
+        "https://cindemir.av.tr/",
+        "https://cindemir.av.tr/ru/homepage-ru/",
+        "https://cindemirlaw.com/",
+        "https://www.facebook.com/people/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office/100066585793269/",
+        "https://x.com/cindemirlegal"
+      ],
+      "knowsAbout": [
+        "International law firm Istanbul",
+        "English-speaking lawyer Turkey",
+        "Private international law",
+        "Company formation in Turkey for foreign nationals",
+        "Immigration and citizenship law Turkey",
+        "Recognition and enforcement of foreign judgments",
+        "Cross-border family and inheritance law",
+        "International arbitration",
+        "Real estate for foreigners in Turkey",
+        "Crypto-asset regulation"
+      ],
+      "employee": [
+        { "@id": "https://cindemir.av.tr/#person-gokhan-cindemir" },
+        { "@id": "https://cindemir.av.tr/#person-elena-zara" },
+        { "@id": "https://cindemir.av.tr/#person-melike-erarslan" },
+        { "@id": "https://cindemir.av.tr/#person-matvey-levant" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Cindemir Law Office — International services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/services/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Cross-border legal counsel in Turkey",
+              "serviceType": "International legal services",
+              "areaServed": "Worldwide",
+              "availableLanguage": ["en", "tr", "ru", "zh-Hans"],
+              "description": "English-speaking legal counsel for international clients with Turkish law matters."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Company formation for foreign nationals",
+              "serviceType": "Corporate and FDI",
+              "description": "Company setup and foreign investment structuring in Turkey."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-russian-federation-decisions-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Recognition and enforcement of foreign judgments",
+              "serviceType": "Private international law",
+              "description": "Recognition and enforcement of foreign court and arbitral awards in Turkey."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Real estate for foreigners",
+              "serviceType": "Property law",
+              "description": "Title deed (tapu) and property transactions for foreign buyers in Turkey."
+            }
+          },
+          {
+            "@type": "Offer",
+            "url": "https://cindemir.av.tr/en/family-heritage/",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "International family and inheritance law",
+              "serviceType": "Family and succession",
+              "description": "Cross-border divorce recognition, marital property and inheritance in Turkey."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://cindemir.av.tr/en/home-2/#webpage",
+      "url": "https://cindemir.av.tr/en/home-2/",
+      "name": "Cindemir Law Office | International lawyers in Istanbul, Turkey",
+      "inLanguage": "en",
+      "isPartOf": { "@id": "https://cindemir.av.tr/#website" },
+      "about": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "description": "Istanbul international law firm for global clients. English-speaking lawyers for corporate, immigration, real estate, family, arbitration and cross-border disputes in Turkey."
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Senior Partner, Attorney at Law",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["en", "tr", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "jobTitle": "Attorney at Law — Russian and Turkish Lawyer",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "tr", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "Attorney at Law",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-matvey-levant",
+      "name": "Matvey Levant",
+      "jobTitle": "Foreign Legal Consultant — Russian Law",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "en"]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-gokhan-cindemir",
+      "name": "Gökhan Cindemir",
+      "jobTitle": "Senior Partner, Attorney at Law",
+      "url": "https://cindemir.av.tr/av-dr-gokhan-cindemir/",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en", "fr", "nl", "ru"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-elena-zara",
+      "name": "Elena Zara",
+      "alternateName": ["Елена Зара", "Av. Elena Zara"],
+      "jobTitle": "Attorney at Law — Russian and Turkish Lawyer",
+      "description": "İstanbul Barosu avukatı. Moskova'da hukuk eğitimi, İstanbul Aydın Üniversitesi Hukuk Fakültesi. Türkiye–RF–BDT dosyaları; Rusça, Türkçe, İngilizce.",
+      "url": "https://cindemir.av.tr/avukatlarimiz/",
+      "image": "https://cindemir.av.tr/wp-content/uploads/2025/09/elena-240x300.jpg",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": [
+        { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+        { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        { "@type": "Language", "name": "English", "alternateName": "en" }
+      ],
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Moskova Sovremennaya Gumanitarnaya Akademiya",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Moscow",
+            "addressCountry": "RU"
+          }
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "İstanbul Aydın Üniversitesi Hukuk Fakültesi"
+        }
+      ],
+      "memberOf": {
+        "@type": "Organization",
+        "name": "İstanbul Barosu"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-melike-erarslan",
+      "name": "Melike Erarslan",
+      "jobTitle": "Attorney at Law",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["tr", "en"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://cindemir.av.tr/#person-matvey-levant",
+      "name": "Matvey Levant",
+      "alternateName": "Матвей Левант",
+      "jobTitle": "Foreign Legal Consultant — Russian Law",
+      "description": "Moskova, Levant & Partners. Rus hukuku danışmanı.",
+      "worksFor": { "@id": "https://cindemir.av.tr/#lawoffice" },
+      "knowsLanguage": ["ru", "en"],
+      "workLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Moscow",
+          "addressCountry": "RU"
+        }
+      }
+    }
+  ]
+}
