@@ -1,0 +1,87 @@
+{
+  "ig_access": {
+    "attempted": true,
+    "clicked": null,
+    "status": "alert_not_found",
+    "home_has_ig_alert": false,
+    "url": "https://www.facebook.com/settings/"
+  },
+  "whatsapp": {
+    "attempted": true,
+    "steps": [
+      {
+        "url": "https://business.facebook.com/latest/whatsapp_manager/overview/?asset_id=1262355825974540&business_id=1161971660662915",
+        "shot": "/workspace/fixes/fb-wa-page-0.png",
+        "has_whatsapp": true,
+        "has_connect": true,
+        "snippets": [
+          "WhatsApp Yöneticisi",
+          "WhatsApp hesapları"
+        ],
+        "clicked": null
+      },
+      {
+        "url": "https://business.facebook.com/latest/whatsapp_manager/phone_numbers/?asset_id=1262355825974540&business_id=1161971660662915",
+        "shot": "/workspace/fixes/fb-wa-page-1.png",
+        "has_whatsapp": true,
+        "has_connect": false,
+        "snippets": [
+          "WhatsApp Yöneticisi",
+          "Bir WhatsApp Business hesabı seçin"
+        ],
+        "clicked": null
+      },
+      {
+        "url": "https://business.facebook.com/latest/whatsapp_manager/overview/?business_id=1161971660662915&asset_id=1262355825974540&nav_ref=whatsapp_manager&psp_linking_success=0&is_from_mbs=1",
+        "shot": "/workspace/fixes/fb-wa-page-2.png",
+        "has_whatsapp": true,
+        "has_connect": true,
+        "snippets": [
+          "WhatsApp Yöneticisi",
+          "WhatsApp hesapları"
+        ],
+        "clicked": null
+      },
+      {
+        "url": "https://business.facebook.com/latest/settings/whatsapp_account/?business_id=1161971660662915&nav_ref=bm_settings_redirect_migration&bm_redirect_migration=true&selected_asset_id=1262355825974540&selected_asset_type=whatsapp-business-account",
+        "shot": "/workspace/fixes/fb-wa-page-3.png",
+        "has_whatsapp": true,
+        "has_connect": true,
+        "snippets": [
+          "WhatsApp hesapları",
+          "WhatsApp Hesapları",
+          "WhatsApp Business Uygulaması",
+          "WhatsApp Business Uygulaması",
+          "WhatsApp Yöneticisi"
+        ],
+        "clicked": null
+      },
+      {
+        "url": "https://business.facebook.com/latest/inbox/all?asset_id=336218871992&business_id=1161971660662915&mailbox_id=336218871992&selected_item_id=100072967767436&thread_type=FB_MESSAGE",
+        "shot": "/workspace/fixes/fb-wa-page-4.png",
+        "has_whatsapp": true,
+        "has_connect": false,
+        "snippets": [
+          "WhatsApp"
+        ],
+        "clicked": null
+      },
+      {
+        "url": "https://business.facebook.com/latest/settings/business_users/?nav_ref=internal_nav&asset_id=336218871992&business_id=1161971660662915",
+        "shot": "/workspace/fixes/fb-wa-page-5.png",
+        "has_whatsapp": false,
+        "has_connect": false,
+        "snippets": [],
+        "clicked": null
+      }
+    ],
+    "status": "whatsapp_ui_found_no_auto_connect",
+    "inbox_settings": {
+      "url": "https://business.facebook.com/latest/inbox/settings/messaging?nav_ref=internal_nav&asset_id=336218871992&business_id=1161971660662915",
+      "clicked": null,
+      "has_whatsapp": false,
+      "snip": "Gelen Kutusu\nGelen kutusu ayarları\nMesajlaşma\nÖneriler\nAramalar\nDaha Fazla Mesaj Alın\nDaralt\n​\nMesajlaşma\nMessenger İnternet Adresin (URL)\nMessenger bağlantını broşür, e-posta veya SMS mesajı gibi Facebook dışında bir yerde kullan. Messenger bağlantın insanları Sayfanla olan bir konuşmaya yönlendirir.\nm.me/336218871992\nMetni Kopyala\nMesajları göndermek için Return tuşunu kullan\nMessenger ve Instagram mesajları göndermek için bir bilgisayarda Return/Enter tuşuna bas. Bu özellik kapalıysa, Gönder'e tıkla.\nMeta Business Suite\nBağlantılar\nAna Sayfa\nAna Sayfa\nBildirimler\nBildirimler\nReklam Yöneticisi\nReklam Yöneticisi\nGelen Kutusu\nGelen Kutusu\nİçerik\nİçerik\nBağlantılar\nİçerik üreticisi pazar yeri\nİçerik üreticisi pazar yeri\nReklamlar\nReklamlar\nİstatistikler\nİstatistikler\nTüm Araçlar\nTüm Araçlar\nPara Kazanma\nPara Kazanma\nDüzenle\nOluştur\nOluştur\nAra\nAra\nBağlantılar\nAyarlar\nAyarlar\nYardım\nYardım"
+    }
+  },
+  "updated": "2026-07-18T09:52:48Z"
+}
