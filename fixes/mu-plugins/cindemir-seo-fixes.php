@@ -181,7 +181,7 @@ final class Cindemir_SEO_Fixes {
 
 	const VERSION = '1.9.85';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = 'f8e5d8d';
+	const DEPLOY_COMMIT = '6c0770a';
 
 	/**
 	 * Google Analytics 4 measurement ID.
