@@ -1038,18 +1038,18 @@ final class Cindemir_SEO_Fixes {
 				if ( strlen( $tmp ) < $min || false === strpos( $tmp, '<?php' ) ) {
 					continue;
 				}
-				if ( false === strpos( $tmp, $marker ) ) {
+				if ( 'cindemir-footer-rocket.php' === $name ) {
+					if ( false === strpos( $tmp, 'Version: 1.0.4' )
+						|| false === strpos( $tmp, 'width="64" height="48"' ) ) {
+						continue;
+					}
+				} elseif ( false === strpos( $tmp, $marker ) ) {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
 						|| false === strpos( $tmp, 'FOOTER_BADGE_CLS_20260805' ) ) ) {
-					continue;
-				}
-				if ( 'cindemir-footer-rocket.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
-						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
