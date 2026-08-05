@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.84 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.85 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + LCP_ALL_PAGES_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.84
+ * Version: 1.9.85
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -178,7 +178,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.84';
+	const VERSION = '1.9.85';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '0f7f997';
 
@@ -361,6 +361,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
 		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'author_rewrite_rules', array( __CLASS__, 'kill_author_rewrites' ) );
@@ -1856,7 +1857,7 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Early resource hints: preconnect fonts + preload homepage LCP hero WebP.
+	 * Early resource hints: preconnect fonts + preload per-page LCP image.
 	 */
 	public static function pagespeed_head_hints() {
 		if ( is_admin() ) {
@@ -1866,18 +1867,227 @@ final class Cindemir_SEO_Fixes {
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
 		echo '<link rel="dns-prefetch" href="https://www.googletagmanager.com">' . "\n";
 		echo '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' . "\n";
-		if ( is_front_page() || is_page( 15 ) ) {
-			// Preload the actual on-disk hero (WebP is uploaded alongside when available).
-			$hero_webp = WP_CONTENT_DIR . '/uploads/2020/10/540664430.webp';
-			if ( file_exists( $hero_webp ) ) {
-				echo '<link rel="preload" as="image" href="' . esc_url( content_url( 'uploads/2020/10/540664430.webp' ) ) . '" type="image/webp" fetchpriority="high">' . "\n";
-			} else {
-				echo '<link rel="preload" as="image" href="' . esc_url( content_url( 'uploads/2020/10/540664430.jpg' ) ) . '" fetchpriority="high">' . "\n";
-			}
+		$lcp = self::lcp_preload_image();
+		if ( is_array( $lcp ) && ! empty( $lcp['url'] ) ) {
+			$type = ! empty( $lcp['type'] ) ? ' type="' . esc_attr( $lcp['type'] ) . '"' : '';
+			echo '<link rel="preload" as="image" href="' . esc_url( $lcp['url'] ) . '"' . $type . ' fetchpriority="high">' . "\n";
 		}
 		echo '<style id="cindemir-font-display">@font-face{font-display:swap!important}'
 			. '.avia-font-entypo-fontello,.av-icon-char{font-display:swap}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Resolve the LCP image URL + MIME for the current request (Ahrefs Aug 5 — all 57 pages).
+	 *
+	 * @return array{url:string,type:string}|null
+	 */
+	private static function lcp_preload_image() {
+		if ( is_front_page() || is_page( 15 ) ) {
+			return self::preferred_upload_image( 'uploads/2020/10/540664430' );
+		}
+		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
+			$team = self::preferred_upload_image( 'uploads/2026/06/3S9A8705-240x300' );
+			if ( $team ) {
+				return $team;
+			}
+		}
+		if ( function_exists( 'is_singular' ) && is_singular( 'post' ) ) {
+			$thumb_id = function_exists( 'get_post_thumbnail_id' ) ? (int) get_post_thumbnail_id() : 0;
+			if ( $thumb_id > 0 && function_exists( 'wp_get_attachment_image_url' ) ) {
+				$url = wp_get_attachment_image_url( $thumb_id, 'large' );
+				if ( is_string( $url ) && '' !== $url ) {
+					return array(
+						'url'  => $url,
+						'type' => self::image_mime_from_url( $url ),
+					);
+				}
+			}
+		}
+		if ( ! is_front_page() ) {
+			return array(
+				'url'  => self::HEADER_LOGO,
+				'type' => 'image/jpeg',
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * Pick WebP when the file exists on disk, otherwise fall back to JPEG.
+	 *
+	 * @param string $rel_without_ext Path under wp-content, without extension.
+	 * @return array{url:string,type:string}|null
+	 */
+	private static function preferred_upload_image( $rel_without_ext ) {
+		$rel_without_ext = ltrim( (string) $rel_without_ext, '/' );
+		$webp_abs        = WP_CONTENT_DIR . '/' . $rel_without_ext . '.webp';
+		if ( file_exists( $webp_abs ) ) {
+			return array(
+				'url'  => content_url( $rel_without_ext . '.webp' ),
+				'type' => 'image/webp',
+			);
+		}
+		$jpg_abs = WP_CONTENT_DIR . '/' . $rel_without_ext . '.jpg';
+		if ( file_exists( $jpg_abs ) ) {
+			return array(
+				'url'  => content_url( $rel_without_ext . '.jpg' ),
+				'type' => 'image/jpeg',
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * @param string $url Image URL.
+	 * @return string MIME type or empty.
+	 */
+	private static function image_mime_from_url( $url ) {
+		$path = (string) parse_url( $url, PHP_URL_PATH );
+		if ( preg_match( '/\.webp$/i', $path ) ) {
+			return 'image/webp';
+		}
+		if ( preg_match( '/\.png$/i', $path ) ) {
+			return 'image/png';
+		}
+		if ( preg_match( '/\.(jpe?g)$/i', $path ) ) {
+			return 'image/jpeg';
+		}
+		return '';
+	}
+
+	/**
+	 * Basename needles that identify the LCP image for the current page.
+	 *
+	 * @return string[]
+	 */
+	private static function lcp_image_needles() {
+		$needles = array();
+		$lcp     = self::lcp_preload_image();
+		if ( is_array( $lcp ) && ! empty( $lcp['url'] ) ) {
+			$base = basename( (string) parse_url( $lcp['url'], PHP_URL_PATH ) );
+			if ( '' !== $base ) {
+				$needles[] = $base;
+				$stem      = preg_replace( '/\.[^.]+$/', '', $base );
+				if ( is_string( $stem ) && '' !== $stem && $stem !== $base ) {
+					$needles[] = $stem;
+				}
+			}
+		}
+		if ( is_front_page() || is_page( 15 ) ) {
+			$needles[] = '540664430';
+		}
+		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
+			$needles[] = '3S9A8705';
+		} elseif ( ! is_front_page() && ! ( function_exists( 'is_page' ) && is_page( 15 ) ) ) {
+			$needles[] = 'cropped-logoicon-1-1';
+		}
+		$needles     = array_values( array_unique( array_filter( $needles ) ) );
+		return $needles;
+	}
+
+	/**
+	 * Site-wide LCP pass: unlazy header/logo + first content hero, single fetchpriority, lazy below-fold.
+	 * Runs on rocket_buffer (after WP Rocket lazy-load) and in rewrite_html.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	public static function pagespeed_optimize_lcp_html( $html ) {
+		if ( is_admin() || ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$needles      = self::lcp_image_needles();
+		$is_home      = ( function_exists( 'is_front_page' ) && is_front_page() ) || ( function_exists( 'is_page' ) && is_page( 15 ) );
+		$is_team_page = function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) );
+		$lcp_set      = false;
+
+		$html = preg_replace_callback(
+			'#<img\b[^>]*>#i',
+			static function ( $m ) use ( &$lcp_set, $needles, $is_home, $is_team_page ) {
+				$tag = $m[0];
+				if ( preg_match( '/\bcindemir-lang-flag\b/i', $tag ) ) {
+					return $tag;
+				}
+				if ( preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*(?:sitepress|/flags/|res/flags)[^"\']*\1/i', $tag ) ) {
+					return $tag;
+				}
+				$is_logo = (bool) preg_match( '/\b(?:logo|cropped-logoicon|cindemir-site-brand)\b/i', $tag );
+				if ( $is_logo && ( $is_home || $is_team_page ) ) {
+					$is_logo = false;
+				}
+				$is_lcp  = false;
+				foreach ( $needles as $needle ) {
+					if ( false !== stripos( $tag, $needle ) ) {
+						$is_lcp = true;
+						break;
+					}
+				}
+				if ( ! $is_lcp && ! $lcp_set && ! $is_home && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
+					if ( ! preg_match( '/\b(?:width|height)=(["\'])(?:1[0-8]|[1-9])\1/i', $tag ) ) {
+						$is_lcp = true;
+					}
+				}
+				if ( $is_logo ) {
+					$is_lcp = true;
+				}
+				if ( $is_lcp && ! $lcp_set ) {
+					$tag     = Cindemir_SEO_Fixes::unlazy_img_tag( $tag );
+					$tag     = preg_replace( '/\sloading=(["\'])[^"\']*\1/i', '', $tag );
+					$tag     = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
+					$tag     = preg_replace( '/<img\b/i', '<img fetchpriority="high" loading="eager"', $tag, 1 );
+					$lcp_set = true;
+					return $tag;
+				}
+				$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
+				if ( ! preg_match( '/\bloading=/i', $tag ) && preg_match( '/\b(?:src|data-lazy-src|data-src)=(["\'])[^"\']*\/wp-content\/uploads\/[^"\']+\1/i', $tag ) ) {
+					$tag = preg_replace( '/<img\b/i', '<img loading="lazy"', $tag, 1 );
+				}
+				return $tag;
+			},
+			$html
+		);
+		if ( null === $html ) {
+			return '';
+		}
+		return $html;
+	}
+
+	/**
+	 * Promote data-lazy-src / data-src to src and drop Rocket lazy placeholders.
+	 *
+	 * @param string $tag Single img tag.
+	 * @return string
+	 */
+	private static function unlazy_img_tag( $tag ) {
+		if ( ! is_string( $tag ) || '' === $tag ) {
+			return $tag;
+		}
+		$real = '';
+		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src' ) as $attr ) {
+			if ( preg_match( '/\b' . preg_quote( $attr, '/' ) . '=(["\'])([^"\']+)\1/i', $tag, $m ) ) {
+				$real = $m[2];
+				break;
+			}
+		}
+		if ( '' !== $real && preg_match( '/\bsrc=(["\'])/i', $tag ) ) {
+			$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( $real ) . '"', $tag, 1 );
+		} elseif ( '' !== $real ) {
+			$tag = preg_replace( '/<img\b/i', '<img src="' . esc_attr( $real ) . '"', $tag, 1 );
+		}
+		foreach ( array( 'data-lazy-src', 'data-src', 'data-rocket-src', 'data-lazy-srcset', 'data-lazy-sizes' ) as $attr ) {
+			$tag = preg_replace( '/\s' . preg_quote( $attr, '/' ) . '=(["\'])[^"\']*\1/i', '', $tag );
+		}
+		if ( preg_match( '/\bsrcset=(["\'])/i', $tag ) ) {
+			// keep srcset when already present
+		} elseif ( preg_match( '/\bdata-lazy-srcset=(["\'])([^"\']+)\1/i', $tag, $sm ) ) {
+			$tag = preg_replace( '/<img\b/i', '<img srcset="' . esc_attr( $sm[2] ) . '"', $tag, 1 );
+		}
+		if ( ! preg_match( '/\bsizes=/i', $tag ) && preg_match( '/\bdata-lazy-sizes=(["\'])([^"\']+)\1/i', $tag, $sz ) ) {
+			$tag = preg_replace( '/<img\b/i', '<img sizes="' . esc_attr( $sz[2] ) . '"', $tag, 1 );
+		}
+		$tag = preg_replace( '/\sclass=(["\'])([^"\']*)\b(?:lazyload|avia-img-lazy-loading[^\s]*|wp-image-lazy)\b([^"\']*)\1/i', ' class="$2$3"', $tag );
+		return $tag;
 	}
 
 	/** Contrast, link underline, and sticky-safe a11y polish for PageSpeed. */
@@ -2349,6 +2559,8 @@ final class Cindemir_SEO_Fixes {
 				$html
 			);
 		}
+
+		$html = self::pagespeed_optimize_lcp_html( $html );
 
 		return $html;
 	}
@@ -3489,7 +3701,7 @@ JS;
 		$logo  = esc_url( self::HEADER_LOGO );
 		$home  = esc_url( home_url( '/' ) );
 		$brand = '<a class="cindemir-site-brand" href="' . $home . '" aria-label="' . esc_attr( $label ) . '">'
-			. '<img src="' . $logo . '" width="48" height="48" alt="' . esc_attr( $label ) . '" decoding="async" />'
+			. '<img src="' . $logo . '" width="48" height="48" alt="' . esc_attr( $label ) . '" decoding="async" fetchpriority="high" loading="eager" />'
 			. '<span class="cindemir-site-brand__text">' . $label . '</span>'
 			. '</a>';
 
