@@ -1,14 +1,15 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.84 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.85 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.84
+ * Version: 1.9.85
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
  * AHREFS_AUG5_20260805
  * GA4_DISABLE_INVALID_ID_20260805
+ * BREADCRUMB_SAFE_EXPAND_20260805
  * Author: Cindemir Law Office
  */
 
@@ -178,9 +179,9 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.84';
+	const VERSION = '1.9.85';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
-	const DEPLOY_COMMIT = '0f7f997';
+	const DEPLOY_COMMIT = 'REPLACE_AFTER_COMMIT';
 
 	/**
 	 * Google Analytics 4 measurement ID.
@@ -2438,6 +2439,7 @@ final class Cindemir_SEO_Fixes {
 		if ( self::is_team_or_services_page() ) {
 			$graph = self::ensure_webpage_in_graph( $graph );
 		}
+		$graph = self::ensure_breadcrumb_in_graph( $graph );
 		return $graph;
 	}
 
@@ -2676,6 +2678,131 @@ final class Cindemir_SEO_Fixes {
 			'publisher' => array( '@id' => 'https://cindemirlaw.com/#organization' ),
 		);
 		return $graph;
+	}
+
+	/**
+	 * Add a minimal BreadcrumbList on singular pages when missing.
+	 * This is intentionally conservative: Home + real parent/category + current page.
+	 *
+	 * @param array $graph Schema graph pieces.
+	 * @return array
+	 */
+	private static function ensure_breadcrumb_in_graph( $graph ) {
+		foreach ( $graph as $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'BreadcrumbList', $types, true ) ) {
+				return $graph;
+			}
+		}
+
+		if ( ! ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) ) {
+			return $graph;
+		}
+
+		$items = self::build_breadcrumb_list_items();
+		if ( count( $items ) < 2 ) {
+			return $graph;
+		}
+
+		$graph[] = array(
+			'@type'           => 'BreadcrumbList',
+			'@id'             => untrailingslashit( $items[ count( $items ) - 1 ]['item'] ) . '/#breadcrumb',
+			'itemListElement' => $items,
+		);
+		return $graph;
+	}
+
+	/**
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function build_breadcrumb_list_items() {
+		$lang = self::front_lang();
+		$home = home_url( '/' );
+		if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) ) {
+			$home = home_url( '/?lang=' . rawurlencode( $lang ) );
+		}
+
+		$items = array(
+			array(
+				'@type'    => 'ListItem',
+				'position' => 1,
+				'name'     => 'Home',
+				'item'     => $home,
+			),
+		);
+
+		$id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( $id > 0 && function_exists( 'is_page' ) && is_page() ) {
+			$ancestors = function_exists( 'get_post_ancestors' ) ? array_reverse( (array) get_post_ancestors( $id ) ) : array();
+			foreach ( $ancestors as $ancestor_id ) {
+				$alink = get_permalink( $ancestor_id );
+				$aname = get_the_title( $ancestor_id );
+				if ( ! is_string( $alink ) || '' === $alink || ! is_string( $aname ) || '' === trim( $aname ) ) {
+					continue;
+				}
+				if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) && false === strpos( $alink, 'lang=' ) ) {
+					$alink .= ( false === strpos( $alink, '?' ) ? '?' : '&' ) . 'lang=' . rawurlencode( $lang );
+				}
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => count( $items ) + 1,
+					'name'     => wp_strip_all_tags( $aname ),
+					'item'     => self::filter_canonical_url( $alink ),
+				);
+			}
+		} elseif ( $id > 0 && function_exists( 'is_single' ) && is_single() && function_exists( 'get_the_category' ) ) {
+			$cats = get_the_category( $id );
+			if ( is_array( $cats ) && ! empty( $cats ) ) {
+				$cat  = $cats[0];
+				$link = get_category_link( $cat->term_id );
+				if ( is_string( $link ) && '' !== $link ) {
+					if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) && false === strpos( $link, 'lang=' ) ) {
+						$link .= ( false === strpos( $link, '?' ) ? '?' : '&' ) . 'lang=' . rawurlencode( $lang );
+					}
+					$items[] = array(
+						'@type'    => 'ListItem',
+						'position' => count( $items ) + 1,
+						'name'     => wp_strip_all_tags( (string) $cat->name ),
+						'item'     => self::filter_canonical_url( $link ),
+					);
+				}
+			}
+		}
+
+		$current_url = '';
+		if ( function_exists( 'wp_get_canonical_url' ) ) {
+			$current_url = (string) wp_get_canonical_url();
+		}
+		if ( '' === $current_url && $id > 0 ) {
+			$current_url = (string) get_permalink( $id );
+		}
+		$current_url = self::filter_canonical_url( $current_url );
+		if ( '' !== $current_url ) {
+			$current_title = wp_strip_all_tags( (string) get_the_title( $id ) );
+			if ( '' === $current_title ) {
+				$current_title = 'Page';
+			}
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => count( $items ) + 1,
+				'name'     => $current_title,
+				'item'     => $current_url,
+			);
+		}
+
+		// Keep the breadcrumb short and factual (avoid noisy or deep chains).
+		if ( count( $items ) > 4 ) {
+			$items = array( $items[0], $items[ count( $items ) - 2 ], $items[ count( $items ) - 1 ] );
+			foreach ( $items as $i => $item ) {
+				$items[ $i ]['position'] = $i + 1;
+			}
+		}
+
+		return $items;
 	}
 
 	/** HTML-buffer fallbacks for RU author attribution + bio placement. */
