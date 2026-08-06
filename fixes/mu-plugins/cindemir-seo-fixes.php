@@ -369,7 +369,7 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_exclude_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
-		add_action( 'template_redirect', array( __CLASS__, 'start_pagespeed_late_buffer' ), 99999 );
+		add_action( 'init', array( __CLASS__, 'start_pagespeed_late_buffer' ), 1 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
@@ -2085,13 +2085,21 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Last-chance buffer so cindemir-cls-fix (cls-buf-v148) cannot re-inject
-	 * the homepage hero preload after earlier rocket_buffer passes.
+	 * Outermost output buffer (started early) so we see HTML after cindemir-cls-fix
+	 * re-injects the homepage hero preload (cls-buf-v148).
 	 */
 	public static function start_pagespeed_late_buffer() {
-		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || wp_doing_ajax() ) {
+		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
 			return;
 		}
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
+		static $started = false;
+		if ( $started ) {
+			return;
+		}
+		$started = true;
 		ob_start( array( __CLASS__, 'pagespeed_early_head_fix' ) );
 	}
 
