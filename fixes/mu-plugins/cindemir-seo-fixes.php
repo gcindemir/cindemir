@@ -369,11 +369,12 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_exclude_js', array( __CLASS__, 'exclude_brand_js' ) );
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
+		add_action( 'template_redirect', array( __CLASS__, 'start_pagespeed_late_buffer' ), 99999 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 999 );
-		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), 998 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), PHP_INT_MAX );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
@@ -2084,6 +2085,17 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
+	 * Last-chance buffer so cindemir-cls-fix (cls-buf-v148) cannot re-inject
+	 * the homepage hero preload after earlier rocket_buffer passes.
+	 */
+	public static function start_pagespeed_late_buffer() {
+		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || wp_doing_ajax() ) {
+			return;
+		}
+		ob_start( array( __CLASS__, 'pagespeed_early_head_fix' ) );
+	}
+
+	/**
 	 * Early-head critical fixes that must beat cindemir-cls-fix (98px header) and
 	 * stray homepage hero preloads on inner pages.
 	 *
@@ -2111,17 +2123,9 @@ final class Cindemir_SEO_Fixes {
 		);
 
 		// Drop homepage-hero preload on non-home pages (wastes bandwidth, confuses LCP).
+		// Simple pattern — cls-fix buffer may re-add this after earlier passes.
 		if ( ! $is_home || $is_team ) {
-			$html = preg_replace(
-				'#<link\b[^>]*rel=(["\'])preload\1[^>]*href=(["\'])[^"\']*540664430[^"\']*\2[^>]*>\s*#i',
-				'',
-				$html
-			);
-			$html = preg_replace(
-				'#<link\b[^>]*href=(["\'])[^"\']*540664430[^"\']*\1[^>]*rel=(["\'])preload\2[^>]*>\s*#i',
-				'',
-				$html
-			);
+			$html = preg_replace( '#<link\b[^>]*540664430[^>]*>\s*#i', '', $html );
 		}
 
 		// Inject critical header lock before any other CSS if missing.
