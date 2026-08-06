@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -17,6 +17,7 @@
  * FOOTER_BADGE_CLS_20260805
  * LCP_ABOUT_TEAM_UNLAZY_20260806
  * PSI_ABOUT_CLS_20260806
+ * PSI_GENERAL_FIX_20260806
  * Author: Cindemir Law Office
  */
 
@@ -369,8 +370,10 @@ final class Cindemir_SEO_Fixes {
 		add_filter( 'rocket_excluded_inline_js_content', array( __CLASS__, 'exclude_brand_inline_js' ) );
 		// Run after Rocket Delay/LazyLoad JS so GA4 is executable in the final HTML.
 		add_filter( 'rocket_buffer', array( __CLASS__, 'undelay_ga4_scripts' ), 100 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), 100 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 101 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_optimize_lcp_html' ), 999 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'pagespeed_early_head_fix' ), 998 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'strip_orphan_footer_nav' ), 102 );
 		add_filter( 'rocket_buffer', array( __CLASS__, 'fix_footer_badge_dimensions' ), 103 );
 		add_filter( 'rocket_cache_dynamic_cookies', array( __CLASS__, 'rocket_dynamic_lang_cookie' ) );
@@ -1047,7 +1050,7 @@ final class Cindemir_SEO_Fixes {
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'PSI_ABOUT_CLS_20260806' ) ) ) {
+						|| false === strpos( $tmp, 'PSI_GENERAL_FIX_20260806' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
@@ -2020,23 +2023,67 @@ final class Cindemir_SEO_Fixes {
 			$type = ! empty( $lcp['type'] ) ? ' type="' . esc_attr( $lcp['type'] ) . '"' : '';
 			echo '<link rel="preload" as="image" href="' . esc_url( $lcp['url'] ) . '"' . $type . ' fetchpriority="high">' . "\n";
 		}
-		echo '<style id="cindemir-font-display">@font-face{font-display:swap!important}'
-			. '.avia-font-entypo-fontello,.av-icon-char{font-display:swap}'
+		// optional = no late font-swap CLS (swap was reintroducing header/text shifts).
+		echo '<style id="cindemir-font-display">@font-face{font-display:optional!important}'
+			. '.avia-font-entypo-fontello,.av-icon-char{font-display:optional}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Mobile-friendly team/about LCP candidate (prefer small WebP/JPEG over 824×1030 ≈600KB).
+	 *
+	 * @return array{url:string,type:string,width:int,height:int}
+	 */
+	private static function team_lcp_image() {
+		// Known CDN assets (file_exists can miss Imagify *.jpg.webp naming).
+		$candidates = array(
+			array(
+				'url'    => 'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705.webp',
+				'type'   => 'image/webp',
+				'width'  => 240,
+				'height' => 300,
+			),
+			array(
+				'url'    => 'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705-240x300.jpg',
+				'type'   => 'image/jpeg',
+				'width'  => 240,
+				'height' => 300,
+			),
+		);
+		foreach ( array( 'uploads/2026/06/3S9A8705', 'uploads/2026/06/3S9A8705-240x300' ) as $rel ) {
+			$disk = self::preferred_upload_image( $rel );
+			if ( is_array( $disk ) && ! empty( $disk['url'] ) ) {
+				array_unshift(
+					$candidates,
+					array(
+						'url'    => $disk['url'],
+						'type'   => $disk['type'],
+						'width'  => 240,
+						'height' => 300,
+					)
+				);
+			}
+		}
+		return $candidates[0];
 	}
 
 	private static function lcp_preload_image() {
 		if ( is_front_page() || is_page( 15 ) ) {
-			return self::preferred_upload_image( 'uploads/2020/10/540664430' );
+			$home = self::preferred_upload_image( 'uploads/2020/10/540664430' );
+			if ( $home ) {
+				return $home;
+			}
+			return array(
+				'url'  => 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg.webp',
+				'type' => 'image/webp',
+			);
 		}
 		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
-			// Preload the size actually used in content (PSI LCP), not the 240px thumb.
-			foreach ( array( 'uploads/2026/06/3S9A8705-824x1030', 'uploads/2026/06/3S9A8705-768x960', 'uploads/2026/06/3S9A8705-240x300' ) as $rel ) {
-				$team = self::preferred_upload_image( $rel );
-				if ( $team ) {
-					return $team;
-				}
-			}
+			$team = self::team_lcp_image();
+			return array(
+				'url'  => $team['url'],
+				'type' => $team['type'],
+			);
 		}
 		if ( function_exists( 'is_singular' ) && is_singular( 'post' ) ) {
 			$thumb_id = function_exists( 'get_post_thumbnail_id' ) ? (int) get_post_thumbnail_id() : 0;
@@ -2060,6 +2107,69 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
+	 * Early-head critical fixes that must beat cindemir-cls-fix (98px header) and
+	 * stray homepage hero preloads on inner pages.
+	 *
+	 * @param string $html Full page HTML.
+	 * @return string
+	 */
+	public static function pagespeed_early_head_fix( $html ) {
+		if ( is_admin() || ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		$is_home = self::request_is_home_page( $html );
+
+		// cls-fix reserves 98px for a meta bar we hide → about CLS ~0.102 on .av-logo-container.
+		$html = str_replace(
+			'#top #header{min-height:98px!important}',
+			'#top #header{min-height:64px!important;height:64px!important;max-height:64px!important}',
+			$html
+		);
+		$html = preg_replace(
+			'/#header_meta,\.container_wrap_meta\{min-height:34px!important;height:34px!important;max-height:34px!important;[^}]*\}/i',
+			'#header_meta,.container_wrap_meta{display:none!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;padding:0!important;margin:0!important;border:0!important}',
+			$html,
+			1
+		);
+
+		// Drop homepage-hero preload on non-home pages (wastes bandwidth, confuses LCP).
+		if ( ! $is_home ) {
+			$html = preg_replace(
+				'#<link\b[^>]*rel=(["\'])preload\1[^>]*href=(["\'])[^"\']*540664430[^"\']*\2[^>]*>\s*#i',
+				'',
+				$html
+			);
+			$html = preg_replace(
+				'#<link\b[^>]*href=(["\'])[^"\']*540664430[^"\']*\1[^>]*rel=(["\'])preload\2[^>]*>\s*#i',
+				'',
+				$html
+			);
+		}
+
+		// Inject critical header lock before any other CSS if missing.
+		if ( false === strpos( $html, 'id="cindemir-header-critical"' ) ) {
+			$critical = '<style id="cindemir-header-critical">'
+				. 'html{--cindemir-header-h:64px}'
+				. '#top #header,#top #wrap_all #header{'
+				. 'min-height:64px!important;height:64px!important;max-height:64px!important;box-sizing:border-box!important}'
+				. '#top #header #header_main,#top #header #header_main .container,'
+				. '#top #header #header_main .container.av-logo-container,#top #header #header_main .inner-container{'
+				. 'min-height:64px!important;height:64px!important;max-height:64px!important;'
+				. 'box-sizing:border-box!important;overflow:hidden!important}'
+				. '#top #header #header_meta,#header_meta{display:none!important;height:0!important;min-height:0!important}'
+				. '#top #header .logo img{width:44px!important;height:44px!important;aspect-ratio:1/1!important;'
+				. 'object-fit:contain!important;max-width:44px!important;max-height:44px!important}'
+				. '</style>';
+			$next     = preg_replace( '/<head\b[^>]*>/i', '$0' . $critical, $html, 1, $count );
+			if ( is_string( $next ) && $count > 0 ) {
+				$html = $next;
+			}
+		}
+
+		return $html;
+	}
+
+	/**
 	 * Pick WebP when the file exists on disk, otherwise fall back to JPEG.
 	 *
 	 * @param string $rel_without_ext Path under wp-content, without extension.
@@ -2067,19 +2177,21 @@ final class Cindemir_SEO_Fixes {
 	 */
 	private static function preferred_upload_image( $rel_without_ext ) {
 		$rel_without_ext = ltrim( (string) $rel_without_ext, '/' );
-		$webp_abs        = WP_CONTENT_DIR . '/' . $rel_without_ext . '.webp';
-		if ( file_exists( $webp_abs ) ) {
-			return array(
-				'url'  => content_url( $rel_without_ext . '.webp' ),
-				'type' => 'image/webp',
-			);
-		}
-		$jpg_abs = WP_CONTENT_DIR . '/' . $rel_without_ext . '.jpg';
-		if ( file_exists( $jpg_abs ) ) {
-			return array(
-				'url'  => content_url( $rel_without_ext . '.jpg' ),
-				'type' => 'image/jpeg',
-			);
+		$base            = trailingslashit( WP_CONTENT_DIR ) . $rel_without_ext;
+		$candidates      = array(
+			array( $base . '.webp', '.webp', 'image/webp' ),
+			array( $base . '.jpg.webp', '.jpg.webp', 'image/webp' ),
+			array( $base . '.jpeg.webp', '.jpeg.webp', 'image/webp' ),
+			array( $base . '.jpg', '.jpg', 'image/jpeg' ),
+			array( $base . '.jpeg', '.jpeg', 'image/jpeg' ),
+		);
+		foreach ( $candidates as $c ) {
+			if ( file_exists( $c[0] ) ) {
+				return array(
+					'url'  => content_url( $rel_without_ext . $c[1] ),
+					'type' => $c[2],
+				);
+			}
 		}
 		return null;
 	}
@@ -2159,10 +2271,11 @@ final class Cindemir_SEO_Fixes {
 		$is_home      = self::request_is_home_page( $html );
 		$is_team_page = self::request_is_team_about_page( $html );
 		$lcp_set      = false;
+		$team_pref    = $is_team_page ? self::team_lcp_image() : null;
 
 		$html = preg_replace_callback(
 			'#<img\b[^>]*>(?:\s*<noscript>\s*<img\b[^>]*>\s*</noscript>)?#i',
-			static function ( $m ) use ( &$lcp_set, $needles, $is_home, $is_team_page ) {
+			static function ( $m ) use ( &$lcp_set, $needles, $is_home, $is_team_page, $team_pref ) {
 				$full = $m[0];
 				if ( ! preg_match( '#<img\b[^>]*>#i', $full, $im ) ) {
 					return $full;
@@ -2190,9 +2303,11 @@ final class Cindemir_SEO_Fixes {
 				// but it MUST still be unlazied + sized (SVG 300×100 → real square = CLS).
 				if ( $is_logo && ( $is_home || $is_team_page ) ) {
 					$tag = Cindemir_SEO_Fixes::unlazy_img_tag( $tag, $noscript_img );
-					$tag = preg_replace( '/\s(?:width|height|loading|fetchpriority)=(["\']?)[^"\'\s>]*\1/i', '', $tag );
+					$tag = preg_replace( '/\s(?:width|height|loading|fetchpriority|alt)=(["\'])[^"\']*\1/i', '', $tag );
+					$tag = preg_replace( '/\s(?:width|height|loading|fetchpriority)=([^\s>]+)/i', '', $tag );
 					$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( Cindemir_SEO_Fixes::HEADER_LOGO ) . '"', $tag, 1 );
-					$tag = preg_replace( '/<img\b/i', '<img width="44" height="44" loading="eager" decoding="async"', $tag, 1 );
+					// Empty alt — brand name is already in adjacent .cindemir-logo-text / aria-label.
+					$tag = preg_replace( '/<img\b/i', '<img width="44" height="44" loading="eager" decoding="async" alt=""', $tag, 1 );
 					return $tag;
 				}
 
@@ -2214,6 +2329,20 @@ final class Cindemir_SEO_Fixes {
 
 				if ( $is_lcp && ! $lcp_set ) {
 					$tag = Cindemir_SEO_Fixes::unlazy_img_tag( $tag, $noscript_img );
+					if ( is_array( $team_pref ) && ! empty( $team_pref['url'] ) && false !== stripos( $blob, '3S9A8705' ) ) {
+						$w = isset( $team_pref['width'] ) ? (int) $team_pref['width'] : 240;
+						$h = isset( $team_pref['height'] ) ? (int) $team_pref['height'] : 300;
+						$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/i', 'src="' . esc_attr( $team_pref['url'] ) . '"', $tag, 1 );
+						$tag = preg_replace( '/\ssrcset=(["\'])[^"\']*\1/i', '', $tag );
+						$tag = preg_replace( '/\ssizes=(["\'])[^"\']*\1/i', '', $tag );
+						$tag = preg_replace( '/\s(?:width|height)=(["\']?)[^"\'\s>]*\1/i', '', $tag );
+						$tag = preg_replace(
+							'/<img\b/i',
+							'<img width="' . $w . '" height="' . $h . '"',
+							$tag,
+							1
+						);
+					}
 					$tag = preg_replace( '/\sloading=(["\'])[^"\']*\1/i', '', $tag );
 					$tag = preg_replace( '/\sfetchpriority=(["\'])[^"\']*\1/i', '', $tag );
 					$tag = preg_replace( '/<img\b/i', '<img fetchpriority="high" loading="eager"', $tag, 1 );
@@ -3843,6 +3972,7 @@ final class Cindemir_SEO_Fixes {
 		$html = self::pagespeed_rewrite_html( $html );
 		$html = self::strip_orphan_footer_nav( $html );
 		$html = self::fix_footer_badge_dimensions( $html );
+		$html = self::pagespeed_early_head_fix( $html );
 		$html = self::pagespeed_optimize_lcp_html( $html );
 		$html = self::polish_homepage_hero_html( $html );
 		$html = self::ensure_contact_form_fallback_html( $html );
@@ -5079,13 +5209,16 @@ public static function homepage_hero_styles() {
 					&& false === strpos( $hay, 'baro_logo' ) ) {
 					return $tag;
 				}
-				if ( ! preg_match( '/\bheight=/i', $tag ) ) {
-					$tag = preg_replace( '/<img\b/i', '<img height="48"', $tag, 1 );
+				// Promote Rocket SVG placeholder (viewBox 0 0 0 48 collapses width → CLS).
+				if ( preg_match( '/\bsrc=(["\'])(data:image\/svg.*?)\1/is', $tag )
+					&& ( preg_match( '/\bdata-lazy-src=(["\'])([^"\']+)\1/i', $tag, $dm )
+						|| preg_match( '/\bdata-src=(["\'])([^"\']+)\1/i', $tag, $dm ) ) ) {
+					$tag = preg_replace( '/\bsrc=(["\'])[^"\']*\1/is', 'src="' . esc_attr( $dm[2] ) . '"', $tag, 1 );
+					$tag = preg_replace( '/\sdata-lazy-src=(["\'])[^"\']*\1/i', '', $tag );
+					$tag = preg_replace( '/\sdata-src=(["\'])[^"\']*\1/i', '', $tag );
 				}
-				if ( preg_match( '/\bwidth=(["\'])?\s*\1/i', $tag ) || ! preg_match( '/\bwidth=/i', $tag ) ) {
-					$tag = preg_replace( '/\swidth=(["\'])[^"\']*\1/i', '', $tag );
-					$tag = preg_replace( '/<img\b/i', '<img width="' . $match_w . '"', $tag, 1 );
-				}
+				$tag = preg_replace( '/\s(?:width|height)=(["\']?)[^"\'\s>]*\1/i', '', $tag );
+				$tag = preg_replace( '/<img\b/i', '<img width="' . $match_w . '" height="48"', $tag, 1 );
 				$tag = preg_replace( "#viewBox='0 0 0 48'#i", "viewBox='0 0 " . $match_w . " 48'", $tag );
 				$tag = preg_replace( '#viewBox="0 0 0 48"#i', 'viewBox="0 0 ' . $match_w . ' 48"', $tag );
 				return $tag;
