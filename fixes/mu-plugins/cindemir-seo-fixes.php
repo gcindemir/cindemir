@@ -2118,6 +2118,7 @@ final class Cindemir_SEO_Fixes {
 			return $html;
 		}
 		$is_home = self::request_is_home_page( $html );
+		$is_team = self::request_is_team_about_page( $html );
 
 		// cls-fix reserves 98px for a meta bar we hide → about CLS ~0.102 on .av-logo-container.
 		$html = str_replace(
@@ -2133,7 +2134,7 @@ final class Cindemir_SEO_Fixes {
 		);
 
 		// Drop homepage-hero preload on non-home pages (wastes bandwidth, confuses LCP).
-		if ( ! $is_home ) {
+		if ( ! $is_home || $is_team ) {
 			$html = preg_replace(
 				'#<link\b[^>]*rel=(["\'])preload\1[^>]*href=(["\'])[^"\']*540664430[^"\']*\2[^>]*>\s*#i',
 				'',
@@ -2246,7 +2247,8 @@ final class Cindemir_SEO_Fixes {
 		if ( ( function_exists( 'is_front_page' ) && is_front_page() ) || ( function_exists( 'is_page' ) && is_page( 15 ) ) ) {
 			return true;
 		}
-		return is_string( $html ) && (bool) preg_match( '/\b(?:home|page-id-15)\b/', $html );
+		// Match the <body> class only — CSS like `body.home #av_section_1` must not count.
+		return is_string( $html ) && (bool) preg_match( '/<body\b[^>]*\bclass=(["\'])[^"\']*\b(?:home|page-id-15)\b/i', $html );
 	}
 
 	/** About / team pages where the group photo is LCP. */
@@ -2254,7 +2256,7 @@ final class Cindemir_SEO_Fixes {
 		if ( function_exists( 'is_page' ) && is_page( array( 19, 2427, 16, 2 ) ) ) {
 			return true;
 		}
-		return is_string( $html ) && (bool) preg_match( '/\bpage-id-(?:19|2427|16|2)\b/', $html );
+		return is_string( $html ) && (bool) preg_match( '/<body\b[^>]*\bclass=(["\'])[^"\']*\bpage-id-(?:19|2427|16|2)\b/i', $html );
 	}
 
 	public static function pagespeed_optimize_lcp_html( $html ) {
