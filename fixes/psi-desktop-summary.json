@@ -1,0 +1,44 @@
+{
+  "scores": {
+    "performance": 100,
+    "accessibility": 88,
+    "best-practices": 96,
+    "seo": 92
+  },
+  "metrics": {
+    "first-contentful-paint": "0.4\u00a0s",
+    "largest-contentful-paint": "0.8\u00a0s",
+    "total-blocking-time": "0\u00a0ms",
+    "cumulative-layout-shift": "0.003",
+    "speed-index": "0.7\u00a0s",
+    "interactive": "0.8\u00a0s",
+    "server-response-time": "Root document took 130\u00a0ms"
+  },
+  "opportunities": [
+    {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "display": "Potential savings of 157\u00a0KiB"
+    },
+    {
+      "id": "modern-image-formats",
+      "title": "Serve images in next-gen formats",
+      "display": "Potential savings of 51\u00a0KiB"
+    },
+    {
+      "id": "unused-css-rules",
+      "title": "Reduce unused CSS",
+      "display": "Potential savings of 122\u00a0KiB"
+    },
+    {
+      "id": "uses-optimized-images",
+      "title": "Efficiently encode images",
+      "display": "Potential savings of 4\u00a0KiB"
+    },
+    {
+      "id": "legacy-javascript",
+      "title": "Avoid serving legacy JavaScript to modern browsers",
+      "display": "Potential savings of 10\u00a0KiB"
+    }
+  ]
+}
