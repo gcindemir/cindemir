@@ -2030,41 +2030,18 @@ final class Cindemir_SEO_Fixes {
 	}
 
 	/**
-	 * Mobile-friendly team/about LCP candidate (prefer small WebP/JPEG over 824×1030 ≈600KB).
+	 * Mobile-friendly team/about LCP candidate (prefer small WebP over 824×1030 ≈600KB JPEG).
 	 *
 	 * @return array{url:string,type:string,width:int,height:int}
 	 */
 	private static function team_lcp_image() {
-		// Known CDN assets (file_exists can miss Imagify *.jpg.webp naming).
-		$candidates = array(
-			array(
-				'url'    => 'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705.webp',
-				'type'   => 'image/webp',
-				'width'  => 240,
-				'height' => 300,
-			),
-			array(
-				'url'    => 'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705-240x300.jpg',
-				'type'   => 'image/jpeg',
-				'width'  => 240,
-				'height' => 300,
-			),
+		// Full WebP (~86KB @ 1600×2000) beats 824×1030 JPEG (~597KB) and is similar to 240×300 JPEG.
+		return array(
+			'url'    => 'https://cindemirlaw.com/wp-content/uploads/2026/06/3S9A8705.webp',
+			'type'   => 'image/webp',
+			'width'  => 240,
+			'height' => 300,
 		);
-		foreach ( array( 'uploads/2026/06/3S9A8705', 'uploads/2026/06/3S9A8705-240x300' ) as $rel ) {
-			$disk = self::preferred_upload_image( $rel );
-			if ( is_array( $disk ) && ! empty( $disk['url'] ) ) {
-				array_unshift(
-					$candidates,
-					array(
-						'url'    => $disk['url'],
-						'type'   => $disk['type'],
-						'width'  => 240,
-						'height' => 300,
-					)
-				);
-			}
-		}
-		return $candidates[0];
 	}
 
 	private static function lcp_preload_image() {
