@@ -16,6 +16,7 @@
  * HEADER_BRAND_FIT_20260805
  * LCP_ABOUT_TEAM_UNLAZY_20260806
  * SITE_DESIGN_20260807
+ * FOOTER_BARO_I18N_20260807
  * Author: Cindemir Law Office
  */
 
@@ -1044,7 +1045,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
+					&& ( false === strpos( $tmp, 'Version: 1.0.5' )
+						|| false === strpos( $tmp, 'FOOTER_BARO_I18N_20260807' )
 						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}

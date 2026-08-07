@@ -1060,7 +1060,8 @@ final class Cindemir_SEO_Fixes {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
+					&& ( false === strpos( $tmp, 'Version: 1.0.5' )
+						|| false === strpos( $tmp, 'FOOTER_BARO_I18N_20260807' )
 						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
