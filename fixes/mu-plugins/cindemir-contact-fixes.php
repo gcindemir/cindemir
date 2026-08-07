@@ -1038,8 +1038,9 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-site-design.php' === $name
-					&& ( false === strpos( $tmp, 'SITE_DESIGN_20260807' )
-						|| false === strpos( $tmp, 'cindemir-home-hero-section' ) ) ) {
+					&& ( false === strpos( $tmp, 'HOME_LIKE_EN_20260807' )
+						|| false === strpos( $tmp, 'cindemir-home-hero-section' )
+						|| false === strpos( $tmp, 'strip_home_slideshow' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name

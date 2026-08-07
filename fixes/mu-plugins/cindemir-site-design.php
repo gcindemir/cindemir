@@ -2,8 +2,9 @@
 /**
  * Plugin Name: Cindemir Site Design
  * Description: Law-firm visual system + EN/RU/ZH homepage unify. Design/performance only — no SEO/meta/schema changes. Keeps WhatsApp/Joinchat.
- * Version: 1.0.0
+ * Version: 1.0.1
  * SITE_DESIGN_20260807
+ * HOME_LIKE_EN_20260807
  * ELENA_ZARA_RU_BIO_20260718
  * Author: Cindemir Law Office
  */
@@ -19,8 +20,8 @@ define( 'CINDEMIR_SITE_DESIGN_LOADED', true );
 
 final class Cindemir_Site_Design {
 
-	const VERSION = '1.0.0';
-	const MARKER  = 'SITE_DESIGN_20260807';
+	const VERSION = '1.0.1';
+	const MARKER  = 'HOME_LIKE_EN_20260807';
 
 	const HERO_WEBP = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg.webp';
 	const TEAM_WEBP = 'https://cindemirlaw.com/wp-content/uploads/2026/07/team-4person.jpg.webp';
@@ -76,17 +77,7 @@ final class Cindemir_Site_Design {
 	private static function unify_homepage( $html ) {
 		$html = self::strip_home_slideshow( $html );
 		$html = self::mark_home_hero_section( $html );
-
-		// ZH: Welcome (#av_section_1/#av_section_2) and mismatched "Team" (#av_section_3)
-		// sit above About — hide them so first viewport matches EN About hero.
-		if ( preg_match( '/<body[^>]*\bclass="[^"]*\bpage-id-2568\b/i', $html ) ) {
-			$html = preg_replace(
-				'#(<div[^>]*id=[\'"]av_section_[123][\'"][^>]*class=[\'"])([^\'"]*)([\'"])#i',
-				'$1$2 cindemir-hide-prehero$3',
-				$html,
-				3
-			);
-		}
+		$html = self::promote_lang_about_hero( $html );
 
 		// Fix known broken RU About CTA (EN slug 404s under ?lang=ru).
 		$html = str_replace(
@@ -102,10 +93,30 @@ final class Cindemir_Site_Design {
 		);
 
 		if ( false === strpos( $html, 'cindemir-design-unify' ) ) {
-			$html = preg_replace( '/<\/body>/i', '<!-- cindemir-design-unify -->' . "\n</body>", $html, 1 );
+			$html = preg_replace( '/<\/body>/i', '<!-- cindemir-design-unify HOME_LIKE_EN_20260807 -->' . "\n</body>", $html, 1 );
 		}
 
 		return $html;
+	}
+
+	/**
+	 * ZH home: Welcome/Team sit above About — hide them and keep Chinese About as first screen.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	private static function promote_lang_about_hero( $html ) {
+		// ZH homepage builder page.
+		if ( ! preg_match( '/<body[^>]*\bclass="[^"]*\bpage-id-2568\b/i', $html ) ) {
+			return $html;
+		}
+		$out = preg_replace(
+			'#(<div[^>]*id=[\'"]av_section_[123][\'"][^>]*class=[\'"])([^\'"]*)([\'"])#i',
+			'$1$2 cindemir-hide-prehero$3',
+			$html,
+			3
+		);
+		return is_string( $out ) ? $out : $html;
 	}
 
 	/**
@@ -254,12 +265,25 @@ body.home,#top,#wrap_all{
 /* —— Hide RU/ZH pre-hero clutter —— */
 body.home #full_slider_1,
 body.home .avia-fullwidth-slider.avia-builder-el-first,
-body.home .cindemir-hide-prehero{
+body.home .cindemir-hide-prehero,
+body.home.page-id-2568 #av_section_1,
+body.home.page-id-2568 #av_section_2,
+body.home.page-id-2568 #av_section_3{
   display:none!important;
   height:0!important;min-height:0!important;max-height:0!important;
   overflow:hidden!important;margin:0!important;padding:0!important;
   border:0!important;
 }
+/* ZH: About hero is #av_section_4 — keep it first on screen like EN. */
+body.home.page-id-2568 #main{
+  display:flex!important;
+  flex-direction:column!important;
+}
+body.home.page-id-2568 #av_section_4,
+body.home.page-id-2568 .cindemir-home-hero-section{
+  order:-20!important;
+}
+body.home.page-id-2568 #av_section_5{order:20!important}
 
 /* —— Unified homepage hero (EN/RU/ZH) —— */
 body.home .cindemir-home-hero-section,

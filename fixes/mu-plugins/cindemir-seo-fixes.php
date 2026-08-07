@@ -20,6 +20,7 @@
  * PSI_GENERAL_FIX_20260806
  * GSC_BREADCRUMB_ITEMLIST_20260807
  * SITE_DESIGN_20260807
+ * HOME_LIKE_EN_20260807
  * Author: Cindemir Law Office
  */
 
@@ -1064,8 +1065,9 @@ final class Cindemir_SEO_Fixes {
 					continue;
 				}
 				if ( 'cindemir-site-design.php' === $name
-					&& ( false === strpos( $tmp, 'SITE_DESIGN_20260807' )
-						|| false === strpos( $tmp, 'cindemir-home-hero-section' ) ) ) {
+					&& ( false === strpos( $tmp, 'HOME_LIKE_EN_20260807' )
+						|| false === strpos( $tmp, 'cindemir-home-hero-section' )
+						|| false === strpos( $tmp, 'strip_home_slideshow' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
