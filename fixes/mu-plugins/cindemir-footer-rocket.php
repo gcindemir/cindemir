@@ -175,7 +175,18 @@ function cindemir_rocket_inject_extras( $html ) {
 		1,
 		$c2
 	);
-	return $c2 ? $with_span : $html;
+	if ( $c2 ) {
+		return $with_span;
+	}
+	// Last resort: append before </footer id=socket>.
+	$fallback = preg_replace(
+		'/(<\/footer>)/i',
+		$block . '$1',
+		$html,
+		1,
+		$c3
+	);
+	return ( $c3 && is_string( $fallback ) ) ? $fallback : $html;
 }
 
 /**
