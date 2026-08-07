@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -18,6 +18,7 @@
  * LCP_ABOUT_TEAM_UNLAZY_20260806
  * PSI_ABOUT_CLS_20260806
  * PSI_GENERAL_FIX_20260806
+ * GSC_BREADCRUMB_ITEMLIST_20260807
  * Author: Cindemir Law Office
  */
 
@@ -1051,7 +1052,8 @@ final class Cindemir_SEO_Fixes {
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
-						|| false === strpos( $tmp, 'PSI_GENERAL_FIX_20260806' ) ) ) {
+						|| false === strpos( $tmp, 'PSI_GENERAL_FIX_20260806' )
+						|| false === strpos( $tmp, 'GSC_BREADCRUMB_ITEMLIST_20260807' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
@@ -2912,6 +2914,7 @@ final class Cindemir_SEO_Fixes {
 			$graph = self::ensure_webpage_in_graph( $graph );
 		}
 		$graph = self::ensure_breadcrumb_in_graph( $graph );
+		$graph = self::sync_webpage_breadcrumb_refs( $graph );
 		return $graph;
 	}
 
@@ -2963,6 +2966,9 @@ final class Cindemir_SEO_Fixes {
 				foreach ( $v as $gi => $gn ) {
 					$node[ $k ][ $gi ] = self::normalize_schema_node( $gn );
 				}
+				// GSC "itemListElement missing" often means WebPage.breadcrumb.@id
+				// does not resolve to the BreadcrumbList @id (RU/ZH ?lang= URLs).
+				$node[ $k ] = self::sync_webpage_breadcrumb_refs( $node[ $k ] );
 			} elseif ( is_array( $v ) && isset( $v['@type'] ) ) {
 				$node[ $k ] = self::normalize_schema_node( $v );
 			}
@@ -3185,9 +3191,10 @@ final class Cindemir_SEO_Fixes {
 			$node = self::normalize_breadcrumb_schema( $graph[ $keep ] );
 			// If Yoast trail is still broken/thin, replace with our factual trail.
 			if ( $can_replace && self::breadcrumb_needs_rebuild( $node ) ) {
-				$node = array(
+				$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
+				$node     = array(
 					'@type'           => 'BreadcrumbList',
-					'@id'             => untrailingslashit( $clean_items[ count( $clean_items ) - 1 ]['item'] ) . '/#breadcrumb',
+					'@id'             => self::breadcrumb_schema_id( $last_url ),
 					'itemListElement' => $clean_items,
 				);
 			}
@@ -3199,15 +3206,26 @@ final class Cindemir_SEO_Fixes {
 		}
 
 		if ( ! $can_replace ) {
+			// Front / thin pages: still emit a valid one-item Home trail so
+			// WebPage.breadcrumb.@id can resolve (GSC Content maps).
+			if ( $clean_items ) {
+				$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
+				$graph[]  = array(
+					'@type'           => 'BreadcrumbList',
+					'@id'             => self::breadcrumb_schema_id( $last_url ),
+					'itemListElement' => $clean_items,
+				);
+			}
 			return $graph;
 		}
 		if ( ! ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) ) {
 			return $graph;
 		}
 
-		$graph[] = array(
+		$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
+		$graph[]  = array(
 			'@type'           => 'BreadcrumbList',
-			'@id'             => untrailingslashit( $clean_items[ count( $clean_items ) - 1 ]['item'] ) . '/#breadcrumb',
+			'@id'             => self::breadcrumb_schema_id( $last_url ),
 			'itemListElement' => $clean_items,
 		);
 		return $graph;
@@ -3338,10 +3356,141 @@ final class Cindemir_SEO_Fixes {
 			}
 			$node['itemListElement'] = $out;
 			if ( ! empty( $out[ $last ]['item'] ) ) {
-				$node['@id'] = untrailingslashit( $out[ $last ]['item'] ) . '/#breadcrumb';
+				$node['@id'] = self::breadcrumb_schema_id( $out[ $last ]['item'] );
+			} else {
+				$node['@id'] = self::breadcrumb_schema_id( $home );
+			}
+		} else {
+			// Never leave an empty BreadcrumbList (GSC: itemListElement missing).
+			$node['itemListElement'] = array(
+				array(
+					'@type'    => 'ListItem',
+					'position' => 1,
+					'name'     => 'Home',
+					'item'     => $home,
+				),
+			);
+			$node['@id'] = self::breadcrumb_schema_id( $home );
+		}
+		$node['@type'] = 'BreadcrumbList';
+		return $node;
+	}
+
+	/**
+	 * Stable BreadcrumbList @id for a page URL.
+	 * Path URLs keep "/#breadcrumb"; query-string lang URLs use "#breadcrumb"
+	 * (no slash before "#") so they match Yoast WebPage.breadcrumb.@id.
+	 *
+	 * @param string $url Page / crumb URL.
+	 * @return string
+	 */
+	private static function breadcrumb_schema_id( $url ) {
+		$url = is_string( $url ) ? trim( $url ) : '';
+		if ( '' === $url ) {
+			$url = 'https://cindemirlaw.com/';
+		}
+		$hash_pos = strpos( $url, '#' );
+		if ( false !== $hash_pos ) {
+			$url = substr( $url, 0, $hash_pos );
+		}
+		$url = untrailingslashit( $url );
+		if ( false !== strpos( $url, '?' ) ) {
+			return $url . '#breadcrumb';
+		}
+		return $url . '/#breadcrumb';
+	}
+
+	/**
+	 * Point every WebPage.breadcrumb.@id at the graph's BreadcrumbList @id,
+	 * and repair lang-homepage WebPage.url when Yoast omits ?lang=.
+	 *
+	 * @param array $graph Schema @graph pieces.
+	 * @return array
+	 */
+	private static function sync_webpage_breadcrumb_refs( $graph ) {
+		if ( ! is_array( $graph ) ) {
+			return $graph;
+		}
+
+		$lang = self::front_lang();
+		$home = 'https://cindemirlaw.com/';
+		if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) ) {
+			$home = 'https://cindemirlaw.com/?lang=' . rawurlencode( $lang );
+		}
+
+		$bc_id  = '';
+		$bc_idx = null;
+		foreach ( $graph as $i => $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( ! in_array( 'BreadcrumbList', $types, true ) ) {
+				continue;
+			}
+			$bc_idx = $i;
+			$items  = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) ? $node['itemListElement'] : array();
+			if ( ! $items ) {
+				$graph[ $i ]['itemListElement'] = array(
+					array(
+						'@type'    => 'ListItem',
+						'position' => 1,
+						'name'     => 'Home',
+						'item'     => $home,
+					),
+				);
+				$items = $graph[ $i ]['itemListElement'];
+			}
+			$last_url = $home;
+			$last     = $items[ count( $items ) - 1 ];
+			if ( is_array( $last ) && isset( $last['item'] ) ) {
+				if ( is_string( $last['item'] ) && '' !== $last['item'] ) {
+					$last_url = $last['item'];
+				} elseif ( is_array( $last['item'] ) && isset( $last['item']['@id'] ) ) {
+					$last_url = (string) $last['item']['@id'];
+				}
+			}
+			$bc_id               = self::breadcrumb_schema_id( $last_url );
+			$graph[ $i ]['@id']  = $bc_id;
+			$graph[ $i ]['@type'] = 'BreadcrumbList';
+			break;
+		}
+
+		if ( '' === $bc_id ) {
+			$bc_id = self::breadcrumb_schema_id( $home );
+		}
+
+		$is_front = ( function_exists( 'is_front_page' ) && is_front_page() )
+			|| ( function_exists( 'is_page' ) && is_page( 15 ) );
+
+		foreach ( $graph as $i => $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			$is_wp = false;
+			foreach ( $types as $t ) {
+				if ( is_string( $t ) && ( 'WebPage' === $t || false !== strpos( $t, 'WebPage' ) ) ) {
+					$is_wp = true;
+					break;
+				}
+			}
+			if ( ! $is_wp ) {
+				continue;
+			}
+			$graph[ $i ]['breadcrumb'] = array( '@id' => $bc_id );
+
+			if ( $is_front && in_array( $lang, array( 'ru', 'zh-hans' ), true ) ) {
+				$wp_url = isset( $node['url'] ) ? (string) $node['url'] : '';
+				if ( '' === $wp_url || false === strpos( $wp_url, 'lang=' ) ) {
+					$graph[ $i ]['url'] = $home;
+				}
 			}
 		}
-		return $node;
+
+		return $graph;
 	}
 
 	/**
