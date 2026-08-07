@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 125,
+    "scheduled_posts": 105,
     "queued_posts": 0,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 85
+    "published_posts": 105
   },
   "days": [
     {
@@ -912,7 +912,7 @@
     {
       "day": 18,
       "date": "2026-08-04",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d18-1",
@@ -920,7 +920,8 @@
           "url": "https://cindemirlaw.com/re-employment-lawsuit/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — re employment lawsuit.\n\nRead the full article:\nhttps://cindemirlaw.com/re-employment-lawsuit/",
           "scheduled_at": "2026-08-04T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d18-2",
@@ -928,7 +929,8 @@
           "url": "https://cindemirlaw.com/termination-of-employment-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — termination of employment under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/termination-of-employment-under-turkish-law/",
           "scheduled_at": "2026-08-04T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d18-3",
@@ -936,7 +938,8 @@
           "url": "https://cindemirlaw.com/intentional-killing-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — intentional killing under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/intentional-killing-under-turkish-law/",
           "scheduled_at": "2026-08-04T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d18-4",
@@ -944,7 +947,8 @@
           "url": "https://cindemirlaw.com/migrant-smuggling-and-human-trafficking-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — migrant smuggling and human trafficking under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/migrant-smuggling-and-human-trafficking-under-turkish-law/",
           "scheduled_at": "2026-08-04T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d18-5",
@@ -952,14 +956,15 @@
           "url": "https://cindemirlaw.com/website-legal-services/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — website legal services.\n\nRead the full article:\nhttps://cindemirlaw.com/website-legal-services/",
           "scheduled_at": "2026-08-04T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         }
       ]
     },
     {
       "day": 19,
       "date": "2026-08-05",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d19-1",
@@ -967,7 +972,8 @@
           "url": "https://cindemirlaw.com/privacy-policy-in-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — privacy policy in turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/privacy-policy-in-turkish-law/",
           "scheduled_at": "2026-08-05T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d19-2",
@@ -975,7 +981,8 @@
           "url": "https://cindemirlaw.com/internet-blackmail-and-turkish-criminal-law/",
           "summary": "Turkish criminal-record and police-clearance documents are often required for visas and residence abroad.\n\nThis guide covers the key procedures, documents and risks for foreign clients — internet blackmail and turkish criminal law.\n\nRead the full article:\nhttps://cindemirlaw.com/internet-blackmail-and-turkish-criminal-law/",
           "scheduled_at": "2026-08-05T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d19-3",
@@ -983,7 +990,8 @@
           "url": "https://cindemirlaw.com/humanitarian-residence-permit-application-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — humanitarian residence permit application in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/humanitarian-residence-permit-application-in-turkey/",
           "scheduled_at": "2026-08-05T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d19-4",
@@ -991,7 +999,8 @@
           "url": "https://cindemirlaw.com/establishing-a-branch-in-turkey-2/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — establishing a branch in turkey 2.\n\nRead the full article:\nhttps://cindemirlaw.com/establishing-a-branch-in-turkey-2/",
           "scheduled_at": "2026-08-05T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d19-5",
@@ -999,14 +1008,15 @@
           "url": "https://cindemirlaw.com/what-are-the-limitations-of-a-will-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — what are the limitations of a will under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/what-are-the-limitations-of-a-will-under-turkish-law/",
           "scheduled_at": "2026-08-05T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         }
       ]
     },
     {
       "day": 20,
       "date": "2026-08-06",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d20-1",
@@ -1014,7 +1024,8 @@
           "url": "https://cindemirlaw.com/liaison-offices-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — liaison offices in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/liaison-offices-in-turkey/",
           "scheduled_at": "2026-08-06T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d20-2",
@@ -1022,7 +1033,8 @@
           "url": "https://cindemirlaw.com/foreigners-and-international-protection-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — foreigners and international protection in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/foreigners-and-international-protection-in-turkey/",
           "scheduled_at": "2026-08-06T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d20-3",
@@ -1030,7 +1042,8 @@
           "url": "https://cindemirlaw.com/international-apostille-services-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international apostille services in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/international-apostille-services-in-turkey/",
           "scheduled_at": "2026-08-06T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d20-4",
@@ -1038,7 +1051,8 @@
           "url": "https://cindemirlaw.com/legal-services-in-sapanca/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal services in sapanca.\n\nRead the full article:\nhttps://cindemirlaw.com/legal-services-in-sapanca/",
           "scheduled_at": "2026-08-06T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d20-5",
@@ -1046,14 +1060,15 @@
           "url": "https://cindemirlaw.com/exemptions-on-the-legislation-of-the-documents-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — exemptions on the legislation of the documents in turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/exemptions-on-the-legislation-of-the-documents-in-turkey/",
           "scheduled_at": "2026-08-06T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         }
       ]
     },
     {
       "day": 21,
       "date": "2026-08-07",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d21-1",
@@ -1061,7 +1076,8 @@
           "url": "https://cindemirlaw.com/personal-injury-and-car-accidents-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — personal injury and car accidents under turkish law.\n\nRead the full article:\nhttps://cindemirlaw.com/personal-injury-and-car-accidents-under-turkish-law/",
           "scheduled_at": "2026-08-07T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d21-2",
@@ -1069,7 +1085,8 @@
           "url": "https://cindemirlaw.com/turkish-law-of-torts/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish law of torts.\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-law-of-torts/",
           "scheduled_at": "2026-08-07T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d21-3",
@@ -1077,7 +1094,8 @@
           "url": "https://cindemirlaw.com/turkish-succession-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish succession law.\n\nRead the full article:\nhttps://cindemirlaw.com/turkish-succession-law/",
           "scheduled_at": "2026-08-07T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d21-4",
@@ -1085,7 +1103,8 @@
           "url": "https://cindemirlaw.com/private-international-law-rules/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — private international law rules.\n\nRead the full article:\nhttps://cindemirlaw.com/private-international-law-rules/",
           "scheduled_at": "2026-08-07T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         },
         {
           "id": "d21-5",
@@ -1093,7 +1112,8 @@
           "url": "https://cindemirlaw.com/international-private-law-and-conventions-that-turkey-is-party/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international private law and conventions that turkey is party.\n\nRead the full article:\nhttps://cindemirlaw.com/international-private-law-and-conventions-that-turkey-is-party/",
           "scheduled_at": "2026-08-07T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published",
+          "published_at": "2026-08-07T12:14:59.595726+00:00"
         }
       ]
     },
