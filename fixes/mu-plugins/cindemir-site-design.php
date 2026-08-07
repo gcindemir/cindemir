@@ -31,12 +31,9 @@ final class Cindemir_Site_Design {
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 0 );
 	}
 
-	/** Fallback when WP Rocket buffer is absent. */
+	/** Always buffer — Rocket may skip some URLs while still registering rocket_buffer. */
 	public static function start_buffer() {
 		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-			return;
-		}
-		if ( has_filter( 'rocket_buffer' ) ) {
 			return;
 		}
 		ob_start( array( __CLASS__, 'transform_html' ) );
