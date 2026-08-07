@@ -985,6 +985,8 @@ final class Cindemir_Contact_Fixes {
 			'cindemir-services-page.php'          => 10000,
 			'cindemir-backup.php'                 => 8000,
 			'cindemir-mobile-header-branding.php' => 400,
+			'cindemir-footer-rocket.php'          => 4000,
+			'cindemir-site-design.php'            => 4000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -1030,7 +1032,18 @@ final class Cindemir_Contact_Fixes {
 						|| false === strpos( $tmp, 'function preferred_upload_image' )
 						|| false === strpos( $tmp, 'function unlazy_img_tag' )
 						|| false === strpos( $tmp, 'AHREFS_AUG5_20260805' )
-						|| false === strpos( $tmp, 'AHREFS_AUG2026' ) ) ) {
+						|| false === strpos( $tmp, 'AHREFS_AUG2026' )
+						|| false === strpos( $tmp, 'SITE_DESIGN_20260807' ) ) ) {
+					continue;
+				}
+				if ( 'cindemir-site-design.php' === $name
+					&& ( false === strpos( $tmp, 'SITE_DESIGN_20260807' )
+						|| false === strpos( $tmp, 'cindemir-home-hero-section' ) ) ) {
+					continue;
+				}
+				if ( 'cindemir-footer-rocket.php' === $name
+					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
+						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
