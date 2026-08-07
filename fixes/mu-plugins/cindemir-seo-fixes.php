@@ -1,5 +1,5 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
@@ -19,6 +19,7 @@
  * PSI_ABOUT_CLS_20260806
  * PSI_GENERAL_FIX_20260806
  * GSC_BREADCRUMB_ITEMLIST_20260807
+ * SITE_DESIGN_20260807
  * Author: Cindemir Law Office
  */
 
@@ -1022,6 +1023,7 @@ final class Cindemir_SEO_Fixes {
 			'cindemir-services-page.php'     => 10000,
 			'cindemir-backup.php'            => 8000,
 			'cindemir-footer-rocket.php'     => 4000,
+			'cindemir-site-design.php'       => 4000,
 		);
 		$out = array();
 		foreach ( $files as $name => $min ) {
@@ -1059,6 +1061,11 @@ final class Cindemir_SEO_Fixes {
 				if ( 'cindemir-footer-rocket.php' === $name
 					&& ( false === strpos( $tmp, 'Version: 1.0.4' )
 						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
+					continue;
+				}
+				if ( 'cindemir-site-design.php' === $name
+					&& ( false === strpos( $tmp, 'SITE_DESIGN_20260807' )
+						|| false === strpos( $tmp, 'cindemir-home-hero-section' ) ) ) {
 					continue;
 				}
 				$body = $tmp;
@@ -4531,7 +4538,7 @@ public static function homepage_hero_styles() {
 		if ( ! ( is_front_page() || is_home() ) ) {
 			return;
 		}
-		$photo = esc_url( 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg' );
+		$photo = esc_url( 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg.webp' );
 		echo '<style id="cindemir-home-hero">'
 			. '.cindemir-mobile-hero-photo{display:none}'
 			/* Phones + tablets (Enfold burger range). */
