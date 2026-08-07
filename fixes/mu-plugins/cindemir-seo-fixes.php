@@ -1060,13 +1060,15 @@ final class Cindemir_SEO_Fixes {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.0.5' )
+					&& ( false === strpos( $tmp, 'Version: 1.0.6' )
 						|| false === strpos( $tmp, 'FOOTER_BARO_I18N_20260807b' )
 						|| false === strpos( $tmp, 'width="64" height="48"' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-site-design.php' === $name
 					&& ( false === strpos( $tmp, 'HOME_LIKE_EN_20260807' )
+						|| false === strpos( $tmp, 'READ_MORE_I18N_20260807' )
+						|| false === strpos( $tmp, 'localize_read_more' )
 						|| false === strpos( $tmp, 'cindemir-home-hero-section' )
 						|| false === strpos( $tmp, 'strip_home_slideshow' ) ) ) {
 					continue;

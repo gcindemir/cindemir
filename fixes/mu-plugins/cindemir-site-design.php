@@ -2,9 +2,10 @@
 /**
  * Plugin Name: Cindemir Site Design
  * Description: Law-firm visual system + EN/RU/ZH homepage unify. Design/performance only — no SEO/meta/schema changes. Keeps WhatsApp/Joinchat.
- * Version: 1.0.1
+ * Version: 1.0.2
  * SITE_DESIGN_20260807
  * HOME_LIKE_EN_20260807
+ * READ_MORE_I18N_20260807
  * ELENA_ZARA_RU_BIO_20260718
  * Author: Cindemir Law Office
  */
@@ -20,8 +21,8 @@ define( 'CINDEMIR_SITE_DESIGN_LOADED', true );
 
 final class Cindemir_Site_Design {
 
-	const VERSION = '1.0.1';
-	const MARKER  = 'HOME_LIKE_EN_20260807';
+	const VERSION = '1.0.2';
+	const MARKER  = 'READ_MORE_I18N_20260807';
 
 	const HERO_WEBP = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg.webp';
 	const TEAM_WEBP = 'https://cindemirlaw.com/wp-content/uploads/2026/07/team-4person.jpg.webp';
@@ -66,7 +67,103 @@ final class Cindemir_Site_Design {
 			$html = self::unify_homepage( $html );
 		}
 
+		$html = self::localize_read_more( $html );
 		$html = self::ensure_design_marker( $html );
+		return $html;
+	}
+
+	/**
+	 * Current front language for UI copy.
+	 *
+	 * @param string $html Optional HTML for fallback detection.
+	 * @return string en|ru|zh-hans|tr
+	 */
+	private static function front_lang( $html = '' ) {
+		if ( ! empty( $_GET['lang'] ) ) {
+			$get = sanitize_key( wp_unslash( $_GET['lang'] ) );
+			if ( $get ) {
+				return ( 'zh' === $get ) ? 'zh-hans' : $get;
+			}
+		}
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && ICL_LANGUAGE_CODE ) {
+			$code = (string) ICL_LANGUAGE_CODE;
+			return ( 'zh' === $code ) ? 'zh-hans' : $code;
+		}
+		if ( function_exists( 'apply_filters' ) ) {
+			$wpml = apply_filters( 'wpml_current_language', null );
+			if ( is_string( $wpml ) && '' !== $wpml ) {
+				return ( 'zh' === $wpml ) ? 'zh-hans' : $wpml;
+			}
+		}
+		if ( is_string( $html ) && '' !== $html ) {
+			if ( preg_match( '/[?&]lang=(ru|zh-hans|zh|en|tr)\b/i', $html, $m ) ) {
+				$l = strtolower( $m[1] );
+				return ( 'zh' === $l ) ? 'zh-hans' : $l;
+			}
+			if ( preg_match( '/<html[^>]+lang=["\']([a-z]{2}(?:-[a-z]+)?)/i', $html, $m ) ) {
+				$l = strtolower( $m[1] );
+				if ( 0 === strpos( $l, 'zh' ) ) {
+					return 'zh-hans';
+				}
+				if ( 0 === strpos( $l, 'ru' ) ) {
+					return 'ru';
+				}
+				if ( 0 === strpos( $l, 'tr' ) ) {
+					return 'tr';
+				}
+			}
+		}
+		return 'en';
+	}
+
+	/**
+	 * Localized "Read More" button label (Enfold avia-button copy).
+	 *
+	 * @param string $lang Language slug.
+	 * @return string
+	 */
+	private static function read_more_label( $lang ) {
+		switch ( $lang ) {
+			case 'ru':
+				return 'Подробнее';
+			case 'zh-hans':
+			case 'zh':
+				return '阅读更多';
+			case 'tr':
+				return 'Devamını Oku';
+			default:
+				return 'Read More';
+		}
+	}
+
+	/**
+	 * Replace hardcoded English "Read More" on avia buttons for the active language.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	private static function localize_read_more( $html ) {
+		if ( false === stripos( $html, 'Read More' ) && false === stripos( $html, 'Read more' ) ) {
+			return $html;
+		}
+		$lang  = self::front_lang( $html );
+		$label = self::read_more_label( $lang );
+		if ( 'Read More' === $label ) {
+			return $html;
+		}
+
+		$patterns = array(
+			'/(<span\s+class=[\'"]avia_iconbox_title[\'"]\s*>)\s*Read\s+More\s*(<\/span>)/i',
+			'/(aria-label=[\'"])Read\s+More([\'"])/i',
+			'/(<(?:a|button)[^>]*>)\s*Read\s+More\s*(<\/(?:a|button)>)/i',
+		);
+		foreach ( $patterns as $pattern ) {
+			$out = preg_replace( $pattern, '$1' . $label . '$2', $html );
+			if ( is_string( $out ) ) {
+				$html = $out;
+			}
+		}
+
 		return $html;
 	}
 
