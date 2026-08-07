@@ -27,7 +27,7 @@ final class Cindemir_Site_Design {
 
 	public static function boot() {
 		add_action( 'wp_head', array( __CLASS__, 'print_design_css' ), 40 );
-		add_filter( 'rocket_buffer', array( __CLASS__, 'transform_html' ), 24 );
+		add_filter( 'rocket_buffer', array( __CLASS__, 'transform_html' ), 1005 );
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), 0 );
 	}
 
@@ -78,25 +78,7 @@ final class Cindemir_Site_Design {
 	 */
 	private static function unify_homepage( $html ) {
 		$html = self::strip_home_slideshow( $html );
-
-		// Mark the About hero (overlay + full-stretch) on every language.
-		$html = preg_replace_callback(
-			'#<div([^>]*\bclass=[\'"](?=[^\'"]*\bavia-section\b)(?=[^\'"]*\bav-section-color-overlay-active\b)(?=[^\'"]*\bavia-full-stretch\b)[^\'"]*[\'"][^>]*)>#i',
-			static function ( $m ) {
-				$attrs = $m[1];
-				if ( false !== stripos( $attrs, 'cindemir-home-hero-section' ) ) {
-					return '<div' . $attrs . '>';
-				}
-				if ( preg_match( '/\bclass=([\'"])(.*?)\1/i', $attrs, $cm ) ) {
-					$q     = $cm[1];
-					$class = $cm[2] . ' cindemir-home-hero-section';
-					$attrs = preg_replace( '/\bclass=([\'"]).*?\1/i', 'class=' . $q . $class . $q, $attrs, 1 );
-				}
-				return '<div' . $attrs . '>';
-			},
-			$html,
-			1
-		);
+		$html = self::mark_home_hero_section( $html );
 
 		// ZH: Welcome (#av_section_1/#av_section_2) and mismatched "Team" (#av_section_3)
 		// sit above About — hide them so first viewport matches EN About hero.
@@ -122,7 +104,60 @@ final class Cindemir_Site_Design {
 			$html
 		);
 
+		if ( false === strpos( $html, 'cindemir-design-unify' ) ) {
+			$html = preg_replace( '/<\/body>/i', '<!-- cindemir-design-unify -->' . "\n</body>", $html, 1 );
+		}
+
 		return $html;
+	}
+
+	/**
+	 * Tag the About full-bleed overlay section.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	private static function mark_home_hero_section( $html ) {
+		// CSS selectors also contain this token — only skip if already applied to markup.
+		if ( preg_match( '/\bclass=[\'"][^\'"]*\bcindemir-home-hero-section\b/i', $html ) ) {
+			return $html;
+		}
+
+		// Prefer known Enfold About hashes (EN + RU/ZH).
+		foreach ( array( 'av-kb0cqels-258634c332e7b841ab39cd0403bc5dac', 'av-kb0cqels-17c76a10768f591d25a945de8c928701' ) as $hash ) {
+			if ( false === strpos( $html, $hash ) ) {
+				continue;
+			}
+			$html2 = preg_replace(
+				'#(\bclass=[\'"][^\'"]*\b' . preg_quote( $hash, '#' ) . '\b[^\'"]*)([\'"])#i',
+				'$1 cindemir-home-hero-section$2',
+				$html,
+				1
+			);
+			if ( is_string( $html2 ) && $html2 !== $html ) {
+				return $html2;
+			}
+		}
+
+		// Generic overlay + full-stretch About section.
+		$html2 = preg_replace_callback(
+			'#<div([^>]*\bclass=[\'"](?=[^\'"]*\bavia-section\b)(?=[^\'"]*\bav-section-color-overlay-active\b)(?=[^\'"]*\bavia-full-stretch\b)[^\'"]*[\'"][^>]*)>#i',
+			static function ( $m ) {
+				$attrs = $m[1];
+				if ( false !== stripos( $attrs, 'cindemir-home-hero-section' ) ) {
+					return '<div' . $attrs . '>';
+				}
+				if ( preg_match( '/\bclass=([\'"])(.*?)\1/i', $attrs, $cm ) ) {
+					$q     = $cm[1];
+					$class = $cm[2] . ' cindemir-home-hero-section';
+					$attrs = preg_replace( '/\bclass=([\'"]).*?\1/i', 'class=' . $q . $class . $q, $attrs, 1 );
+				}
+				return '<div' . $attrs . '>';
+			},
+			$html,
+			1
+		);
+		return is_string( $html2 ) ? $html2 : $html;
 	}
 
 	/**
