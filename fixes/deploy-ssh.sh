@@ -72,6 +72,7 @@ upload_plugins() {
     cindemir-contact-fixes.php
     cindemir-expose-yoast-meta.php
     cindemir-menu-fix.php
+    cindemir-footer-rocket.php
   )
   if [[ "${CINDEMIR_UPLOAD_SEO:-}" == "1" ]]; then
     files+=(cindemir-seo-fixes.php)
