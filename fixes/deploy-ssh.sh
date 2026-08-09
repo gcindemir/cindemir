@@ -66,12 +66,18 @@ purge_empty_plugins() {
 }
 
 upload_plugins() {
+  # Never overwrite live cindemir-seo-fixes.php from this thin repo copy
+  # (production file is ~250KB and diverged). Deploy menu-fix (+ small plugins) only.
   local files=(
-    cindemir-seo-fixes.php
     cindemir-contact-fixes.php
     cindemir-expose-yoast-meta.php
     cindemir-menu-fix.php
   )
+  if [[ "${CINDEMIR_UPLOAD_SEO:-}" == "1" ]]; then
+    files+=(cindemir-seo-fixes.php)
+  else
+    echo "Note: skipping cindemir-seo-fixes.php (set CINDEMIR_UPLOAD_SEO=1 to force)."
+  fi
   echo "Uploading mu-plugins → ${USER}@${HOST}:${REMOTE}"
   ssh_cmd "mkdir -p ${REMOTE}"
   for f in "${files[@]}"; do

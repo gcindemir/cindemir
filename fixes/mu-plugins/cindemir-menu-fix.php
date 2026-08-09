@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Menu Fix
  * Description: Fixes main-nav language switcher hrefs on all pages + keeps RU/ZH menus pointing at real translated pages.
- * Version: 1.1.0
+ * Version: 1.3.0
  * Author: Cindemir Law Office
  */
 
@@ -18,7 +18,7 @@ define( 'CINDEMIR_MENU_FIX_LOADED', true );
 final class Cindemir_Menu_Fix {
 
 	const PRESS_URL = 'https://cindemir.av.tr/en/we-are-in-news/';
-	const VERSION   = '1.1.0';
+	const VERSION   = '1.3.0';
 
 	/** @var array<string,array{label:string,flag:string}> */
 	private static $langs = array(
@@ -43,8 +43,182 @@ final class Cindemir_Menu_Fix {
 		// rewrites language-switcher hrefs AFTER seo stamp/lang passes.
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), -1000 );
 		add_action( 'init', array( __CLASS__, 'maybe_repair_menus' ), 30 );
-		add_action( 'wp_head', array( __CLASS__, 'print_burger_css' ), 99 );
-		add_action( 'wp_footer', array( __CLASS__, 'print_burger_js' ), 99 );
+		// Very early head — before Rocket/Debloat can drop footer scripts.
+		add_action( 'wp_head', array( __CLASS__, 'print_burger_css' ), 1 );
+		add_action( 'wp_head', array( __CLASS__, 'print_burger_js' ), 2 );
+		add_action( 'wp_footer', array( __CLASS__, 'print_burger_js' ), 1 );
+		add_action( 'send_headers', array( __CLASS__, 'no_store_html_headers' ), 0 );
+		add_filter( 'rocket_delay_js_exclusions', array( __CLASS__, 'rocket_exclude' ) );
+		add_filter( 'rocket_exclude_defer_js', array( __CLASS__, 'rocket_exclude' ) );
+		add_filter( 'rocket_exclude_js', array( __CLASS__, 'rocket_exclude' ) );
+		add_filter( 'debloat_delay_js_exclusions', array( __CLASS__, 'rocket_exclude' ) );
+		// Ensure final Rocket HTML always contains the fix (Rocket was stripping footer/head JS on EN).
+		add_filter( 'rocket_buffer', array( __CLASS__, 'inject_into_rocket_buffer' ), 1000 );
+	}
+
+	/**
+	 * Re-inject burger CSS/JS into the final HTML Rocket writes to disk.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	public static function inject_into_rocket_buffer( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+		// Always ensure CSS/JS strings are present (do not use print_* static guards —
+		// those may already have fired during the request while Rocket later stripped them).
+		if ( false === strpos( $html, 'cindemir-menu-fix-burger' ) ) {
+			$html = preg_replace( '/<\/head>/i', self::burger_css_tag() . '</head>', $html, 1 );
+		}
+		if ( false === strpos( $html, 'cindemir-menu-fix-burger-js' ) ) {
+			$html = preg_replace( '/<\/head>/i', self::burger_js_tag() . '</head>', $html, 1 );
+		}
+		// Visible cache-bust marker for view-source checks.
+		if ( false === strpos( $html, 'cindemir-menu-fix-v' . self::VERSION ) ) {
+			$html = preg_replace(
+				'/<body\b[^>]*>/i',
+				'$0<!--cindemir-menu-fix-v' . self::VERSION . '-->',
+				$html,
+				1
+			);
+		}
+		return $html;
+	}
+
+	/** @return string */
+	private static function burger_css_tag() {
+		return '<style id="cindemir-menu-fix-burger" data-cfasync="false">'
+			/* Beat Enfold + header 64px lock: use viewport units, not % of header. */
+			. 'html.av-burger-overlay-active #top #header,'
+			. 'html.av-burger-overlay-active #top #wrap_all #header,'
+			. 'html.av-burger-overlay-active #top #header #header_main,'
+			. 'html.av-burger-overlay-active #top #header #header_main .container,'
+			. 'html.av-burger-overlay-active #top #header #header_main .inner-container{'
+			. 'max-height:none!important;height:auto!important;overflow:visible!important}'
+			. '.av-burger-overlay,'
+			. 'div.av-burger-overlay,'
+			. '#top .av-burger-overlay,'
+			. '#top #header .av-burger-overlay,'
+			. '#top #wrap_all .av-burger-overlay,'
+			. '#header .av-burger-overlay,'
+			. 'body > .av-burger-overlay,'
+			. 'body .av-burger-overlay{'
+			. 'position:fixed!important;'
+			. 'top:0!important;left:0!important;right:0!important;bottom:0!important;'
+			. 'inset:0!important;'
+			. 'width:100vw!important;width:100dvw!important;'
+			. 'height:100vh!important;height:100dvh!important;'
+			. 'min-width:100vw!important;min-height:100vh!important;min-height:100dvh!important;'
+			. 'max-width:none!important;max-height:none!important;'
+			. 'overflow:hidden!important;z-index:2147483000!important;'
+			. 'transform:none!important;-webkit-transform:none!important;'
+			. '}'
+			. '.av-burger-overlay-scroll,'
+			. '#top .av-burger-overlay-scroll,'
+			. '#top #header .av-burger-overlay-scroll,'
+			. '#header .av-burger-overlay-scroll{'
+			. 'position:absolute!important;top:0!important;right:0!important;left:auto!important;'
+			. 'width:min(350px,88vw)!important;'
+			. 'height:100vh!important;height:100dvh!important;'
+			. 'min-height:100vh!important;max-height:none!important;'
+			. 'overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;'
+			. 'z-index:10!important;background:#fff!important;'
+			. 'transform:none!important;-webkit-transform:none!important;'
+			. '}'
+			. 'html.av-burger-overlay-active .av-burger-overlay{display:block!important;opacity:1!important}'
+			. 'html.av-burger-overlay-active .av-burger-overlay-scroll{'
+			. 'transform:none!important;-webkit-transform:none!important}'
+			. '.av-burger-overlay-bg{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;min-height:100vh!important;z-index:3!important;opacity:.55!important;background:#000!important}'
+			. '.av-burger-overlay-inner{min-height:100%!important;height:auto!important;display:block!important}'
+			. '#av-burger-menu-ul{padding:72px 0 48px!important;height:auto!important;min-height:0!important;display:block!important;width:100%!important}'
+			. '#top #wrap_all #av-burger-menu-ul > li,'
+			. '#av-burger-menu-ul > li{opacity:1!important;top:0!important;left:0!important;position:relative!important;display:list-item!important;transform:none!important}'
+			. '#top #av-burger-menu-ul > li > a,'
+			. '#av-burger-menu-ul > li > a{color:#286060!important;font-size:18px!important;line-height:1.35!important;padding:14px 28px!important;display:block!important}'
+			. 'html.av-burger-overlay-active,html.av-burger-overlay-active body{overflow:hidden!important}'
+			. '</style>' . "\n";
+	}
+
+	/** @return string */
+	private static function burger_js_tag() {
+		return '<script id="cindemir-menu-fix-burger-js" data-nowprocket nowprocket data-no-minify="1" data-cfasync="false" data-pagespeed-no-defer>'
+			. '(function(){'
+			. 'function fixOverlay(o){'
+			. 'if(!o||!document.body)return;'
+			. 'if(o.parentElement!==document.body){try{document.body.appendChild(o);}catch(e){}}'
+			. 'var vh=(window.innerHeight||document.documentElement.clientHeight||800)+"px";'
+			. 'var vw=(window.innerWidth||document.documentElement.clientWidth||390)+"px";'
+			. 'o.style.setProperty("position","fixed","important");'
+			. 'o.style.setProperty("top","0","important");'
+			. 'o.style.setProperty("left","0","important");'
+			. 'o.style.setProperty("right","0","important");'
+			. 'o.style.setProperty("bottom","0","important");'
+			. 'o.style.setProperty("width",vw,"important");'
+			. 'o.style.setProperty("height",vh,"important");'
+			. 'o.style.setProperty("min-height",vh,"important");'
+			. 'o.style.setProperty("max-height","none","important");'
+			. 'o.style.setProperty("z-index","2147483000","important");'
+			. 'o.style.setProperty("overflow","hidden","important");'
+			. 'o.style.setProperty("transform","none","important");'
+			. 'var s=o.querySelector(".av-burger-overlay-scroll");'
+			. 'if(s){'
+			. 's.style.setProperty("position","absolute","important");'
+			. 's.style.setProperty("top","0","important");'
+			. 's.style.setProperty("right","0","important");'
+			. 's.style.setProperty("width","min(350px, 88vw)","important");'
+			. 's.style.setProperty("height",vh,"important");'
+			. 's.style.setProperty("min-height",vh,"important");'
+			. 's.style.setProperty("max-height","none","important");'
+			. 's.style.setProperty("overflow","auto","important");'
+			. 's.style.setProperty("background","#fff","important");'
+			. 's.style.setProperty("transform","none","important");'
+			. '}'
+			. 'if(document.documentElement.className.indexOf("av-burger-overlay-active")>=0){'
+			. 'var items=o.querySelectorAll("#av-burger-menu-ul > li");'
+			. 'for(var i=0;i<items.length;i++){items[i].style.setProperty("opacity","1","important");items[i].style.setProperty("top","0","important");items[i].style.setProperty("transform","none","important");}'
+			. '}'
+			. '}'
+			. 'function hoist(){fixOverlay(document.querySelector(".av-burger-overlay"));}'
+			. 'function arm(){'
+			. 'hoist();'
+			. 'var mo=new MutationObserver(function(){hoist();});'
+			. 'mo.observe(document.documentElement,{attributes:true,attributeFilter:["class"]});'
+			. 'if(document.body){mo.observe(document.body,{childList:true,subtree:true});}'
+			. '}'
+			. 'if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",arm);}else{arm();}'
+			. 'document.addEventListener("click",function(ev){'
+			. 'if(ev.target&&ev.target.closest&&ev.target.closest(".av-burger-menu-main,.av-hamburger,.av-hamburger-box,.av-hamburger-inner")){'
+			. 'setTimeout(hoist,0);setTimeout(hoist,50);setTimeout(hoist,200);setTimeout(hoist,500);'
+			. '}'
+			. '},true);'
+			. '})();'
+			. '</script>';
+	}
+
+	/** Stop browsers/CDN holding a broken 8-hour HTML snapshot. */
+	public static function no_store_html_headers() {
+		if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+		if ( ! headers_sent() ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+			header( 'Pragma: no-cache' );
+		}
+	}
+
+	/**
+	 * @param array $list Exclusion list.
+	 * @return array
+	 */
+	public static function rocket_exclude( $list ) {
+		if ( ! is_array( $list ) ) {
+			$list = array();
+		}
+		$list[] = 'cindemir-menu-fix';
+		$list[] = 'cindemir-menu-fix-burger';
+		$list[] = 'cindemir-lang-switch';
+		return $list;
 	}
 
 	/**
@@ -55,61 +229,26 @@ final class Cindemir_Menu_Fix {
 		if ( is_admin() ) {
 			return;
 		}
-		echo '<style id="cindemir-menu-fix-burger">'
-			. '.av-burger-overlay,'
-			. '#top .av-burger-overlay,'
-			. '#top #header .av-burger-overlay,'
-			. '#top #wrap_all .av-burger-overlay,'
-			. 'body .av-burger-overlay{'
-			. 'position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;bottom:0!important;'
-			. 'width:100vw!important;width:100dvw!important;'
-			. 'height:100vh!important;height:100dvh!important;'
-			. 'min-height:100vh!important;min-height:100dvh!important;'
-			. 'max-height:none!important;overflow:hidden!important;z-index:10050!important;'
-			. '}'
-			. '.av-burger-overlay-scroll,'
-			. '#top .av-burger-overlay-scroll,'
-			. '#top #header .av-burger-overlay-scroll{'
-			. 'position:absolute!important;top:0!important;left:auto!important;right:0!important;'
-			. 'width:min(350px,86vw)!important;'
-			. 'height:100%!important;min-height:100%!important;max-height:none!important;'
-			. 'overflow:auto!important;-webkit-overflow-scrolling:touch;z-index:10!important;'
-			. '}'
-			. '.av-burger-overlay-bg{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;min-height:100vh!important;z-index:3!important}'
-			. '.av-burger-overlay-inner{min-height:100%!important;height:auto!important}'
-			. '#av-burger-menu-ul{padding-top:72px!important;padding-bottom:48px!important;height:auto!important;display:block!important}'
-			. '#av-burger-menu-ul > li{opacity:1!important;top:0!important;position:relative!important}'
-			. '#top #av-burger-menu-ul > li > a{color:#286060!important;font-size:18px!important;line-height:1.35!important;padding:14px 28px!important}'
-			. 'html.av-burger-overlay-active{overflow:hidden!important}'
-			. '</style>' . "\n";
+		static $done = false;
+		if ( $done ) {
+			return;
+		}
+		$done = true;
+		echo self::burger_css_tag();
+		echo '<!--cindemir-menu-fix-v' . self::VERSION . "-->\n";
 	}
 
-	/** Move overlay to <body> so fixed positioning is not trapped by #header. */
+	/** Move overlay to <body> + inline !important sizes (survives Rocket delay). */
 	public static function print_burger_js() {
 		if ( is_admin() ) {
 			return;
 		}
-		echo '<script id="cindemir-menu-fix-burger-js" data-nowprocket nowprocket data-no-minify="1">'
-			. '(function(){'
-			. 'function hoist(){'
-			. 'var o=document.querySelector(".av-burger-overlay");'
-			. 'if(!o||!document.body)return;'
-			. 'if(o.parentElement!==document.body){document.body.appendChild(o);}'
-			. 'o.style.setProperty("height","100vh","important");'
-			. 'o.style.setProperty("min-height","100vh","important");'
-			. 'o.style.setProperty("max-height","none","important");'
-			. 'o.style.setProperty("width","100vw","important");'
-			. 'var s=o.querySelector(".av-burger-overlay-scroll");'
-			. 'if(s){s.style.setProperty("height","100%","important");s.style.setProperty("max-height","none","important");}'
-			. '}'
-			. 'hoist();'
-			. 'document.addEventListener("click",function(ev){'
-			. 'if(ev.target&&ev.target.closest&&ev.target.closest(".av-burger-menu-main,.av-hamburger")){setTimeout(hoist,10);setTimeout(hoist,120);}'
-			. '},true);'
-			. 'var mo=new MutationObserver(hoist);'
-			. 'if(document.documentElement){mo.observe(document.documentElement,{attributes:true,attributeFilter:["class"]});}'
-			. '})();'
-			. '</script>' . "\n";
+		static $done = false;
+		if ( $done ) {
+			return;
+		}
+		$done = true;
+		echo self::burger_js_tag() . "\n";
 	}
 
 	/** One-shot repair flag for WP menus (RU/ZH targets + ZH labels). */
