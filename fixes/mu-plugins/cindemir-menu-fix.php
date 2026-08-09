@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Menu Fix
  * Description: Fixes main-nav language switcher hrefs on all pages + keeps RU/ZH menus pointing at real translated pages.
- * Version: 1.6.2
+ * Version: 1.6.3
  * Author: Cindemir Law Office
  */
 
@@ -18,7 +18,7 @@ define( 'CINDEMIR_MENU_FIX_LOADED', true );
 final class Cindemir_Menu_Fix {
 
 	const PRESS_URL = 'https://cindemir.av.tr/en/we-are-in-news/';
-	const VERSION   = '1.6.2';
+	const VERSION   = '1.6.3';
 
 	/** @var array<string,array{label:string,flag:string}> */
 	private static $langs = array(
@@ -188,6 +188,17 @@ final class Cindemir_Menu_Fix {
 			. 'transform:none!important;border:0!important;border-bottom:0!important;'
 			. 'margin:0!important;padding:0!important;background:transparent!important;'
 			. 'list-style:none!important}'
+			/* Must beat the display:block rule above */
+			. '#top #wrap_all #av-burger-menu-ul > li.cindemir-lang-item,'
+			. '#top #wrap_all #av-burger-menu-ul > li[class*="language_"],'
+			. '#top #wrap_all #av-burger-menu-ul > li[class*="wpml-ls-item"],'
+			. '#av-burger-menu-ul > li.cindemir-lang-item,'
+			. '#av-burger-menu-ul > li[class*="language_"],'
+			. '#av-burger-menu-ul > li[class*="wpml-ls-item"],'
+			. 'html.av-burger-overlay-active #av-burger-menu-ul > li.cindemir-lang-item,'
+			. 'html.av-burger-overlay-active #av-burger-menu-ul > li[class*="language_"]{'
+			. 'display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;'
+			. 'visibility:hidden!important;pointer-events:none!important}'
 			. '#av-burger-menu-ul > li::before,'
 			. '#av-burger-menu-ul > li::after,'
 			. '#av-burger-menu-ul > li > a::before,'
@@ -228,37 +239,32 @@ final class Cindemir_Menu_Fix {
 			. '#av-burger-menu-ul .avia-bullet,'
 			. '#av-burger-menu-ul .avia-menu-subtext{'
 			. 'display:none!important}'
-			/* Hide raw language LIs — chips live in .cindemir-lang-row only */
-			. '#av-burger-menu-ul > li.cindemir-lang-item,'
-			. '#av-burger-menu-ul > li[class*="language_"],'
-			. '#av-burger-menu-ul > li[class*="wpml-ls-item"]{display:none!important}'
-			/* Language chips — quieter */
+			/* Language chips — quieter, single row */
+			. '#top #wrap_all #av-burger-menu-ul > li.cindemir-lang-row,'
 			. '#av-burger-menu-ul > li.cindemir-lang-row{'
-			. 'display:block!important;margin-top:8px!important;padding-top:8px!important;'
+			. 'display:block!important;visibility:visible!important;height:auto!important;'
+			. 'margin-top:6px!important;padding-top:8px!important;'
 			. 'border-top:1px solid rgba(31,74,74,.10)!important;'
-			. 'list-style:none!important}'
+			. 'list-style:none!important;overflow:visible!important;pointer-events:auto!important}'
 			. '#av-burger-menu-ul .cindemir-lang-row-inner{'
-			. 'display:flex!important;flex-wrap:nowrap!important;gap:4px!important;align-items:center!important;'
-			. 'justify-content:flex-start!important;padding:0 2px!important}'
-			. '#av-burger-menu-ul .cindemir-lang-row-inner > a,'
-			. '#av-burger-menu-ul > li.cindemir-lang-item > a,'
-			. '#av-burger-menu-ul > li[class*="language_"] > a,'
-			. '#av-burger-menu-ul > li[class*="wpml-ls-item"] > a{'
-			. 'display:inline-flex!important;align-items:center!important;gap:4px!important;'
-			. 'padding:4px 7px!important;font-size:10px!important;font-weight:600!important;'
+			. 'display:flex!important;flex-wrap:nowrap!important;gap:3px!important;align-items:center!important;'
+			. 'justify-content:flex-start!important;padding:0 2px!important;height:auto!important}'
+			. '#av-burger-menu-ul .cindemir-lang-row-inner > a{'
+			. 'display:inline-flex!important;align-items:center!important;gap:3px!important;'
+			. 'padding:3px 6px!important;font-size:9px!important;font-weight:600!important;'
 			. 'font-family:"Segoe UI",system-ui,-apple-system,sans-serif!important;'
-			. 'letter-spacing:.04em!important;text-transform:uppercase!important;'
+			. 'letter-spacing:.03em!important;text-transform:uppercase!important;'
 			. 'color:#1f4a4a!important;background:transparent!important;'
 			. 'border:1px solid rgba(31,74,74,.12)!important;border-radius:999px!important;'
 			. 'box-shadow:none!important;text-decoration:none!important;transform:none!important;'
-			. 'line-height:1!important}'
+			. 'line-height:1!important;height:auto!important;min-height:0!important}'
 			. '#av-burger-menu-ul .cindemir-lang-row-inner > a:hover,'
 			. '#av-burger-menu-ul .cindemir-lang-row-inner > a:focus{'
 			. 'background:rgba(31,74,74,.06)!important;border-color:rgba(31,74,74,.22)!important}'
 			. '#av-burger-menu-ul .cindemir-lang-flag,'
 			. '#av-burger-menu-ul img.avia_wpml_flag,'
 			. '#av-burger-menu-ul .wpml-ls-flag{'
-			. 'width:13px!important;height:9px!important;object-fit:cover!important;'
+			. 'width:12px!important;height:8px!important;object-fit:cover!important;'
 			. 'border-radius:1px!important;display:inline-block!important;flex:0 0 auto!important;'
 			. 'opacity:.9!important}'
 			/* Soften burger X while open */
@@ -405,15 +411,22 @@ final class Cindemir_Menu_Fix {
 			. 'if(bg){bg.style.setProperty("background","#0e1c1c","important");bg.style.setProperty("opacity","0.22","important");}'
 			. 'var items=o.querySelectorAll("#av-burger-menu-ul > li");'
 			. 'for(var i=0;i<items.length;i++){'
-			. 'items[i].style.setProperty("opacity","1","important");'
-			. 'items[i].style.setProperty("top","0","important");'
-			. 'items[i].style.setProperty("transform","none","important");'
-			. 'items[i].style.setProperty("height","auto","important");'
-			. 'items[i].style.setProperty("min-height","0","important");'
-			. 'items[i].style.setProperty("line-height","normal","important");'
-			. 'var link=items[i].querySelector(":scope > a");'
-			. 'if(link){link.style.setProperty("height","auto","important");link.style.setProperty("min-height","0","important");link.style.setProperty("line-height","1.25","important");link.style.setProperty("padding","7px 10px","important");}'
+			. 'var li=items[i];'
+			. 'var cls=String(li.className||"");'
+			. 'if(cls.indexOf("cindemir-lang-item")>=0||(cls.indexOf("language_")>=0&&cls.indexOf("cindemir-lang-row")<0)||cls.indexOf("wpml-ls-item")>=0){'
+			. 'li.style.setProperty("display","none","important");'
+			. 'continue;'
 			. '}'
+			. 'li.style.setProperty("opacity","1","important");'
+			. 'li.style.setProperty("top","0","important");'
+			. 'li.style.setProperty("transform","none","important");'
+			. 'li.style.setProperty("height","auto","important");'
+			. 'li.style.setProperty("min-height","0","important");'
+			. 'li.style.setProperty("line-height","normal","important");'
+			. 'var link=li.querySelector(":scope > a");'
+			. 'if(link&&cls.indexOf("cindemir-lang-row")<0){link.style.setProperty("height","auto","important");link.style.setProperty("min-height","0","important");link.style.setProperty("line-height","1.25","important");link.style.setProperty("padding","7px 10px","important");}'
+			. '}'
+			. 'polishMenu(o.querySelector("#av-burger-menu-ul"));'
 			. '}'
 			. 'function openMenu(){'
 			. 'var o=ensureOverlay();'
