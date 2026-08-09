@@ -1,0 +1,87 @@
+[22:30:03] Starting Bluehost automation
+[22:31:34] FATAL: BrowserType.launch_persistent_context: Target page, context or browser has been closed
+Browser logs:
+
+<launching> /opt/google/chrome/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --no-sandbox --no-sandbox --disable-dev-shm-usage --user-data-dir=/home/ubuntu/.config/google-chrome --remote-debugging-pipe about:blank
+<launched> pid=32231
+[pid=32231][err] [0711/223003.777997:WARNING:chrome/app/chrome_main_linux.cc:84] Read channel stable from /opt/google/chrome/CHROME_VERSION_EXTRA
+[pid=32231][err] [32231:32249:0711/223003.892953:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223003.919560:ERROR:components/content_settings/core/browser/content_settings_pref.cc:326] Invalid pattern strings: *,
+[pid=32231][err] [32231:32249:0711/223003.922155:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32265:32265:0711/223003.966870:ERROR:components/viz/service/main/viz_main_impl.cc:190] Exiting GPU process due to errors during initialization
+[pid=32231][err] [32231:32249:0711/223003.974130:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] 
+[pid=32231][err] DevTools remote debugging requires a non-default data directory. Specify this using --user-data-dir.
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] [32231:32249:0711/223004.007232:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32249:0711/223004.007428:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+[pid=32231][err] [32231:32231:0711/223004.122284:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32249:0711/223004.122353:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223004.127770:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32231:0711/223004.138570:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32249:0711/223004.141930:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223004.171749:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32231:0711/223004.176561:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32249:0711/223004.176696:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223004.187239:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[pid=32231][err] [32231:32231:0711/223004.196578:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32249:0711/223004.196770:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223004.210151:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32231:32249:0711/223004.210290:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=32231][err] [32231:32231:0711/223004.219329:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[pid=32231][err] [32524:32524:0711/223004.264345:ERROR:components/viz/service/main/viz_main_impl.cc:190] Exiting GPU process due to errors during initialization
+[pid=32231][err] [32505:32522:0711/223004.359478:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+[pid=32231][err] [32399:32427:0711/223004.360888:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+[pid=32231][err] [32399:32427:0711/223004.361165:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+[pid=32231][err] [32231:32250:0711/223006.388089:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=32231][err] [32231:32250:0711/223030.300472:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[pid=32231][err] [32231:32250:0711/223127.319775:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+Call log:
+  - <launching> /opt/google/chrome/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --no-sandbox --no-sandbox --disable-dev-shm-usage --user-data-dir=/home/ubuntu/.config/google-chrome --remote-debugging-pipe about:blank
+  - <launched> pid=32231
+  - [pid=32231][err] [0711/223003.777997:WARNING:chrome/app/chrome_main_linux.cc:84] Read channel stable from /opt/google/chrome/CHROME_VERSION_EXTRA
+  - [pid=32231][err] [32231:32249:0711/223003.892953:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223003.919560:ERROR:components/content_settings/core/browser/content_settings_pref.cc:326] Invalid pattern strings: *,
+  - [pid=32231][err] [32231:32249:0711/223003.922155:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32265:32265:0711/223003.966870:ERROR:components/viz/service/main/viz_main_impl.cc:190] Exiting GPU process due to errors during initialization
+  - [pid=32231][err] [32231:32249:0711/223003.974130:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err]
+  - [pid=32231][err] DevTools remote debugging requires a non-default data directory. Specify this using --user-data-dir.
+  - [pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+  - [pid=32231][err] [32231:32249:0711/223004.007232:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32249:0711/223004.007428:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  5 × [pid=32231][err] touch: cannot touch '/home/ubuntu/.local/share/icons/hicolor/.xdg-icon-resource-dummy': No such file or directory
+  - [pid=32231][err] [32231:32231:0711/223004.122284:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32249:0711/223004.122353:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223004.127770:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32231:0711/223004.138570:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32249:0711/223004.141930:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223004.171749:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32231:0711/223004.176561:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32249:0711/223004.176696:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223004.187239:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+  - [pid=32231][err] [32231:32231:0711/223004.196578:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32249:0711/223004.196770:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223004.210151:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32231:32249:0711/223004.210290:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+  - [pid=32231][err] [32231:32231:0711/223004.219329:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+  - [pid=32231][err] [32524:32524:0711/223004.264345:ERROR:components/viz/service/main/viz_main_impl.cc:190] Exiting GPU process due to errors during initialization
+  - [pid=32231][err] [32505:32522:0711/223004.359478:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+  - [pid=32231][err] [32399:32427:0711/223004.360888:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+  - [pid=32231][err] [32399:32427:0711/223004.361165:ERROR:gpu/ipc/client/command_buffer_proxy_impl.cc:285] ContextResult::kTransientFailure: Failed to send GpuControl.CreateCommandBuffer.
+  - [pid=32231][err] [32231:32250:0711/223006.388089:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+  - [pid=32231][err] [32231:32250:0711/223030.300472:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+  - [pid=32231][err] [32231:32250:0711/223127.319775:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+  - [pid=32231] <gracefully close start>
+  - [pid=32231] <kill>
+  - [pid=32231] <will force kill>
+  - [pid=32231] <process did exit: exitCode=null, signal=SIGKILL>
+  - [pid=32231] starting temporary directories cleanup
+  - [pid=32231] finished temporary directories cleanup
+  - [pid=32231] <gracefully close end>
+
