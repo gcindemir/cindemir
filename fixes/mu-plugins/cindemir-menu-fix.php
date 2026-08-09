@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Menu Fix
  * Description: Fixes main-nav language switcher hrefs on all pages + keeps RU/ZH menus pointing at real translated pages.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Cindemir Law Office
  */
 
@@ -18,6 +18,7 @@ define( 'CINDEMIR_MENU_FIX_LOADED', true );
 final class Cindemir_Menu_Fix {
 
 	const PRESS_URL = 'https://cindemir.av.tr/en/we-are-in-news/';
+	const VERSION   = '1.1.0';
 
 	/** @var array<string,array{label:string,flag:string}> */
 	private static $langs = array(
@@ -42,6 +43,73 @@ final class Cindemir_Menu_Fix {
 		// rewrites language-switcher hrefs AFTER seo stamp/lang passes.
 		add_action( 'template_redirect', array( __CLASS__, 'start_buffer' ), -1000 );
 		add_action( 'init', array( __CLASS__, 'maybe_repair_menus' ), 30 );
+		add_action( 'wp_head', array( __CLASS__, 'print_burger_css' ), 99 );
+		add_action( 'wp_footer', array( __CLASS__, 'print_burger_js' ), 99 );
+	}
+
+	/**
+	 * Header is locked to 64px; Enfold nests .av-burger-overlay inside #header,
+	 * so height:100% collapses to ~64px and menu items are clipped. Force viewport.
+	 */
+	public static function print_burger_css() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<style id="cindemir-menu-fix-burger">'
+			. '.av-burger-overlay,'
+			. '#top .av-burger-overlay,'
+			. '#top #header .av-burger-overlay,'
+			. '#top #wrap_all .av-burger-overlay,'
+			. 'body .av-burger-overlay{'
+			. 'position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;bottom:0!important;'
+			. 'width:100vw!important;width:100dvw!important;'
+			. 'height:100vh!important;height:100dvh!important;'
+			. 'min-height:100vh!important;min-height:100dvh!important;'
+			. 'max-height:none!important;overflow:hidden!important;z-index:10050!important;'
+			. '}'
+			. '.av-burger-overlay-scroll,'
+			. '#top .av-burger-overlay-scroll,'
+			. '#top #header .av-burger-overlay-scroll{'
+			. 'position:absolute!important;top:0!important;left:auto!important;right:0!important;'
+			. 'width:min(350px,86vw)!important;'
+			. 'height:100%!important;min-height:100%!important;max-height:none!important;'
+			. 'overflow:auto!important;-webkit-overflow-scrolling:touch;z-index:10!important;'
+			. '}'
+			. '.av-burger-overlay-bg{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;min-height:100vh!important;z-index:3!important}'
+			. '.av-burger-overlay-inner{min-height:100%!important;height:auto!important}'
+			. '#av-burger-menu-ul{padding-top:72px!important;padding-bottom:48px!important;height:auto!important;display:block!important}'
+			. '#av-burger-menu-ul > li{opacity:1!important;top:0!important;position:relative!important}'
+			. '#top #av-burger-menu-ul > li > a{color:#286060!important;font-size:18px!important;line-height:1.35!important;padding:14px 28px!important}'
+			. 'html.av-burger-overlay-active{overflow:hidden!important}'
+			. '</style>' . "\n";
+	}
+
+	/** Move overlay to <body> so fixed positioning is not trapped by #header. */
+	public static function print_burger_js() {
+		if ( is_admin() ) {
+			return;
+		}
+		echo '<script id="cindemir-menu-fix-burger-js" data-nowprocket nowprocket data-no-minify="1">'
+			. '(function(){'
+			. 'function hoist(){'
+			. 'var o=document.querySelector(".av-burger-overlay");'
+			. 'if(!o||!document.body)return;'
+			. 'if(o.parentElement!==document.body){document.body.appendChild(o);}'
+			. 'o.style.setProperty("height","100vh","important");'
+			. 'o.style.setProperty("min-height","100vh","important");'
+			. 'o.style.setProperty("max-height","none","important");'
+			. 'o.style.setProperty("width","100vw","important");'
+			. 'var s=o.querySelector(".av-burger-overlay-scroll");'
+			. 'if(s){s.style.setProperty("height","100%","important");s.style.setProperty("max-height","none","important");}'
+			. '}'
+			. 'hoist();'
+			. 'document.addEventListener("click",function(ev){'
+			. 'if(ev.target&&ev.target.closest&&ev.target.closest(".av-burger-menu-main,.av-hamburger")){setTimeout(hoist,10);setTimeout(hoist,120);}'
+			. '},true);'
+			. 'var mo=new MutationObserver(hoist);'
+			. 'if(document.documentElement){mo.observe(document.documentElement,{attributes:true,attributeFilter:["class"]});}'
+			. '})();'
+			. '</script>' . "\n";
 	}
 
 	/** One-shot repair flag for WP menus (RU/ZH targets + ZH labels). */
