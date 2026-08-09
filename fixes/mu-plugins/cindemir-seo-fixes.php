@@ -2138,7 +2138,7 @@ final class Cindemir_SEO_Fixes {
 			return true;
 		}
 		if ( is_string( $html ) && '' !== $html ) {
-			if ( preg_match( '/\b(?:\bhome\b|page-id-15|page-id-2570|page-id-2568)\b/', $html ) ) {
+			if ( preg_match( '/\bhome\b|page-id-(?:15|2570|2568)\b/', $html ) ) {
 				return true;
 			}
 		}
