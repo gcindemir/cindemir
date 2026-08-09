@@ -70,6 +70,7 @@ upload_plugins() {
     cindemir-seo-fixes.php
     cindemir-contact-fixes.php
     cindemir-expose-yoast-meta.php
+    cindemir-menu-fix.php
   )
   echo "Uploading mu-plugins → ${USER}@${HOST}:${REMOTE}"
   ssh_cmd "mkdir -p ${REMOTE}"
