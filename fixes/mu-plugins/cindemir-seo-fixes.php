@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.90 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.91 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.90
+ * Version: 1.9.91
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -22,6 +22,7 @@
  * SITE_DESIGN_20260807
  * HOME_LIKE_EN_20260807
  * BREADCRUMB_HOMEPAGE_GSC_20260809
+ * WEBPAGE_BREADCRUMB_DANGLING_20260809
  * Author: Cindemir Law Office
  */
 
@@ -191,7 +192,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.90';
+	const VERSION = '1.9.91';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -3494,7 +3495,7 @@ final class Cindemir_SEO_Fixes {
 		}
 
 		$bc_id  = '';
-		$bc_idx = null;
+		$has_bc = false;
 		foreach ( $graph as $i => $node ) {
 			if ( ! is_array( $node ) ) {
 				continue;
@@ -3504,18 +3505,14 @@ final class Cindemir_SEO_Fixes {
 			if ( ! in_array( 'BreadcrumbList', $types, true ) ) {
 				continue;
 			}
-			$bc_idx = $i;
+			$has_bc = true;
 			$items  = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) ? $node['itemListElement'] : array();
+			// Never invent a stub itemListElement here — empty BC should be dropped upstream.
 			if ( ! $items ) {
-				$graph[ $i ]['itemListElement'] = array(
-					array(
-						'@type'    => 'ListItem',
-						'position' => 1,
-						'name'     => 'Home',
-						'item'     => $home,
-					),
-				);
-				$items = $graph[ $i ]['itemListElement'];
+				unset( $graph[ $i ] );
+				$has_bc = false;
+				$bc_id  = '';
+				continue;
 			}
 			$last_url = $home;
 			$last     = $items[ count( $items ) - 1 ];
@@ -3526,14 +3523,13 @@ final class Cindemir_SEO_Fixes {
 					$last_url = (string) $last['item']['@id'];
 				}
 			}
-			$bc_id               = self::breadcrumb_schema_id( $last_url );
-			$graph[ $i ]['@id']  = $bc_id;
+			$bc_id                = self::breadcrumb_schema_id( $last_url );
+			$graph[ $i ]['@id']   = $bc_id;
 			$graph[ $i ]['@type'] = 'BreadcrumbList';
 			break;
 		}
-
-		if ( '' === $bc_id ) {
-			$bc_id = self::breadcrumb_schema_id( $home );
+		if ( ! $has_bc ) {
+			$graph = array_values( $graph );
 		}
 
 		$is_front = self::request_is_home_page();
@@ -3554,7 +3550,12 @@ final class Cindemir_SEO_Fixes {
 			if ( ! $is_wp ) {
 				continue;
 			}
-			$graph[ $i ]['breadcrumb'] = array( '@id' => $bc_id );
+			if ( $has_bc && '' !== $bc_id ) {
+				$graph[ $i ]['breadcrumb'] = array( '@id' => $bc_id );
+			} else {
+				// No BreadcrumbList in graph (homepages) — drop orphan WebPage.breadcrumb.
+				unset( $graph[ $i ]['breadcrumb'] );
+			}
 
 			if ( $is_front && in_array( $lang, array( 'ru', 'zh-hans' ), true ) ) {
 				$wp_url = isset( $node['url'] ) ? (string) $node['url'] : '';
