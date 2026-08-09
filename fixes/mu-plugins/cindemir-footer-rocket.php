@@ -2,7 +2,8 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.1.5
+ * Version: 1.1.6
+ * FOOTER_DEDUP_20260809
  * FOOTER_FULL_ADDRESS_20260809
  * FOOTER_TBB_LAZYFIX_20260809
  * FOOTER_BADGE_COMPACT_20260809
@@ -178,27 +179,93 @@ function cindemir_rocket_localize_baro_label( $html ) {
 	return is_string( $next ) ? $next : $html;
 }
 
+/**
+ * Build the single structured copyright block.
+ *
+ * @return string
+ */
+function cindemir_rocket_copyright_inner_html() {
+	return '<span class="cindemir-footer-copy">Copyright 2026 © Cindemir Law Office</span>'
+		. '<span class="cindemir-footer-addr">Al Mazaya Ritim Istanbul 44/18, Maltepe / Istanbul / Turkey</span>'
+		. '<span class="cindemir-footer-reach">'
+		. '<a href="tel:+902165506775" class="cindemir-footer-phone">+90 216 550 67 75</a>'
+		. '<span class="cindemir-footer-sep" aria-hidden="true">·</span>'
+		. '<a href="mailto:cindemir@cindemir.av.tr" class="cindemir-footer-email">cindemir@cindemir.av.tr</a>'
+		. '</span>';
+}
+
+/**
+ * Replace #socket .copyright with one clean structured block.
+ *
+ * Important: nested </span> breaks a naive non-greedy regex, and this buffer
+ * can run twice (ob_start + rocket_buffer), which used to duplicate address/phone.
+ *
+ * @param string $html HTML.
+ * @return string
+ */
 function cindemir_rocket_linkify_copyright( $html ) {
-	return preg_replace_callback(
-		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>)(.*?)(<\/span>)/is',
-		static function ( $m ) {
-			// Always rewrite so a shortened address from an older deploy is replaced.
-			$structured = '<span class="cindemir-footer-copy">Copyright 2026 © Cindemir Law Office</span>'
-				. '<span class="cindemir-footer-addr">Al Mazaya Ritim Istanbul 44/18, Maltepe / Istanbul / Turkey</span>'
-				. '<span class="cindemir-footer-reach">'
-				. '<a href="tel:+902165506775" class="cindemir-footer-phone">+90 216 550 67 75</a>'
-				. '<span class="cindemir-footer-sep" aria-hidden="true">·</span>'
-				. '<a href="mailto:cindemir@cindemir.av.tr" class="cindemir-footer-email">cindemir@cindemir.av.tr</a>'
-				. '</span>';
-			return $m[1] . $structured . $m[5];
-		},
-		$html,
-		1
+	if ( ! is_string( $html ) || '' === $html ) {
+		return $html;
+	}
+
+	// Drop orphaned addr/reach left over from earlier broken rewrites.
+	$html = preg_replace(
+		'#</span>\s*(?:<span class="cindemir-footer-addr">[\s\S]*?</span>\s*<span class="cindemir-footer-reach">[\s\S]*?</span>\s*)+</span>#i',
+		'</span>',
+		$html
 	);
+	if ( ! is_string( $html ) ) {
+		return '';
+	}
+
+	$socket_pos = stripos( $html, "id='socket'" );
+	if ( false === $socket_pos ) {
+		$socket_pos = stripos( $html, 'id="socket"' );
+	}
+	if ( false === $socket_pos ) {
+		return $html;
+	}
+
+	if ( ! preg_match( '/<span[^>]*\bclass=(["\'])copyright\1[^>]*>/i', $html, $open_m, PREG_OFFSET_CAPTURE, $socket_pos ) ) {
+		return $html;
+	}
+
+	$open_tag = $open_m[0][0];
+	$start    = (int) $open_m[0][1];
+	$i        = $start + strlen( $open_tag );
+	$depth    = 1;
+	$len      = strlen( $html );
+	$end      = null;
+
+	while ( $i < $len && $depth > 0 ) {
+		$next_open  = stripos( $html, '<span', $i );
+		$next_close = stripos( $html, '</span>', $i );
+		if ( false === $next_close ) {
+			break;
+		}
+		if ( false !== $next_open && $next_open < $next_close ) {
+			++$depth;
+			$i = $next_open + 5;
+			continue;
+		}
+		--$depth;
+		if ( 0 === $depth ) {
+			$end = $next_close + 7;
+			break;
+		}
+		$i = $next_close + 7;
+	}
+
+	if ( null === $end ) {
+		return $html;
+	}
+
+	$replacement = $open_tag . cindemir_rocket_copyright_inner_html() . '</span>';
+	return substr( $html, 0, $start ) . $replacement . substr( $html, $end );
 }
 
 function cindemir_rocket_inject_extras( $html ) {
-	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.5' ) ) {
+	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.6' ) ) {
 		return $html;
 	}
 	// Replace older injected blocks so cached HTML picks up the tidy layout.
@@ -213,39 +280,51 @@ function cindemir_rocket_inject_extras( $html ) {
 			$html = $stripped;
 		}
 	}
-	$block    = cindemir_rocket_footer_markup( $html );
-	$with_div = preg_replace_callback(
-		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)(\s*<\/div>)/is',
-		static function ( $m ) use ( $block ) {
-			return $m[1] . $block . $m[4];
-		},
-		$html,
-		1,
-		$c
-	);
-	if ( $c ) {
-		return $with_div;
+
+	$block = cindemir_rocket_footer_markup( $html );
+
+	// Insert after the full (nested) copyright </span>, not the first inner </span>.
+	$socket_pos = stripos( $html, "id='socket'" );
+	if ( false === $socket_pos ) {
+		$socket_pos = stripos( $html, 'id="socket"' );
 	}
-	$with_span = preg_replace_callback(
-		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>.*?<\/span>)/is',
-		static function ( $m ) use ( $block ) {
-			return $m[0] . $block;
-		},
-		$html,
-		1,
-		$c2
-	);
-	if ( $c2 ) {
-		return $with_span;
+	if ( false === $socket_pos ) {
+		return $html;
 	}
-	$fallback = preg_replace(
-		'/(<\/footer>)/i',
-		$block . '$1',
-		$html,
-		1,
-		$c3
-	);
-	return ( $c3 && is_string( $fallback ) ) ? $fallback : $html;
+	if ( ! preg_match( '/<span[^>]*\bclass=(["\'])copyright\1[^>]*>/i', $html, $open_m, PREG_OFFSET_CAPTURE, $socket_pos ) ) {
+		$fallback = preg_replace( '/(<\/footer>)/i', $block . '$1', $html, 1, $c3 );
+		return ( $c3 && is_string( $fallback ) ) ? $fallback : $html;
+	}
+
+	$start = (int) $open_m[0][1];
+	$i     = $start + strlen( $open_m[0][0] );
+	$depth = 1;
+	$len   = strlen( $html );
+	$end   = null;
+	while ( $i < $len && $depth > 0 ) {
+		$next_open  = stripos( $html, '<span', $i );
+		$next_close = stripos( $html, '</span>', $i );
+		if ( false === $next_close ) {
+			break;
+		}
+		if ( false !== $next_open && $next_open < $next_close ) {
+			++$depth;
+			$i = $next_open + 5;
+			continue;
+		}
+		--$depth;
+		if ( 0 === $depth ) {
+			$end = $next_close + 7;
+			break;
+		}
+		$i = $next_close + 7;
+	}
+	if ( null === $end ) {
+		$fallback = preg_replace( '/(<\/footer>)/i', $block . '$1', $html, 1, $c3 );
+		return ( $c3 && is_string( $fallback ) ) ? $fallback : $html;
+	}
+
+	return substr( $html, 0, $end ) . $block . substr( $html, $end );
 }
 
 /**
@@ -384,13 +463,13 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '</div>'
 		. '</div>'
 		. '<style id="cindemir-footer-fixes-css">' . $css . '</style>'
-		. '<!-- cindemir-footer-rocket 1.1.5 FOOTER_FULL_ADDRESS_20260809 -->';
+		. '<!-- cindemir-footer-rocket 1.1.6 FOOTER_DEDUP_20260809 -->';
 }
 
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v115' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v116' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -399,7 +478,7 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v115', 1, false );
+		update_option( 'cindemir_footer_rocket_v116', 1, false );
 	},
 	1
 );
