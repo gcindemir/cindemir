@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Cindemirlaw Deploy — Adım Adım</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 1.5rem auto; padding: 0 1rem 3rem; line-height: 1.45; color: #111; }
+    h1 { font-size: 1.35rem; margin-bottom: 0.25rem; }
+    .status { padding: 0.75rem 1rem; border-radius: 8px; margin: 1rem 0; }
+    .warn { background: #fef3c7; border: 1px solid #f59e0b; }
+    .ok { background: #ecfdf5; border: 1px solid #10b981; }
+    a.btn { display: inline-block; margin: 0.25rem 0.5rem 0.25rem 0; padding: 0.55rem 0.9rem; background: #1d4ed8; color: #fff !important; text-decoration: none; border-radius: 6px; font-size: 0.95rem; }
+    a.btn:hover { background: #1e40af; }
+    a.btn.gray { background: #4b5563; }
+    a.btn.green { background: #047857; }
+    .step { border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1.1rem; margin: 1rem 0; }
+    .step h2 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+    code, .mono { font-family: ui-monospace, monospace; font-size: 0.9rem; }
+    .path { background: #fffbeb; border: 1px solid #fde68a; padding: 0.55rem 0.7rem; border-radius: 6px; word-break: break-all; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.5rem; }
+    th, td { border: 1px solid #e5e7eb; padding: 0.45rem 0.5rem; vertical-align: top; }
+    th { background: #f9fafb; text-align: left; }
+    .meta { max-width: 360px; word-break: break-word; }
+    button.copy { font-size: 0.75rem; padding: 0.2rem 0.45rem; cursor: pointer; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; }
+    button.copy:hover { background: #f3f4f6; }
+    ol { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Cindemirlaw.com — Bluehost Deploy</h1>
+  <p><strong>Durum (canlı kontrol):</strong> Meta'lar henüz eski · <code>cindemir-expose-yoast-meta.php</code> yok · <code>cindemir-seo-fixes.php</code> var (güncellenmeli)</p>
+
+  <div class="status warn">
+    <strong>Şimdi:</strong> Bluehost’a giriş yap → File Manager → mu-plugins zip yükle → 14 sayfa meta → dil ayarı.
+  </div>
+
+  <p>
+    <a class="btn" href="https://www.bluehost.com/my-account/login" target="_blank">Bluehost Giriş</a>
+    <a class="btn gray" href="https://my.bluehost.com/hosting/app" target="_blank">Hosting Panel</a>
+    <a class="btn green" href="https://cindemirlaw.com/wp-admin/" target="_blank">WP Admin</a>
+  </p>
+
+  <div class="step">
+    <h2>Adım 1 — mu-plugins yükle (2 dosya)</h2>
+    <ol>
+      <li>Bluehost → <strong>Hosting</strong> → <strong>File Manager</strong></li>
+      <li>Klasör: <span class="path">public_html/wp-content/mu-plugins/</span> (yoksa oluştur)</li>
+      <li>Zip yükle ve çıkar: <code>fixes/deploy-package/mu-plugins.zip</code> (repo’da hazır)</li>
+      <li>İçinde: <code>cindemir-seo-fixes.php</code> (v1.5.6) + <code>cindemir-expose-yoast-meta.php</code></li>
+    </ol>
+    <p><a class="btn" href="file:///workspace/fixes/deploy-package/mu-plugins.zip">Zip dosyasını aç (yerel)</a></p>
+  </div>
+
+  <div class="step">
+    <h2>Adım 2 — 14 sayfa meta description</h2>
+    <p>Her satırda <strong>Düzenle</strong> → Yoast → Meta açıklaması → <strong>Kopyala</strong> → yapıştır → Güncelle.</p>
+    <table>
+      <thead><tr><th>ID</th><th>Sayfa</th><th>Meta (110–160, reklamsız)</th><th></th></tr></thead>
+      <tbody id="pages"></tbody>
+    </table>
+  </div>
+
+  <div class="step">
+    <h2>Adım 3 — ?lang= redirect (kritik)</h2>
+    <p>WP Admin → <strong>Languages</strong> (Polylang) veya <strong>WPML</strong> → varsayılan dilde URL’de <code>?lang=</code> olmasın.</p>
+    <p>Polylang: <em>Hide URL language information for default language</em> → AÇIK.</p>
+    <p>Sonra Yoast sitemap kaydet + cache purge.</p>
+  </div>
+
+  <div class="step">
+    <h2>Adım 4 — Doğrula</h2>
+    <p>
+      <a class="btn gray" href="https://cindemirlaw.com/about-us/" target="_blank">about-us</a>
+      <a class="btn gray" href="https://cindemirlaw.com/sitemap_index.xml" target="_blank">sitemap</a>
+      <a class="btn gray" href="https://cindemirlaw.com/hakan/?lang=zh-hans" target="_blank">hakan ZH (görsel)</a>
+    </p>
+  </div>
+
+  <script>
+    const pages = [
+      {id:43, slug:'our-videos', meta:"Cindemir Law Office'in Türk hukuku ve yabancılara yönelik hukuki konular hakkında hazırladığı video içeriklerinin derlendiği sayfa."},
+      {id:2, slug:'onas', meta:"Cindemir Law Office — независимая юридическая фирма в Стамбуле, работающая с 2004 года в сфере турецкого и международного права."},
+      {id:105, slug:'stati', meta:"Статьи о турецком праве: гражданское, коммерческое, миграционное и уголовное право Турции для иностранных граждан и компаний."},
+      {id:3884, slug:'who-is-hafiz-huseyin-husnu-efendi', meta:"Hafız Hüseyin Hüsnü Efendi'nin biyografisi: 1847'de Batum'da doğan bu ismin hayatı, ilmî kişiliği ve tarihsel arka planı ele alınır."},
+      {id:16, slug:'about-us', meta:"Cindemir Law Office, 2004'ten bu yana İstanbul'da faaliyet gösteren, Türk ve uluslararası hukuk alanında çalışan bağımsız bir hukuk bürosudur."},
+      {id:2427, slug:'komanda', meta:"Команда Cindemir Law Office: адвокаты и консультанты, работающие в области турецкого и международного права в Стамбуле."},
+      {id:392, slug:'support', meta:"Cindemir Law Office'in müvekkillerle iletişimi ve Türkiye'deki hukuki süreçlerde yabancılara sağladığı destek hakkında bilgi."},
+      {id:51, slug:'news-events', meta:"Cindemir Law Office'ten haberler ve etkinlikler: yabancı birey ve şirketleri ilgilendiren Türk hukukundaki gelişmelere dair güncellemeler."},
+      {id:19, slug:'team', meta:"Cindemir Law Office ekibi: İstanbul'da Türk ve uluslararası hukuk alanında çalışan avukatlar ve danışmanlar hakkında bilgi."},
+      {id:103, slug:'pod', meta:"О порядке общения адвоката с подзащитным в Турции: обмен информацией, права и обязанности сторон в уголовном процессе."},
+      {id:17, slug:'articles', meta:"Türk hukukuna dair makaleler: yabancı birey ve şirketleri ilgilendiren medeni, ticari, göç ve ceza hukuku konuları ele alınır."},
+      {id:390, slug:'privacy-policy', meta:"Cindemir Law Office'in gizlilik politikası: web sitesi ziyaretçilerine ait kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu açıklanır."},
+      {id:56, slug:'nashiyurist', meta:"Юридические услуги в Турции: корпоративное, миграционное, семейное и уголовное право для иностранных клиентов в Стамбуле."},
+      {id:3874, slug:'family-heritage', meta:"Cindemir Law Office'in tarihçesi: Osmanlı mahkemelerinden günümüze uzanan hukuki geçmişi İstanbul üzerinden anlatılır."}
+    ];
+    const tbody = document.getElementById('pages');
+    pages.forEach(p => {
+      const tr = document.createElement('tr');
+      const edit = `https://cindemirlaw.com/wp-admin/post.php?post=${p.id}&action=edit`;
+      tr.innerHTML = `<td>${p.id}</td><td><a href="${edit}" target="_blank">${p.slug}</a></td><td class="meta">${p.meta} <span class="mono">(${p.meta.length})</span></td><td><button class="copy" data-text="${p.meta.replace(/"/g,'&quot;')}">Kopyala</button></td>`;
+      tbody.appendChild(tr);
+    });
+    document.querySelectorAll('button.copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.text);
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = 'Kopyala', 1200);
+      });
+    });
+  </script>
+</body>
+</html>
