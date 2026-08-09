@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.89 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.90 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.89
+ * Version: 1.9.90
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -21,6 +21,7 @@
  * GSC_BREADCRUMB_ITEMLIST_20260807
  * SITE_DESIGN_20260807
  * HOME_LIKE_EN_20260807
+ * BREADCRUMB_HOMEPAGE_GSC_20260809
  * Author: Cindemir Law Office
  */
 
@@ -190,7 +191,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.89';
+	const VERSION = '1.9.90';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -1056,7 +1057,8 @@ final class Cindemir_SEO_Fixes {
 					&& ( false === strpos( $tmp, 'Version: ' . self::VERSION )
 						|| false === strpos( $tmp, 'BACKUP_WP_CRON_20260719' )
 						|| false === strpos( $tmp, 'PSI_GENERAL_FIX_20260806' )
-						|| false === strpos( $tmp, 'GSC_BREADCRUMB_ITEMLIST_20260807' ) ) ) {
+						|| false === strpos( $tmp, 'GSC_BREADCRUMB_ITEMLIST_20260807' )
+						|| false === strpos( $tmp, 'BREADCRUMB_HOMEPAGE_GSC_20260809' ) ) ) {
 					continue;
 				}
 				if ( 'cindemir-footer-rocket.php' === $name
@@ -2247,11 +2249,24 @@ final class Cindemir_SEO_Fixes {
 
 	/** @param string $html Optional HTML for body-class fallback. */
 	private static function request_is_home_page( $html = '' ) {
-		if ( ( function_exists( 'is_front_page' ) && is_front_page() ) || ( function_exists( 'is_page' ) && is_page( 15 ) ) ) {
+		if ( function_exists( 'is_front_page' ) && is_front_page() ) {
+			return true;
+		}
+		// EN home (15) + WPML translated fronts (RU 2570 / ZH 2568).
+		if ( function_exists( 'is_page' ) && is_page( array( 15, 2570, 2568 ) ) ) {
 			return true;
 		}
 		// Match the <body> class only — CSS like `body.home #av_section_1` must not count.
-		return is_string( $html ) && (bool) preg_match( '/<body\b[^>]*\bclass=(["\'])[^"\']*\b(?:home|page-id-15)\b/i', $html );
+		if ( is_string( $html ) && (bool) preg_match( '/<body\b[^>]*\bclass=(["\'])[^"\']*\b(?:home|page-id-(?:15|2570|2568))\b/i', $html ) ) {
+			return true;
+		}
+		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+		$path = (string) ( wp_parse_url( $uri, PHP_URL_PATH ) ?: '/' );
+		$path = untrailingslashit( $path );
+		if ( in_array( $path, array( '', '/' ), true ) && ! empty( $_GET['lang'] ) ) {
+			return true;
+		}
+		return false;
 	}
 
 	/** About / team pages where the group photo is LCP. */
@@ -3178,6 +3193,9 @@ final class Cindemir_SEO_Fixes {
 	 * - fix Yoast junk (/home/, /glavnaya/, name=URL)
 	 * - dedupe multiple BreadcrumbList nodes
 	 * - add a minimal factual trail when missing on singular pages
+	 * - on front pages (EN/RU/ZH): remove BreadcrumbList entirely
+	 *   (GSC: "itemListElement missing" on ?lang=ru / ?lang=zh-hans)
+	 * - never keep a BreadcrumbList without itemListElement
 	 *
 	 * @param array $graph Schema graph pieces.
 	 * @return array
@@ -3195,39 +3213,46 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 
+		// Homepages: breadcrumbs are not useful and WPML/Yoast stubs triggered GSC errors.
+		if ( self::request_is_home_page() ) {
+			return self::remove_breadcrumb_nodes_from_graph( $graph, $bc_indexes );
+		}
+
 		$clean_items = self::build_breadcrumb_list_items();
 		$can_replace = count( $clean_items ) >= 2;
 
 		if ( $bc_indexes ) {
 			$keep = $bc_indexes[0];
 			$node = self::normalize_breadcrumb_schema( $graph[ $keep ] );
-			// If Yoast trail is still broken/thin, replace with our factual trail.
-			if ( $can_replace && self::breadcrumb_needs_rebuild( $node ) ) {
-				$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
-				$node     = array(
-					'@type'           => 'BreadcrumbList',
-					'@id'             => self::breadcrumb_schema_id( $last_url ),
-					'itemListElement' => $clean_items,
-				);
+			$has_items = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) && count( $node['itemListElement'] ) > 0;
+
+			// If Yoast trail is still broken/thin/missing items, replace or drop.
+			if ( ! $has_items || self::breadcrumb_needs_rebuild( $node ) ) {
+				if ( $can_replace ) {
+					$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
+					$node     = array(
+						'@type'           => 'BreadcrumbList',
+						'@id'             => self::breadcrumb_schema_id( $last_url ),
+						'itemListElement' => $clean_items,
+					);
+					$has_items = true;
+				} else {
+					return self::remove_breadcrumb_nodes_from_graph( $graph, $bc_indexes );
+				}
 			}
+
+			if ( ! $has_items ) {
+				return self::remove_breadcrumb_nodes_from_graph( $graph, $bc_indexes );
+			}
+
 			$graph[ $keep ] = $node;
 			for ( $j = count( $bc_indexes ) - 1; $j >= 1; $j-- ) {
 				unset( $graph[ $bc_indexes[ $j ] ] );
 			}
-			return array_values( $graph );
+			return self::sync_webpage_breadcrumb_refs( array_values( $graph ) );
 		}
 
 		if ( ! $can_replace ) {
-			// Front / thin pages: still emit a valid one-item Home trail so
-			// WebPage.breadcrumb.@id can resolve (GSC Content maps).
-			if ( $clean_items ) {
-				$last_url = $clean_items[ count( $clean_items ) - 1 ]['item'];
-				$graph[]  = array(
-					'@type'           => 'BreadcrumbList',
-					'@id'             => self::breadcrumb_schema_id( $last_url ),
-					'itemListElement' => $clean_items,
-				);
-			}
 			return $graph;
 		}
 		if ( ! ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) ) {
@@ -3240,6 +3265,44 @@ final class Cindemir_SEO_Fixes {
 			'@id'             => self::breadcrumb_schema_id( $last_url ),
 			'itemListElement' => $clean_items,
 		);
+		return self::sync_webpage_breadcrumb_refs( $graph );
+	}
+
+	/**
+	 * Drop BreadcrumbList nodes and dangling WebPage.breadcrumb refs.
+	 *
+	 * @param array      $graph      Schema graph.
+	 * @param array|null $bc_indexes Indexes of BreadcrumbList nodes (optional).
+	 * @return array
+	 */
+	private static function remove_breadcrumb_nodes_from_graph( $graph, $bc_indexes = null ) {
+		if ( null === $bc_indexes ) {
+			$bc_indexes = array();
+			foreach ( $graph as $i => $node ) {
+				if ( ! is_array( $node ) ) {
+					continue;
+				}
+				$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+				$types = is_array( $type ) ? $type : array( $type );
+				if ( in_array( 'BreadcrumbList', $types, true ) ) {
+					$bc_indexes[] = $i;
+				}
+			}
+		}
+		for ( $j = count( $bc_indexes ) - 1; $j >= 0; $j-- ) {
+			unset( $graph[ $bc_indexes[ $j ] ] );
+		}
+		$graph = array_values( $graph );
+		foreach ( $graph as $i => $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$type  = isset( $node['@type'] ) ? $node['@type'] : '';
+			$types = is_array( $type ) ? $type : array( $type );
+			if ( in_array( 'WebPage', $types, true ) && isset( $node['breadcrumb'] ) ) {
+				unset( $graph[ $i ]['breadcrumb'] );
+			}
+		}
 		return $graph;
 	}
 
@@ -3473,8 +3536,7 @@ final class Cindemir_SEO_Fixes {
 			$bc_id = self::breadcrumb_schema_id( $home );
 		}
 
-		$is_front = ( function_exists( 'is_front_page' ) && is_front_page() )
-			|| ( function_exists( 'is_page' ) && is_page( 15 ) );
+		$is_front = self::request_is_home_page();
 
 		foreach ( $graph as $i => $node ) {
 			if ( ! is_array( $node ) ) {
