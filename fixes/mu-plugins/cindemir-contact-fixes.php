@@ -19,6 +19,7 @@
  * FOOTER_BARO_I18N_20260807b
  * WEBPAGE_BREADCRUMB_DANGLING_20260809
  * ARTICLE_IMAGE_RICH_20260809
+ * HEADER_BRAND_NO_NL_20260809
  * Author: Cindemir Law Office
  */
 
@@ -992,8 +993,14 @@ final class Cindemir_Contact_Fixes {
 			'cindemir-footer-rocket.php'          => 4000,
 			'cindemir-site-design.php'            => 4000,
 		);
+		// Disable orphan header-brand-i18n mu-plugin (old deploy leftover; can fight SEO brand CSS).
+		$orphan_i18n = trailingslashit( WPMU_PLUGIN_DIR ) . 'cindemir-header-brand-i18n.php';
+		if ( is_string( WPMU_PLUGIN_DIR ) && file_exists( $orphan_i18n ) ) {
+			@rename( $orphan_i18n, $orphan_i18n . '.off' );
+		}
 		$out = array();
 		foreach ( $files as $name => $min ) {
+
 			$dest = trailingslashit( WPMU_PLUGIN_DIR ) . $name;
 			$body = '';
 			$src  = '';
@@ -1028,8 +1035,9 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.92' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.93' )
 						|| false === strpos( $tmp, 'ARTICLE_IMAGE_RICH_20260809' )
+						|| false === strpos( $tmp, 'HEADER_BRAND_NO_NL_20260809' )
 						|| false === strpos( $tmp, 'WEBPAGE_BREADCRUMB_DANGLING_20260809' )
 						|| false === strpos( $tmp, 'LCP_ABOUT_TEAM_UNLAZY_20260806' )
 						|| false === strpos( $tmp, 'HEADER_BRAND_FIT_20260805' )

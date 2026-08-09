@@ -32,16 +32,16 @@ add_action(
 		$labels = array(
 			'en'      => 'Cindemir Law Office',
 			'tr'      => 'Cindemir Hukuk Bürosu',
-			'ru'      => 'Юридическая фирма\\A Cindemir',
-			'zh-hans' => '辛德米尔\\A 律师事务所',
-			'zh'      => '辛德米尔\\A 律师事务所',
+			'ru'      => 'Юридическая фирма Cindemir',
+			'zh-hans' => '辛德米尔律师事务所',
+			'zh'      => '辛德米尔律师事务所',
 		);
 		$label = isset( $labels[ $lang ] ) ? $labels[ $lang ] : $labels['en'];
 		echo '<style id="cindemir-mobile-brand">'
 			. '#header .logo a{display:inline-flex!important;align-items:center;gap:8px}'
 			. '#header .logo a::after{content:"' . $label . '";font-size:15px;font-weight:700;'
-			. 'line-height:1.15;color:#244f4f;white-space:pre-line;overflow:visible;'
-			. 'text-overflow:clip;max-width:min(220px,52vw)}'
+			. 'line-height:1.15;color:#244f4f;white-space:nowrap;overflow:hidden;'
+			. 'text-overflow:ellipsis;max-width:min(220px,52vw)}'
 			. '@media(max-width:989px){#header .logo img{max-height:36px!important;max-width:36px!important}}'
 			. '</style>';
 	},

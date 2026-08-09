@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.92 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.93 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.92
+ * Version: 1.9.93
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -24,6 +24,7 @@
  * BREADCRUMB_HOMEPAGE_GSC_20260809
  * WEBPAGE_BREADCRUMB_DANGLING_20260809
  * ARTICLE_IMAGE_RICH_20260809
+ * HEADER_BRAND_NO_NL_20260809
  * Author: Cindemir Law Office
  */
 
@@ -193,7 +194,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.92';
+	const VERSION = '1.9.93';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -4676,17 +4677,10 @@ JS;
 	}
 
 	/**
-	 * CSS content: value for .logo a::after (may include \\A line breaks).
+	 * CSS content: value for .logo a::after.
+	 * Keep single-line (no \\A / \\n) — nowrap + CSS escapes were showing as literal junk in the header.
 	 */
 	private static function header_brand_css_content() {
-		$lang = self::front_lang();
-		if ( 'ru' === $lang ) {
-			// Two lines so the full Russian brand fits without "фирм..." ellipsis.
-			return 'Юридическая фирма\\A Cindemir';
-		}
-		if ( in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
-			return '辛德米尔\\A 律师事务所';
-		}
 		return self::header_brand_label();
 	}
 
@@ -4702,7 +4696,7 @@ JS;
 			. '.avia-section .flex_column[class*="av-"][style*="529568"]{'
 			. 'background-size:cover!important;background-position:center center!important;'
 			. 'background-repeat:no-repeat!important}'
-			. '</style>\n';
+			. '</style>' . "\n";
 	}
 
 public static function homepage_hero_styles() {
