@@ -2,7 +2,8 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.1.2
+ * Version: 1.1.3
+ * FOOTER_BADGE_COMPACT_20260809
  * FOOTER_BADGE_CONTRAST_20260809
  * FOOTER_TIDY_20260809
  * FOOTER_BARO_I18N_20260807b
@@ -165,7 +166,7 @@ function cindemir_rocket_linkify_copyright( $html ) {
 }
 
 function cindemir_rocket_inject_extras( $html ) {
-	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.2' ) ) {
+	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.3' ) ) {
 		return $html;
 	}
 	// Replace older injected blocks so cached HTML picks up the tidy layout.
@@ -290,25 +291,28 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '#socket .cindemir-footer-social-list a{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;transition:background .15s ease}'
 		. '#socket .cindemir-footer-social-list a:hover{background:rgba(255,255,255,.22)}'
 		. '#socket .cindemir-footer-social-list svg{width:16px;height:16px;fill:currentColor;display:block}'
-		. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:4px 0 2px}'
-		/* White pads so dark baro seals stay readable on teal socket. */
+		. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:2px 0}'
+		/* Compact white pads — visible on teal without hurting LCP/PageSpeed. */
 		. '#socket .cindemir-footer-badges a{'
 		. 'display:inline-flex!important;align-items:center!important;justify-content:center!important;'
 		. 'box-sizing:border-box;background:#fff!important;'
-		. 'box-shadow:0 1px 2px rgba(0,0,0,.18);text-decoration:none!important}'
+		. 'box-shadow:0 1px 1px rgba(0,0,0,.14);text-decoration:none!important}'
 		. '#socket .cindemir-footer-badges a.cindemir-badge-aea{'
-		. 'width:auto;min-width:128px;height:72px;padding:10px 14px;border-radius:12px}'
+		. 'width:auto;min-width:88px;height:40px;padding:5px 8px;border-radius:8px}'
 		. '#socket .cindemir-footer-badges a.cindemir-badge-baro,'
 		. '#socket .cindemir-footer-badges a.cindemir-badge-tbb{'
-		. 'width:84px;min-width:84px;height:84px;padding:8px;border-radius:50%}'
+		. 'width:44px;min-width:44px;height:44px;padding:4px;border-radius:50%}'
+		. '#socket .cindemir-footer-badges img,'
+		. '#socket .cindemir-footer-badges picture{'
+		. 'display:block!important;margin:0!important}'
 		. '#socket .cindemir-footer-badges img{'
-		. 'display:block!important;object-fit:contain!important;border:0!important;opacity:1!important;'
+		. 'object-fit:contain!important;border:0!important;opacity:1!important;'
 		. 'filter:none!important;-webkit-filter:none!important;background:transparent!important}'
 		. '#socket .cindemir-footer-badges img.cindemir-badge-img-aea{'
-		. 'height:50px!important;width:auto!important;max-width:140px!important;max-height:50px!important}'
+		. 'height:28px!important;width:auto!important;max-width:72px!important;max-height:28px!important}'
 		. '#socket .cindemir-footer-badges img.cindemir-badge-img-baro,'
 		. '#socket .cindemir-footer-badges img.cindemir-badge-img-tbb{'
-		. 'width:68px!important;height:68px!important;max-width:68px!important;max-height:68px!important}'
+		. 'width:36px!important;height:36px!important;max-width:36px!important;max-height:36px!important}'
 		. '#socket .cindemir-baro-verification-bar{margin:0;text-align:center;order:3}'
 		. '#socket .cindemir-baro-verification-bar a{color:rgba(255,255,255,.78)!important;text-decoration:underline;text-underline-offset:2px;font-size:12px;line-height:1.35}'
 		. '#socket .cindemir-footer-meta{width:100%;margin:4px 0 0;padding:0;font-size:11.5px;line-height:1.4;text-align:center;color:rgba(255,255,255,.78)}'
@@ -317,46 +321,53 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '#socket .cindemir-footer-social-list{grid-template-columns:repeat(4,34px)}'
 		. '#socket .container{padding-bottom:72px!important}'
 		. '#socket .cindemir-footer-copy{font-size:13.5px}'
-		. '#socket .cindemir-footer-badges{gap:10px}'
-		. '#socket .cindemir-footer-badges a.cindemir-badge-aea{min-width:108px;height:64px;padding:8px 10px}'
+		. '#socket .cindemir-footer-badges{gap:8px}'
+		. '#socket .cindemir-footer-badges a.cindemir-badge-aea{min-width:80px;height:36px;padding:4px 7px}'
 		. '#socket .cindemir-footer-badges a.cindemir-badge-baro,'
-		. '#socket .cindemir-footer-badges a.cindemir-badge-tbb{width:72px;min-width:72px;height:72px;padding:6px}'
-		. '#socket .cindemir-footer-badges img.cindemir-badge-img-aea{height:44px!important;max-height:44px!important}'
+		. '#socket .cindemir-footer-badges a.cindemir-badge-tbb{width:40px;min-width:40px;height:40px;padding:3px}'
+		. '#socket .cindemir-footer-badges img.cindemir-badge-img-aea{height:24px!important;max-height:24px!important;max-width:64px!important}'
 		. '#socket .cindemir-footer-badges img.cindemir-badge-img-baro,'
-		. '#socket .cindemir-footer-badges img.cindemir-badge-img-tbb{width:60px!important;height:60px!important;max-width:60px!important;max-height:60px!important}'
+		. '#socket .cindemir-footer-badges img.cindemir-badge-img-tbb{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important}'
 		. '}';
 
-	$aea  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/aea.png';
-	$ibar = 'https://cindemirlaw.com/wp-content/uploads/cindemir/baro.png';
-	$tbb  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/tbb_amblem.png';
+	$base = 'https://cindemirlaw.com/wp-content/uploads/cindemir/';
+	$aea  = $base . 'aea.png';
+	$ibar = $base . 'baro.png';
+	$tbb  = $base . 'tbb_amblem.png';
+	$aea_w  = $base . 'aea.webp';
+	$ibar_w = $base . 'baro.webp';
+	$tbb_w  = $base . 'tbb_amblem.webp';
+
+	$badge = static function ( $class, $href, $title, $img_class, $png, $webp, $w, $h, $alt ) {
+		return '<a class="' . esc_attr( $class ) . '" href="' . esc_url( $href ) . '" target="_blank" rel="noopener noreferrer" title="' . esc_attr( $title ) . '">'
+			. '<picture>'
+			. '<source type="image/webp" srcset="' . esc_url( $webp ) . '">'
+			. '<img class="' . esc_attr( $img_class ) . '" src="' . esc_url( $png ) . '" alt="' . esc_attr( $alt ) . '" width="' . (int) $w . '" height="' . (int) $h . '" loading="lazy" decoding="async" />'
+			. '</picture>'
+			. '</a>';
+	};
 
 	return '<div class="cindemir-socket-extras" id="cindemir-socket-extras">'
 		. '<nav class="cindemir-footer-social" aria-label="Social media">'
 		. '<ul class="cindemir-footer-social-list">' . $items . '</ul>'
 		. '</nav>'
 		. '<div class="cindemir-footer-badges" aria-label="Membership badges">'
-		. '<a class="cindemir-badge-aea" href="https://www.aeuropea.com/" target="_blank" rel="noopener noreferrer" title="AEuropea">'
-		. '<img class="cindemir-badge-img-aea" src="' . esc_url( $aea ) . '" alt="AEuropea International Lawyers Network" width="140" height="50" loading="eager" decoding="async" />'
-		. '</a>'
-		. '<a class="cindemir-badge-baro" href="https://istanbulbarosu.org.tr/" target="_blank" rel="noopener noreferrer" title="İstanbul Barosu">'
-		. '<img class="cindemir-badge-img-baro" src="' . esc_url( $ibar ) . '" alt="İstanbul Barosu" width="68" height="68" loading="eager" decoding="async" />'
-		. '</a>'
-		. '<a class="cindemir-badge-tbb" href="https://www.barobirlik.org.tr/" target="_blank" rel="noopener noreferrer" title="Türkiye Barolar Birliği">'
-		. '<img class="cindemir-badge-img-tbb" src="' . esc_url( $tbb ) . '" alt="Türkiye Barolar Birliği" width="68" height="68" loading="eager" decoding="async" />'
-		. '</a>'
+		. $badge( 'cindemir-badge-aea', 'https://www.aeuropea.com/', 'AEuropea', 'cindemir-badge-img-aea', $aea, $aea_w, 72, 28, 'AEuropea International Lawyers Network' )
+		. $badge( 'cindemir-badge-baro', 'https://istanbulbarosu.org.tr/', 'İstanbul Barosu', 'cindemir-badge-img-baro', $ibar, $ibar_w, 36, 36, 'İstanbul Barosu' )
+		. $badge( 'cindemir-badge-tbb', 'https://www.barobirlik.org.tr/', 'Türkiye Barolar Birliği', 'cindemir-badge-img-tbb', $tbb, $tbb_w, 36, 36, 'Türkiye Barolar Birliği' )
 		. '</div>'
 		. '<div id="cindemir-baro-verification-bar" class="cindemir-baro-verification-bar">'
 		. '<a href="' . esc_url( $baro ) . '" target="_blank" rel="noopener noreferrer">' . $label . '</a>'
 		. '</div>'
 		. '</div>'
 		. '<style id="cindemir-footer-fixes-css">' . $css . '</style>'
-		. '<!-- cindemir-footer-rocket 1.1.2 FOOTER_BADGE_CONTRAST_20260809 -->';
+		. '<!-- cindemir-footer-rocket 1.1.3 FOOTER_BADGE_COMPACT_20260809 -->';
 }
 
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v112' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v113' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -365,7 +376,7 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v112', 1, false );
+		update_option( 'cindemir_footer_rocket_v113', 1, false );
 	},
 	1
 );
