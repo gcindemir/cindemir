@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Menu Fix
  * Description: Fixes main-nav language switcher hrefs on all pages + keeps RU/ZH menus pointing at real translated pages.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Cindemir Law Office
  */
 
@@ -18,7 +18,7 @@ define( 'CINDEMIR_MENU_FIX_LOADED', true );
 final class Cindemir_Menu_Fix {
 
 	const PRESS_URL = 'https://cindemir.av.tr/en/we-are-in-news/';
-	const VERSION   = '1.4.0';
+	const VERSION   = '1.4.1';
 
 	/** @var array<string,array{label:string,flag:string}> */
 	private static $langs = array(
@@ -147,12 +147,30 @@ final class Cindemir_Menu_Fix {
 			. 'transform:none!important;-webkit-transform:none!important}'
 			. '.av-burger-overlay-bg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:100vh!important;z-index:3!important;opacity:.55!important;background:#000!important;cursor:pointer!important}'
 			. '.av-burger-overlay-inner{min-height:100%!important;height:auto!important;display:block!important;position:relative!important;z-index:5!important}'
-			. '#av-burger-menu-ul{padding:72px 0 48px!important;height:auto!important;min-height:0!important;display:block!important;width:100%!important;margin:0!important;list-style:none!important}'
+			. '#av-burger-menu-ul,'
+			. '.av-burger-overlay #av-burger-menu-ul,'
+			. '.av-burger-overlay ul.av-main-nav{'
+			. 'padding:72px 0 48px!important;height:auto!important;min-height:0!important;'
+			. 'display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;'
+			. 'align-items:stretch!important;justify-content:flex-start!important;'
+			. 'width:100%!important;max-width:100%!important;margin:0!important;list-style:none!important;'
+			. 'float:none!important;text-align:left!important}'
 			. '#top #wrap_all #av-burger-menu-ul > li,'
-			. '#av-burger-menu-ul > li{opacity:1!important;top:0!important;left:0!important;position:relative!important;display:list-item!important;transform:none!important;border-bottom:1px solid rgba(0,0,0,.08)}'
+			. '#av-burger-menu-ul > li,'
+			. '.av-burger-overlay #av-burger-menu-ul > li{'
+			. 'opacity:1!important;top:0!important;left:0!important;right:auto!important;'
+			. 'position:relative!important;display:block!important;float:none!important;'
+			. 'width:100%!important;max-width:100%!important;flex:0 0 auto!important;'
+			. 'transform:none!important;border-bottom:1px solid rgba(0,0,0,.08);margin:0!important}'
 			. '#top #av-burger-menu-ul > li > a,'
-			. '#av-burger-menu-ul > li > a{color:#286060!important;font-size:18px!important;line-height:1.35!important;padding:14px 28px!important;display:block!important}'
+			. '#av-burger-menu-ul > li > a,'
+			. '.av-burger-overlay #av-burger-menu-ul > li > a{'
+			. 'color:#286060!important;font-size:18px!important;line-height:1.35!important;'
+			. 'padding:14px 28px!important;display:block!important;width:auto!important;'
+			. 'float:none!important;text-align:left!important}'
 			. '#av-burger-menu-ul > li.av-burger-menu-main{display:none!important}'
+			. '.av-burger-overlay .sub-menu{display:none!important}'
+			. '.av-burger-overlay .avia-menu-fx,.av-burger-overlay .av-menu-button{display:none!important}'
 			. 'html.av-burger-overlay-active,html.av-burger-overlay-active body{overflow:hidden!important}'
 			/* Close control stays above the dimmed panel. */
 			. 'html.av-burger-overlay-active #top #header,'
