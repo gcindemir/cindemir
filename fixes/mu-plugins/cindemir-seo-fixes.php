@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.91 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.92 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.91
+ * Version: 1.9.92
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -23,6 +23,7 @@
  * HOME_LIKE_EN_20260807
  * BREADCRUMB_HOMEPAGE_GSC_20260809
  * WEBPAGE_BREADCRUMB_DANGLING_20260809
+ * ARTICLE_IMAGE_RICH_20260809
  * Author: Cindemir Law Office
  */
 
@@ -192,7 +193,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.91';
+	const VERSION = '1.9.92';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -2980,7 +2981,16 @@ final class Cindemir_SEO_Fixes {
 		if ( in_array( 'BreadcrumbList', $types, true ) ) {
 			$node = self::normalize_breadcrumb_schema( $node );
 		}
-		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) || in_array( 'VideoObject', $types, true ) ) {
+		if ( in_array( 'Article', $types, true ) || in_array( 'BlogPosting', $types, true ) || in_array( 'NewsArticle', $types, true ) ) {
+			$node = self::ensure_article_image( $node );
+			if ( isset( $node['author'] ) ) {
+				$node['author'] = self::normalize_schema_node( $node['author'] );
+			}
+			if ( isset( $node['publisher'] ) && is_array( $node['publisher'] ) ) {
+				$node['publisher'] = self::normalize_organization_schema( $node['publisher'] );
+			}
+		}
+		if ( in_array( 'VideoObject', $types, true ) ) {
 			if ( isset( $node['author'] ) ) {
 				$node['author'] = self::normalize_schema_node( $node['author'] );
 			}
@@ -3002,6 +3012,87 @@ final class Cindemir_SEO_Fixes {
 			}
 		}
 		return $node;
+	}
+
+	/**
+	 * Backfill Article.image for rich results (Yoast often emits null when no
+	 * featured image is mapped, even if og:image exists).
+	 *
+	 * @param array $node Article-like schema node.
+	 * @return array
+	 */
+	private static function ensure_article_image( $node ) {
+		if ( ! is_array( $node ) ) {
+			return $node;
+		}
+		$existing = self::schema_image_url( isset( $node['image'] ) ? $node['image'] : null );
+		if ( '' !== $existing ) {
+			return $node;
+		}
+
+		$url = '';
+		if ( function_exists( 'is_singular' ) && is_singular( array( 'post', 'page' ) ) ) {
+			$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+			if ( $post_id > 0 && function_exists( 'get_the_post_thumbnail_url' ) ) {
+				$thumb = get_the_post_thumbnail_url( $post_id, 'full' );
+				if ( is_string( $thumb ) && '' !== $thumb ) {
+					$url = $thumb;
+				}
+			}
+			if ( '' === $url && $post_id > 0 ) {
+				foreach ( array( '_yoast_wpseo_opengraph-image', '_yoast_wpseo_twitter-image' ) as $meta_key ) {
+					$meta = get_post_meta( $post_id, $meta_key, true );
+					if ( is_string( $meta ) && preg_match( '#^https?://#i', $meta ) ) {
+						$url = $meta;
+						break;
+					}
+				}
+			}
+		}
+		if ( '' === $url && ! empty( $GLOBALS['cindemir_schema_og_image'] ) && is_string( $GLOBALS['cindemir_schema_og_image'] ) ) {
+			$url = $GLOBALS['cindemir_schema_og_image'];
+		}
+		if ( '' === $url ) {
+			// Drop explicit null/empty — invalid for Google Article rich results.
+			unset( $node['image'] );
+			return $node;
+		}
+
+		$url = self::rewrite_media_url( $url );
+		$node['image'] = array(
+			'@type' => 'ImageObject',
+			'url'   => $url,
+		);
+		if ( empty( $node['thumbnailUrl'] ) ) {
+			$node['thumbnailUrl'] = $url;
+		}
+		return $node;
+	}
+
+	/**
+	 * @param mixed $image Schema image value.
+	 * @return string
+	 */
+	private static function schema_image_url( $image ) {
+		if ( is_string( $image ) && preg_match( '#^https?://#i', $image ) ) {
+			return $image;
+		}
+		if ( is_array( $image ) ) {
+			if ( isset( $image['url'] ) && is_string( $image['url'] ) && preg_match( '#^https?://#i', $image['url'] ) ) {
+				return $image['url'];
+			}
+			if ( isset( $image['@id'] ) && is_string( $image['@id'] ) && preg_match( '#^https?://#i', $image['@id'] ) ) {
+				return $image['@id'];
+			}
+			// List of images / ImageObjects.
+			foreach ( $image as $item ) {
+				$u = self::schema_image_url( $item );
+				if ( '' !== $u ) {
+					return $u;
+				}
+			}
+		}
+		return '';
 	}
 
 	/**
@@ -3749,6 +3840,16 @@ final class Cindemir_SEO_Fixes {
 		if ( ! is_string( $html ) || '' === $html || false === stripos( $html, 'application/ld+json' ) ) {
 			return $html;
 		}
+		// Expose og:image to Article backfill when featured image meta is empty.
+		$og = '';
+		if ( preg_match( '/<meta\b[^>]*\bproperty=["\']og:image["\'][^>]*\bcontent=["\']([^"\']+)["\']/i', $html, $om )
+			|| preg_match( '/<meta\b[^>]*\bcontent=["\']([^"\']+)["\'][^>]*\bproperty=["\']og:image["\']/i', $html, $om ) ) {
+			$og = trim( (string) $om[1] );
+		}
+		$prev_og = isset( $GLOBALS['cindemir_schema_og_image'] ) ? $GLOBALS['cindemir_schema_og_image'] : null;
+		if ( '' !== $og ) {
+			$GLOBALS['cindemir_schema_og_image'] = $og;
+		}
 		// Per-script replace avoids PCRE failures on huge pages / VideoObject transcripts.
 		if ( preg_match_all( '#<script\b[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is', $html, $matches, PREG_SET_ORDER ) ) {
 			foreach ( $matches as $m ) {
@@ -3768,6 +3869,11 @@ final class Cindemir_SEO_Fixes {
 				$open = substr( $m[0], 0, strpos( $m[0], '>' ) + 1 );
 				$html = str_replace( $m[0], $open . $json . '</script>', $html );
 			}
+		}
+		if ( null === $prev_og ) {
+			unset( $GLOBALS['cindemir_schema_og_image'] );
+		} else {
+			$GLOBALS['cindemir_schema_og_image'] = $prev_og;
 		}
 		return self::append_missing_schema_script( $html );
 	}
