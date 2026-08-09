@@ -2,7 +2,8 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.1.4
+ * Version: 1.1.5
+ * FOOTER_FULL_ADDRESS_20260809
  * FOOTER_TBB_LAZYFIX_20260809
  * FOOTER_BADGE_COMPACT_20260809
  * FOOTER_BADGE_CONTRAST_20260809
@@ -181,11 +182,9 @@ function cindemir_rocket_linkify_copyright( $html ) {
 	return preg_replace_callback(
 		'/(<footer[^>]*id=(["\'])socket\2[^>]*>.*?<span[^>]*class=(["\'])copyright\3[^>]*>)(.*?)(<\/span>)/is',
 		static function ( $m ) {
-			if ( false !== strpos( $m[4], 'cindemir-footer-copy' ) ) {
-				return $m[0];
-			}
+			// Always rewrite so a shortened address from an older deploy is replaced.
 			$structured = '<span class="cindemir-footer-copy">Copyright 2026 © Cindemir Law Office</span>'
-				. '<span class="cindemir-footer-addr">Ritim Istanbul 44/18, Maltepe / Istanbul</span>'
+				. '<span class="cindemir-footer-addr">Al Mazaya Ritim Istanbul 44/18, Maltepe / Istanbul / Turkey</span>'
 				. '<span class="cindemir-footer-reach">'
 				. '<a href="tel:+902165506775" class="cindemir-footer-phone">+90 216 550 67 75</a>'
 				. '<span class="cindemir-footer-sep" aria-hidden="true">·</span>'
@@ -199,7 +198,7 @@ function cindemir_rocket_linkify_copyright( $html ) {
 }
 
 function cindemir_rocket_inject_extras( $html ) {
-	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.4' ) ) {
+	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.5' ) ) {
 		return $html;
 	}
 	// Replace older injected blocks so cached HTML picks up the tidy layout.
@@ -314,7 +313,7 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '#socket .container{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;max-width:640px!important;margin:0 auto!important;padding-top:6px!important;padding-bottom:18px!important;text-align:center}'
 		. '#socket .copyright{display:flex!important;flex-direction:column!important;align-items:center!important;gap:5px!important;width:100%!important;margin:0!important;text-align:center!important;font-size:13px!important;line-height:1.45!important}'
 		. '#socket .cindemir-footer-copy{display:block;font-weight:600;font-size:14px;letter-spacing:.01em;color:rgba(255,255,255,.96)}'
-		. '#socket .cindemir-footer-addr{display:block;font-size:12.5px;color:rgba(255,255,255,.82)}'
+		. '#socket .cindemir-footer-addr{display:block;font-size:12.5px;color:rgba(255,255,255,.82);max-width:36em;padding:0 8px}'
 		. '#socket .cindemir-footer-reach{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 10px;font-size:13px}'
 		. '#socket .cindemir-footer-sep{opacity:.55}'
 		. '#socket .copyright a.cindemir-footer-email,#socket .copyright a.cindemir-footer-phone{color:inherit!important;text-decoration:underline;text-underline-offset:2px}'
@@ -385,13 +384,13 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '</div>'
 		. '</div>'
 		. '<style id="cindemir-footer-fixes-css">' . $css . '</style>'
-		. '<!-- cindemir-footer-rocket 1.1.4 FOOTER_TBB_LAZYFIX_20260809 -->';
+		. '<!-- cindemir-footer-rocket 1.1.5 FOOTER_FULL_ADDRESS_20260809 -->';
 }
 
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v114' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v115' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -400,7 +399,7 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v114', 1, false );
+		update_option( 'cindemir_footer_rocket_v115', 1, false );
 	},
 	1
 );
