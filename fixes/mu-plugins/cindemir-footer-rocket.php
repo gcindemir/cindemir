@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.1.6
+ * Version: 1.1.7
  * FOOTER_DEDUP_20260809
  * FOOTER_FULL_ADDRESS_20260809
  * FOOTER_TBB_LAZYFIX_20260809
@@ -208,16 +208,6 @@ function cindemir_rocket_linkify_copyright( $html ) {
 		return $html;
 	}
 
-	// Drop orphaned addr/reach left over from earlier broken rewrites.
-	$html = preg_replace(
-		'#</span>\s*(?:<span class="cindemir-footer-addr">[\s\S]*?</span>\s*<span class="cindemir-footer-reach">[\s\S]*?</span>\s*)+</span>#i',
-		'</span>',
-		$html
-	);
-	if ( ! is_string( $html ) ) {
-		return '';
-	}
-
 	$socket_pos = stripos( $html, "id='socket'" );
 	if ( false === $socket_pos ) {
 		$socket_pos = stripos( $html, 'id="socket"' );
@@ -261,11 +251,21 @@ function cindemir_rocket_linkify_copyright( $html ) {
 	}
 
 	$replacement = $open_tag . cindemir_rocket_copyright_inner_html() . '</span>';
-	return substr( $html, 0, $start ) . $replacement . substr( $html, $end );
+	$html        = substr( $html, 0, $start ) . $replacement . substr( $html, $end );
+
+	// Remove duplicate addr/reach blocks left after a previous broken rewrite
+	// (they sit just after the real copyright </span>).
+	$cleaned = preg_replace(
+		'#(cindemir-footer-reach">[\s\S]*?</span></span>)\s*(?:<span class="cindemir-footer-addr">[\s\S]*?</span>\s*<span class="cindemir-footer-reach">[\s\S]*?</span>\s*(?:</span>\s*)?)+#i',
+		'$1',
+		$html,
+		1
+	);
+	return is_string( $cleaned ) ? $cleaned : $html;
 }
 
 function cindemir_rocket_inject_extras( $html ) {
-	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.6' ) ) {
+	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.7' ) ) {
 		return $html;
 	}
 	// Replace older injected blocks so cached HTML picks up the tidy layout.
@@ -463,13 +463,13 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '</div>'
 		. '</div>'
 		. '<style id="cindemir-footer-fixes-css">' . $css . '</style>'
-		. '<!-- cindemir-footer-rocket 1.1.6 FOOTER_DEDUP_20260809 -->';
+		. '<!-- cindemir-footer-rocket 1.1.7 FOOTER_DEDUP_20260809 -->';
 }
 
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v116' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v117' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -478,7 +478,7 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v116', 1, false );
+		update_option( 'cindemir_footer_rocket_v117', 1, false );
 	},
 	1
 );
