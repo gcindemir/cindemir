@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir Menu Fix
  * Description: Fixes main-nav language switcher hrefs on all pages + keeps RU/ZH menus pointing at real translated pages.
- * Version: 1.6.4
+ * Version: 1.6.5
  * Author: Cindemir Law Office
  */
 
@@ -18,7 +18,7 @@ define( 'CINDEMIR_MENU_FIX_LOADED', true );
 final class Cindemir_Menu_Fix {
 
 	const PRESS_URL = 'https://cindemir.av.tr/en/we-are-in-news/';
-	const VERSION   = '1.6.4';
+	const VERSION   = '1.6.5';
 
 	/** @var array<string,array{label:string,flag:string}> */
 	private static $langs = array(
@@ -196,10 +196,15 @@ final class Cindemir_Menu_Fix {
 			. '#av-burger-menu-ul > li.cindemir-lang-item,'
 			. '#av-burger-menu-ul > li[class*="language_"],'
 			. '#av-burger-menu-ul > li[class*="wpml-ls-item"],'
+			. '#av-burger-menu-ul > li.cindemir-lang-sentinel,'
 			. 'html.av-burger-overlay-active #av-burger-menu-ul > li.cindemir-lang-item,'
-			. 'html.av-burger-overlay-active #av-burger-menu-ul > li[class*="language_"]{'
-			. 'display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;'
-			. 'visibility:hidden!important;pointer-events:none!important}'
+			. 'html.av-burger-overlay-active #av-burger-menu-ul > li[class*="language_"],'
+			. 'body .av-burger-overlay #av-burger-menu-ul > li.cindemir-lang-item,'
+			. 'body .av-burger-overlay #av-burger-menu-ul > li[class*="language_"]{'
+			. 'display:none!important;height:0!important;max-height:0!important;min-height:0!important;'
+			. 'margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;'
+			. 'visibility:hidden!important;pointer-events:none!important;flex:0 0 0!important;'
+			. 'position:absolute!important;left:-9999px!important;width:0!important}'
 			. '#av-burger-menu-ul > li::before,'
 			. '#av-burger-menu-ul > li::after,'
 			. '#av-burger-menu-ul > li > a::before,'
@@ -334,6 +339,14 @@ final class Cindemir_Menu_Fix {
 			. 'ul.appendChild(row);'
 			. '}'
 			. 'for(var r2=0;r2<langs.length;r2++){if(langs[r2].parentNode)langs[r2].parentNode.removeChild(langs[r2]);}'
+			/* Sentinel stops cindemir-lang-switch from re-injecting language LIs */
+			. 'if(!ul.querySelector(".cindemir-lang-sentinel")){'
+			. 'var sent=document.createElement("li");'
+			. 'sent.className="menu-item cindemir-lang-item cindemir-lang-sentinel";'
+			. 'sent.setAttribute("aria-hidden","true");'
+			. 'sent.style.cssText="display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important";'
+			. 'ul.appendChild(sent);'
+			. '}'
 			. '}'
 			. 'function cloneNavItems(ul){'
 			. 'if(!ul||ul.getAttribute("data-cindemir-filled")==="1")return;'
@@ -436,6 +449,9 @@ final class Cindemir_Menu_Fix {
 			. 'fixOverlay(o);'
 			. 'var burger=document.querySelector(".av-burger-menu-main .av-hamburger");'
 			. 'if(burger){burger.classList.add("is-active");}'
+			/* Re-polish after cindemir-lang-switch (50ms) may re-append language LIs */
+			. 'setTimeout(function(){var u=document.querySelector("#av-burger-menu-ul");if(u)polishMenu(u);},80);'
+			. 'setTimeout(function(){var u=document.querySelector("#av-burger-menu-ul");if(u)polishMenu(u);},200);'
 			. '}'
 			. 'function closeMenu(){'
 			. 'ROOT.classList.remove("av-burger-overlay-active");'
