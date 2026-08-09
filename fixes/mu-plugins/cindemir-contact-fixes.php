@@ -17,7 +17,7 @@
  * LCP_ABOUT_TEAM_UNLAZY_20260806
  * SITE_DESIGN_20260807
  * FOOTER_BARO_I18N_20260807b
- * BREADCRUMB_HOMEPAGE_GSC_20260809
+ * WEBPAGE_BREADCRUMB_DANGLING_20260809
  * Author: Cindemir Law Office
  */
 
@@ -1028,7 +1028,7 @@ final class Cindemir_Contact_Fixes {
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
 					&& ( false === strpos( $tmp, 'Version: 1.9.90' )
-						|| false === strpos( $tmp, 'BREADCRUMB_HOMEPAGE_GSC_20260809' )
+						|| false === strpos( $tmp, 'WEBPAGE_BREADCRUMB_DANGLING_20260809' )
 						|| false === strpos( $tmp, 'LCP_ABOUT_TEAM_UNLAZY_20260806' )
 						|| false === strpos( $tmp, 'HEADER_BRAND_FIT_20260805' )
 						|| false === strpos( $tmp, 'BREADCRUMB_QUALITY_FIX_20260805' )
