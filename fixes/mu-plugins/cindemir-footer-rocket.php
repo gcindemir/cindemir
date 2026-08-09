@@ -2,7 +2,8 @@
 /**
  * Plugin Name: Cindemir Footer Rocket
  * Description: Inject footer into WP Rocket cached HTML (mailto, social, baro, badges).
- * Version: 1.1.0
+ * Version: 1.1.1
+ * FOOTER_BADGE_CONTRAST_20260809
  * FOOTER_TIDY_20260809
  * FOOTER_BARO_I18N_20260807b
  * ELENA_ZARA_RU_BIO_20260718
@@ -164,7 +165,7 @@ function cindemir_rocket_linkify_copyright( $html ) {
 }
 
 function cindemir_rocket_inject_extras( $html ) {
-	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.0' ) ) {
+	if ( false !== strpos( $html, 'cindemir-footer-rocket 1.1.1' ) ) {
 		return $html;
 	}
 	// Replace older injected blocks so cached HTML picks up the tidy layout.
@@ -289,9 +290,19 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '#socket .cindemir-footer-social-list a{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;transition:background .15s ease}'
 		. '#socket .cindemir-footer-social-list a:hover{background:rgba(255,255,255,.22)}'
 		. '#socket .cindemir-footer-social-list svg{width:16px;height:16px;fill:currentColor;display:block}'
-		. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:0}'
-		. '#socket .cindemir-footer-badges a{display:inline-flex;align-items:center;justify-content:center;height:44px}'
-		. '#socket .cindemir-footer-badges img{height:40px!important;width:auto!important;max-height:40px!important;display:block;object-fit:contain;border:0;opacity:.95}'
+		. '#socket .cindemir-footer-badges{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:2px 0 0}'
+		/* White pads so dark baro seals stay readable on teal socket. */
+		. '#socket .cindemir-footer-badges a{'
+		. 'display:inline-flex!important;align-items:center!important;justify-content:center!important;'
+		. 'min-width:72px;height:72px;padding:8px 10px;box-sizing:border-box;'
+		. 'background:#fff!important;border-radius:12px;'
+		. 'box-shadow:0 1px 0 rgba(0,0,0,.12);text-decoration:none!important}'
+		. '#socket .cindemir-footer-badges a.cindemir-badge-aea{min-width:110px;padding:8px 12px}'
+		. '#socket .cindemir-footer-badges img{'
+		. 'height:56px!important;width:auto!important;max-width:96px!important;max-height:56px!important;'
+		. 'display:block!important;object-fit:contain!important;border:0!important;opacity:1!important;'
+		. 'filter:none!important;-webkit-filter:none!important;background:transparent!important}'
+		. '#socket .cindemir-footer-badges img.cindemir-badge-img-aea{height:48px!important;max-height:48px!important;max-width:120px!important}'
 		. '#socket .cindemir-baro-verification-bar{margin:0;text-align:center;order:3}'
 		. '#socket .cindemir-baro-verification-bar a{color:rgba(255,255,255,.78)!important;text-decoration:underline;text-underline-offset:2px;font-size:12px;line-height:1.35}'
 		. '#socket .cindemir-footer-meta{width:100%;margin:4px 0 0;padding:0;font-size:11.5px;line-height:1.4;text-align:center;color:rgba(255,255,255,.78)}'
@@ -300,21 +311,30 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '#socket .cindemir-footer-social-list{grid-template-columns:repeat(4,34px)}'
 		. '#socket .container{padding-bottom:72px!important}'
 		. '#socket .cindemir-footer-copy{font-size:13.5px}'
+		. '#socket .cindemir-footer-badges{gap:10px}'
+		. '#socket .cindemir-footer-badges a{min-width:64px;height:64px;padding:7px 8px;border-radius:10px}'
+		. '#socket .cindemir-footer-badges a.cindemir-badge-aea{min-width:96px}'
+		. '#socket .cindemir-footer-badges img{height:48px!important;max-height:48px!important}'
+		. '#socket .cindemir-footer-badges img.cindemir-badge-img-aea{height:42px!important;max-height:42px!important}'
 		. '}';
+
+	$aea  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/aea.png';
+	$ibar = 'https://cindemirlaw.com/wp-content/uploads/cindemir/baro.png';
+	$tbb  = 'https://cindemirlaw.com/wp-content/uploads/cindemir/tbb_amblem.png';
 
 	return '<div class="cindemir-socket-extras" id="cindemir-socket-extras">'
 		. '<nav class="cindemir-footer-social" aria-label="Social media">'
 		. '<ul class="cindemir-footer-social-list">' . $items . '</ul>'
 		. '</nav>'
 		. '<div class="cindemir-footer-badges" aria-label="Membership badges">'
-		. '<a href="https://www.aeuropea.com/" target="_blank" rel="noopener noreferrer" title="AEuropea">'
-		. '<img src="https://www.aeuropea.com/wp-content/uploads/2025/09/aea-01v001-ILN-small.png" alt="AEuropea" width="64" height="40" loading="lazy" decoding="async" />'
+		. '<a class="cindemir-badge-aea" href="https://www.aeuropea.com/" target="_blank" rel="noopener noreferrer" title="AEuropea">'
+		. '<img class="cindemir-badge-img-aea" src="' . esc_url( $aea ) . '" alt="AEuropea International Lawyers Network" width="120" height="48" loading="eager" decoding="async" />'
 		. '</a>'
-		. '<a href="https://istanbulbarosu.org.tr/" target="_blank" rel="noopener noreferrer" title="İstanbul Barosu">'
-		. '<img src="https://istanbulbarosu.org.tr/images/baro_logo.png" alt="İstanbul Barosu" width="40" height="40" loading="lazy" decoding="async" />'
+		. '<a class="cindemir-badge-baro" href="https://istanbulbarosu.org.tr/" target="_blank" rel="noopener noreferrer" title="İstanbul Barosu">'
+		. '<img class="cindemir-badge-img-baro" src="' . esc_url( $ibar ) . '" alt="İstanbul Barosu" width="56" height="56" loading="eager" decoding="async" />'
 		. '</a>'
-		. '<a href="https://www.barobirlik.org.tr/" target="_blank" rel="noopener noreferrer" title="Türkiye Barolar Birliği">'
-		. '<img src="https://cindemirlaw.com/wp-content/uploads/cindemir/tbb_amblem_60.png" alt="Türkiye Barolar Birliği" width="40" height="40" loading="lazy" decoding="async" />'
+		. '<a class="cindemir-badge-tbb" href="https://www.barobirlik.org.tr/" target="_blank" rel="noopener noreferrer" title="Türkiye Barolar Birliği">'
+		. '<img class="cindemir-badge-img-tbb" src="' . esc_url( $tbb ) . '" alt="Türkiye Barolar Birliği" width="56" height="56" loading="eager" decoding="async" />'
 		. '</a>'
 		. '</div>'
 		. '<div id="cindemir-baro-verification-bar" class="cindemir-baro-verification-bar">'
@@ -322,13 +342,13 @@ function cindemir_rocket_footer_markup( $html = '' ) {
 		. '</div>'
 		. '</div>'
 		. '<style id="cindemir-footer-fixes-css">' . $css . '</style>'
-		. '<!-- cindemir-footer-rocket 1.1.0 FOOTER_TIDY_20260809 -->';
+		. '<!-- cindemir-footer-rocket 1.1.1 FOOTER_BADGE_CONTRAST_20260809 -->';
 }
 
 add_action(
 	'init',
 	static function () {
-		if ( get_option( 'cindemir_footer_rocket_v110' ) ) {
+		if ( get_option( 'cindemir_footer_rocket_v111' ) ) {
 			return;
 		}
 		if ( function_exists( 'rocket_clean_domain' ) ) {
@@ -337,7 +357,7 @@ add_action(
 		if ( function_exists( 'wp_cache_flush' ) ) {
 			wp_cache_flush();
 		}
-		update_option( 'cindemir_footer_rocket_v110', 1, false );
+		update_option( 'cindemir_footer_rocket_v111', 1, false );
 	},
 	1
 );
