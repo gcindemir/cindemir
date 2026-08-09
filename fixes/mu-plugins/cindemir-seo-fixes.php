@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.93 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.94 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 + MENU_OPEN_FIX_20260809 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.93
+ * Version: 1.9.94
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -25,6 +25,7 @@
  * WEBPAGE_BREADCRUMB_DANGLING_20260809
  * ARTICLE_IMAGE_RICH_20260809
  * HEADER_BRAND_NO_NL_20260809
+ * MENU_OPEN_FIX_20260809
  * Author: Cindemir Law Office
  */
 
@@ -194,7 +195,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.93';
+	const VERSION = '1.9.94';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -4815,7 +4816,7 @@ public static function homepage_hero_styles() {
 			. '#top #header #header_main .container.av-logo-container,'
 			. '#top #header #header_main .inner-container{'
 			. 'min-height:64px!important;height:64px!important;max-height:64px!important;'
-			. 'box-sizing:border-box!important;overflow:hidden!important}'
+			. 'box-sizing:border-box!important;overflow:visible!important}'
 			. '#top #header .logo{'
 			. 'display:flex!important;visibility:visible!important;opacity:1!important;'
 			. 'position:relative!important;left:0!important;right:auto!important;float:none!important;'
@@ -4850,9 +4851,9 @@ public static function homepage_hero_styles() {
 			. '#header .logo a:has(.cindemir-logo-text)::after{content:none!important;display:none!important}'
 			. '#top #header .main_menu{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '#top #header .av-burger-menu-main{'
-			. 'display:block!important;visibility:visible!important;opacity:1!important;'
+			. 'visibility:visible!important;opacity:1!important;'
 			. 'min-width:44px!important;min-height:44px!important;line-height:44px!important}'
-			. '#top #header .av-hamburger{display:inline-block!important;visibility:visible!important;'
+			. '#top #header .av-hamburger{visibility:visible!important;'
 			. 'min-width:28px!important;min-height:22px!important}'
 			. '#top #header .cindemir-site-brand{display:none!important}'
 			/* Drop the entire top meta strip (socials + old lang bar). Socials already live in the footer. */
@@ -4877,7 +4878,8 @@ public static function homepage_hero_styles() {
 			. '@media only screen and (min-width:990px){'
 			. '#top #header #header_main .inner-container{'
 			. 'display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px;'
-			. 'flex-wrap:nowrap!important;overflow:hidden}'
+			. 'flex-wrap:nowrap!important;overflow:visible!important}'
+			. '#top #header .main_menu,#top #header .av-main-nav,#top #header .av-main-nav > li{overflow:visible!important}'
 			. '#top #header .logo{max-width:min(280px,32vw)!important;flex:0 0 auto}'
 			. '#top #header .logo .cindemir-logo-text,'
 			. '#top #header .logo a::after,#header .logo a::after{'
@@ -4921,6 +4923,18 @@ public static function homepage_hero_styles() {
 			. 'display:flex!important;align-items:center;gap:10px;font-weight:700!important}'
 			. '.html_av-overlay-active .cindemir-lang-flag,'
 			. '#av-burger-menu-ul .cindemir-lang-flag{width:22px;height:15px;border-radius:2px}'
+			. '}'
+			. '.av-burger-overlay,#top .av-burger-overlay{z-index:10050!important;}'
+			. 'html.av-burger-overlay-active .av-burger-overlay{display:block!important;}'
+			. '#top #header .av-burger-menu-main,'
+			. '#top #header .menu-item-avia-special.av-burger-menu-main{'
+			. 'position:relative!important;z-index:10060!important;pointer-events:auto!important}'
+			. '#top #header .av-burger-menu-main > a{pointer-events:auto!important;cursor:pointer!important}'
+			. '@media only screen and (min-width:990px){'
+			. '#top #header .av-burger-menu-main{display:none!important}'
+			. '}'
+			. '@media only screen and (max-width:989px){'
+			. '#top #header .av-burger-menu-main{display:block!important;visibility:visible!important;opacity:1!important}'
 			. '}'
 			. '</style>';
 	}
@@ -5025,10 +5039,12 @@ public static function homepage_hero_styles() {
 			. 'try{'
 			. 'var a=links[i],raw=a.getAttribute("href");'
 			. 'if(!raw)continue;'
-			. 'if(a.closest&&a.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))continue;'
+			. 'if(raw.charAt(0)==="#"||raw.indexOf("javascript:")===0)continue;'
+			. 'if(a.closest&&a.closest(".av-burger-menu-main,.menu-item-avia-special,.avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))continue;'
 			. 'var u=new URL(raw,location.origin);'
 			. 'if(u.hostname!==location.hostname)continue;'
 			. 'if(u.searchParams.get("lang"))continue;'
+			. 'if(u.hash&&(!u.pathname||u.pathname==="/")&&raw.charAt(0)==="#")continue;'
 			. 'if(/\\/(wp-content|wp-includes|wp-admin|wp-json|feed)(\\/|$)/.test(u.pathname))continue;'
 			. 'if(/\\.(css|js|jpe?g|png|gif|webp|svg|ico|woff2?|xml)(\\?|$)/i.test(u.pathname))continue;'
 			. 'u.searchParams.set("lang",lang);a.setAttribute("href",u.pathname+u.search+u.hash);'
@@ -5071,8 +5087,10 @@ public static function homepage_hero_styles() {
 			. 'if(!t)return;'
 			. 'try{'
 			. 'if(!lang||lang==="en"||lang==="en-us"||lang==="en_us")return;'
-			. 'if(t.closest&&t.closest(".avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))return;'
-			. 'var u=new URL(t.getAttribute("href"),location.origin);'
+			. 'if(t.closest&&t.closest(".av-burger-menu-main,.menu-item-avia-special,.avia_wpml_language_switch,.wpml-ls-item,.wpml-ls,.cindemir-lang-item"))return;'
+			. 'var href=t.getAttribute("href")||"";'
+			. 'if(href.charAt(0)==="#"||href.indexOf("javascript:")===0)return;'
+			. 'var u=new URL(href,location.origin);'
 			. 'if(u.hostname!==location.hostname)return;'
 			. 'if(u.searchParams.get("lang"))return;'
 			. 'if(/\\/(wp-content|wp-includes|wp-admin|wp-json|feed)(\\/|$)/.test(u.pathname))return;'
