@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir LCP Safe
  * Description: Design-safe LCP speedups — WebP hero img, no opacity:0 entrance on LCP nodes, clean robots.txt. Does not change layout/colors.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Cindemir Law Office
  */
 
