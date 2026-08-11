@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.94 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 + MENU_OPEN_FIX_20260809 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.95 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 + MENU_OPEN_FIX_20260809 + BREADCRUMB_ARTICLES_HUB_20260811 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.94
+ * Version: 1.9.95
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -26,6 +26,7 @@
  * ARTICLE_IMAGE_RICH_20260809
  * HEADER_BRAND_NO_NL_20260809
  * MENU_OPEN_FIX_20260809
+ * BREADCRUMB_ARTICLES_HUB_20260811
  * Author: Cindemir Law Office
  */
 
@@ -195,7 +196,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.94';
+	const VERSION = '1.9.95';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -3479,7 +3480,7 @@ final class Cindemir_SEO_Fixes {
 			}
 			$url = self::normalize_breadcrumb_url( $url, $home );
 			if ( 0 === $i ) {
-				$name = 'Home';
+				$name = self::breadcrumb_home_label();
 				$url  = $home;
 			} elseif ( '' === $name || preg_match( '#^https?://#i', $name ) ) {
 				$name = 'Page';
@@ -3530,19 +3531,62 @@ final class Cindemir_SEO_Fixes {
 				$node['@id'] = self::breadcrumb_schema_id( $home );
 			}
 		} else {
-			// Never leave an empty BreadcrumbList (GSC: itemListElement missing).
-			$node['itemListElement'] = array(
-				array(
-					'@type'    => 'ListItem',
-					'position' => 1,
-					'name'     => 'Home',
-					'item'     => $home,
-				),
-			);
-			$node['@id'] = self::breadcrumb_schema_id( $home );
+			unset( $node['itemListElement'] );
 		}
 		$node['@type'] = 'BreadcrumbList';
 		return $node;
+	}
+
+	/**
+	 * Localized label for the first breadcrumb crumb.
+	 *
+	 * @return string
+	 */
+	private static function breadcrumb_home_label() {
+		$lang = self::front_lang();
+		if ( 'ru' === $lang ) {
+			return 'Главная';
+		}
+		if ( in_array( $lang, array( 'zh-hans', 'zh' ), true ) ) {
+			return '首页';
+		}
+		if ( 'tr' === $lang ) {
+			return 'Ana Sayfa';
+		}
+		return 'Home';
+	}
+
+	/**
+	 * Articles archive crumb for blog posts (Home > Articles > Post).
+	 *
+	 * @return array<string,string>|null ListItem fields without position.
+	 */
+	private static function articles_hub_breadcrumb_item() {
+		$lang = self::front_lang();
+		$hubs = array(
+			'en'      => array(
+				'name' => 'Articles',
+				'url'  => 'https://cindemirlaw.com/articles/',
+			),
+			'ru'      => array(
+				'name' => 'Статьи',
+				'url'  => 'https://cindemirlaw.com/stati/?lang=ru',
+			),
+			'zh-hans' => array(
+				'name' => '文章',
+				'url'  => 'https://cindemirlaw.com/articles/?lang=zh-hans',
+			),
+			'zh'      => array(
+				'name' => '文章',
+				'url'  => 'https://cindemirlaw.com/articles/?lang=zh-hans',
+			),
+		);
+		$hub = isset( $hubs[ $lang ] ) ? $hubs[ $lang ] : $hubs['en'];
+		return array(
+			'@type' => 'ListItem',
+			'name'  => $hub['name'],
+			'item'  => self::filter_canonical_url( $hub['url'] ),
+		);
 	}
 
 	/**
@@ -3694,7 +3738,7 @@ final class Cindemir_SEO_Fixes {
 			array(
 				'@type'    => 'ListItem',
 				'position' => 1,
-				'name'     => 'Home',
+				'name'     => self::breadcrumb_home_label(),
 				'item'     => $home,
 			),
 		);
@@ -3718,21 +3762,30 @@ final class Cindemir_SEO_Fixes {
 					'item'     => self::filter_canonical_url( $alink ),
 				);
 			}
-		} elseif ( $id > 0 && function_exists( 'is_single' ) && is_single() && function_exists( 'get_the_category' ) ) {
-			$cats = get_the_category( $id );
-			if ( is_array( $cats ) && ! empty( $cats ) ) {
-				$cat  = $cats[0];
-				$link = get_category_link( $cat->term_id );
-				if ( is_string( $link ) && '' !== $link ) {
-					if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) && false === strpos( $link, 'lang=' ) ) {
-						$link .= ( false === strpos( $link, '?' ) ? '?' : '&' ) . 'lang=' . rawurlencode( $lang );
+		} elseif ( $id > 0 && function_exists( 'is_single' ) && is_single() ) {
+			$post_type = function_exists( 'get_post_type' ) ? get_post_type( $id ) : 'post';
+			if ( 'post' === $post_type ) {
+				$hub = self::articles_hub_breadcrumb_item();
+				if ( is_array( $hub ) ) {
+					$hub['position'] = count( $items ) + 1;
+					$items[]         = $hub;
+				}
+			} elseif ( function_exists( 'get_the_category' ) ) {
+				$cats = get_the_category( $id );
+				if ( is_array( $cats ) && ! empty( $cats ) ) {
+					$cat  = $cats[0];
+					$link = get_category_link( $cat->term_id );
+					if ( is_string( $link ) && '' !== $link ) {
+						if ( in_array( $lang, array( 'ru', 'zh-hans' ), true ) && false === strpos( $link, 'lang=' ) ) {
+							$link .= ( false === strpos( $link, '?' ) ? '?' : '&' ) . 'lang=' . rawurlencode( $lang );
+						}
+						$items[] = array(
+							'@type'    => 'ListItem',
+							'position' => count( $items ) + 1,
+							'name'     => wp_strip_all_tags( (string) $cat->name ),
+							'item'     => self::filter_canonical_url( $link ),
+						);
 					}
-					$items[] = array(
-						'@type'    => 'ListItem',
-						'position' => count( $items ) + 1,
-						'name'     => wp_strip_all_tags( (string) $cat->name ),
-						'item'     => self::filter_canonical_url( $link ),
-					);
 				}
 			}
 		}
