@@ -3476,7 +3476,7 @@ final class Cindemir_SEO_Fixes {
 			// Yoast sometimes puts the URL in name and /home/ in item.
 			if ( '' !== $name && preg_match( '#^https?://#i', $name ) && ( '' === $url || preg_match( '#/(?:home|glavnaya|shouye)(/|$|\?)#i', $url ) ) ) {
 				$url  = $name;
-				$name = ( 0 === $i ) ? 'Home' : $name;
+				$name = ( 0 === $i ) ? self::breadcrumb_home_label() : $name;
 			}
 			$url = self::normalize_breadcrumb_url( $url, $home );
 			if ( 0 === $i ) {
