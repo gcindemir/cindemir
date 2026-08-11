@@ -1,9 +1,9 @@
 <?php
-/* SERVICES_EMBED_DEPLOY_MARKER 1.9.95 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 + MENU_OPEN_FIX_20260809 + BREADCRUMB_ARTICLES_HUB_20260811 */
+/* SERVICES_EMBED_DEPLOY_MARKER 1.9.96 + SERVICES_BLANK_FIX_20260715 + TEAM_PHOTO_SYNC_20260718B + ELENA_ZARA_RU_BIO_20260718 + ELENA_ZARA_BAR_SAFE_20260718 + SCHEMA_FIX_20260718 + BACKUP_WP_CRON_20260719 + RU_HREFLANG_404_20260801 + AHREFS_AUG2026 + AHREFS_AUG5_20260805 + GA4_DISABLE_INVALID_ID_20260805 + BREADCRUMB_SAFE_EXPAND_20260805 + BREADCRUMB_QUALITY_FIX_20260805 + LCP_ALL_PAGES_20260805 + LCP_HELPERS_RESTORE_20260805 + HEADER_BRAND_FIT_20260805 + REMOVE_OUR_VIDEOS_FOOTER_20260805 + FOOTER_BADGE_CLS_20260805 + LCP_ABOUT_TEAM_UNLAZY_20260806 + PSI_ABOUT_CLS_20260806 + PSI_GENERAL_FIX_20260806 + GSC_BREADCRUMB_ITEMLIST_20260807 + SITE_DESIGN_20260807 + BREADCRUMB_HOMEPAGE_GSC_20260809 + WEBPAGE_BREADCRUMB_DANGLING_20260809 + ARTICLE_IMAGE_RICH_20260809 + HEADER_BRAND_NO_NL_20260809 + MENU_OPEN_FIX_20260809 + BREADCRUMB_ARTICLES_HUB_20260811 + BREADCRUMB_POST_REBUILD_20260811 */
 /**
  * Plugin Name: Cindemir SEO Fixes
  * Description: Full Ahrefs cleanup: redirect href rewrite, flatten hops, H1/alts/orphans, author disable, title trim.
- * Version: 1.9.95
+ * Version: 1.9.96
  * SERVICES_BLANK_FIX_20260715
  * RU_HREFLANG_404_20260801
  * AHREFS_AUG2026
@@ -27,6 +27,7 @@
  * HEADER_BRAND_NO_NL_20260809
  * MENU_OPEN_FIX_20260809
  * BREADCRUMB_ARTICLES_HUB_20260811
+ * BREADCRUMB_POST_REBUILD_20260811
  * Author: Cindemir Law Office
  */
 
@@ -196,7 +197,7 @@ final class Cindemir_SEO_Fixes {
 		'/russian/wp-content/uploads/2014/11/white-2-copy.jpg' => '/wp-content/uploads/2020/10/white-2-copy-300x300.jpg',
 	);
 
-	const VERSION = '1.9.95';
+	const VERSION = '1.9.96';
 	/** Pin pull-plugins to this commit so stale branch CDNs cannot win. */
 	const DEPLOY_COMMIT = '1db58cc';
 
@@ -3409,6 +3410,22 @@ final class Cindemir_SEO_Fixes {
 		$items = isset( $node['itemListElement'] ) && is_array( $node['itemListElement'] ) ? $node['itemListElement'] : array();
 		if ( count( $items ) < 2 ) {
 			return true;
+		}
+		// Blog posts should include the Articles hub (Home > Articles > Post).
+		if ( function_exists( 'is_single' ) && is_single()
+			&& function_exists( 'get_post_type' ) && 'post' === get_post_type() ) {
+			$hub = self::articles_hub_breadcrumb_item();
+			if ( is_array( $hub ) && ! empty( $hub['name'] ) ) {
+				$names = array();
+				foreach ( $items as $item ) {
+					if ( is_array( $item ) && ! empty( $item['name'] ) ) {
+						$names[] = (string) $item['name'];
+					}
+				}
+				if ( ! in_array( (string) $hub['name'], $names, true ) && count( $items ) < 3 ) {
+					return true;
+				}
+			}
 		}
 		foreach ( $items as $item ) {
 			if ( ! is_array( $item ) ) {

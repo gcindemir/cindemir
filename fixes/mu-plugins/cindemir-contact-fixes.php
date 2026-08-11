@@ -21,7 +21,7 @@
  * ARTICLE_IMAGE_RICH_20260809
  * HEADER_BRAND_NO_NL_20260809
  * MENU_OPEN_FIX_20260809
- * BREADCRUMB_ARTICLES_HUB_20260811
+ * BREADCRUMB_POST_REBUILD_20260811
  * Author: Cindemir Law Office
  */
 
@@ -1037,8 +1037,8 @@ final class Cindemir_Contact_Fixes {
 					continue;
 				}
 				if ( 'cindemir-seo-fixes.php' === $name
-					&& ( false === strpos( $tmp, 'Version: 1.9.95' )
-						|| false === strpos( $tmp, 'BREADCRUMB_ARTICLES_HUB_20260811' )
+					&& ( false === strpos( $tmp, 'Version: 1.9.96' )
+						|| false === strpos( $tmp, 'BREADCRUMB_POST_REBUILD_20260811' )
 						|| false === strpos( $tmp, 'ARTICLE_IMAGE_RICH_20260809' )
 						|| false === strpos( $tmp, 'HEADER_BRAND_NO_NL_20260809' )
 						|| false === strpos( $tmp, 'MENU_OPEN_FIX_20260809' )
