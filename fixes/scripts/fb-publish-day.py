@@ -15,7 +15,7 @@ ROOT = Path("/workspace")
 CAL = ROOT / "fixes/facebook-content-calendar.json"
 COVER = ROOT / "fixes/assets/fb-cover-cindemir.png"
 LOGO = ROOT / "fixes/assets/fb-logo.jpg"
-PROFILE = Path("/tmp/fb-jifkln9c")
+PROFILE = Path("/home/ubuntu/.chrome-agent")
 LOG = ROOT / "fixes/facebook-publish.log"
 
 PAGE_ID = "100066585793269"
@@ -275,7 +275,7 @@ def main():
 
     # Avoid matching this shell command line: kill only chrome with this profile
     os.system(
-        "pgrep -af 'user-data-dir=/tmp/fb-jifkln9c' | awk '{print $1}' | "
+        "pgrep -af 'user-data-dir=/home/ubuntu/.chrome-agent' | awk '{print $1}' | "
         "xargs -r kill -9 2>/dev/null"
     )
     time.sleep(2)

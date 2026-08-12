@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path("/workspace")
 CAL = ROOT / "fixes/facebook-content-calendar.json"
-PROFILE = Path("/tmp/fb-jifkln9c")
+PROFILE = Path("/home/ubuntu/.chrome-agent")
 PAGE_HOME = (
     "https://www.facebook.com/p/Cindemir-Hukuk-B%C3%BCrosu-Cindemir-Law-Office-100066585793269/"
 )
