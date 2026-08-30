@@ -134,47 +134,92 @@ def update_bio(page, bio):
     return False
 
 
+def composer_present(page):
+    for sel in [
+        'span:has-text("Ne düşünüyorsun")',
+        'span:has-text("Bir düşünceni paylaş")',
+        'span:has-text("What\'s on your mind")',
+        'span:has-text("Güncelleme yaz")',
+        'div[role="button"]:has-text("Gönderi oluştur")',
+        'div[role="button"]:has-text("Create post")',
+        '[aria-label="Gönderi oluştur"]',
+        '[aria-label="Create post"]',
+    ]:
+        try:
+            if page.locator(sel).count():
+                return sel
+        except Exception:
+            pass
+    return ""
+
+
 def switch_to_page(page):
     """Switch into Page identity if Facebook shows Geçiş Yap / Switch."""
+    if composer_present(page):
+        return True
     close_popups(page)
     for label in ["Şimdi Geçiş Yap", "Geçiş Yap", "Switch Now", "Switch"]:
         try:
             loc = page.get_by_role("button", name=label)
             if loc.count():
                 loc.first.click(timeout=5000, force=True)
-                time.sleep(6)
+                time.sleep(8)
                 log(f"switched to page ({label})")
-                return True
+                break
         except Exception:
             pass
+        else:
+            continue
         try:
             loc = page.get_by_text(label, exact=True)
             if loc.count():
                 loc.first.click(timeout=5000, force=True)
-                time.sleep(6)
+                time.sleep(8)
                 log(f"switched to page text ({label})")
-                return True
+                break
         except Exception:
             pass
-    # JS fallback
-    try:
-        res = page.evaluate(
-            """() => {
-              const labels=['Şimdi Geçiş Yap','Geçiş Yap','Switch Now','Switch'];
-              const btns=[...document.querySelectorAll('[role=button]')];
-              for (const label of labels) {
-                const hit=btns.find(el => (el.innerText||'').trim()===label);
-                if (hit) { hit.click(); return label; }
-              }
-              return '';
-            }"""
-        )
-        if res:
-            time.sleep(6)
-            log(f"switched to page js ({res})")
+    else:
+        # JS fallback
+        try:
+            res = page.evaluate(
+                """() => {
+                  const labels=['Şimdi Geçiş Yap','Geçiş Yap','Switch Now','Switch'];
+                  const btns=[...document.querySelectorAll('[role=button]')];
+                  for (const label of labels) {
+                    const hit=btns.find(el => (el.innerText||'').trim()===label);
+                    if (hit) { hit.click(); return label; }
+                  }
+                  return '';
+                }"""
+            )
+            if res:
+                time.sleep(8)
+                log(f"switched to page js ({res})")
+        except Exception:
+            pass
+
+    # Reload as Page so composer appears
+    page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
+    time.sleep(6)
+    close_popups(page)
+    return bool(composer_present(page))
+
+
+def open_composer(page):
+    for sel in [
+        'span:has-text("Ne düşünüyorsun")',
+        'span:has-text("Bir düşünceni paylaş")',
+        'span:has-text("What\'s on your mind")',
+        'span:has-text("Güncelleme yaz")',
+        'div[role="button"]:has-text("Gönderi oluştur")',
+        'div[role="button"]:has-text("Create post")',
+        '[aria-label="Gönderi oluştur"]',
+        '[aria-label="Create post"]',
+    ]:
+        if page.locator(sel).count():
+            page.locator(sel).first.click(timeout=8000, force=True)
             return True
-    except Exception:
-        pass
     return False
 
 
@@ -183,31 +228,33 @@ def publish_post(page, text, idx):
     time.sleep(5)
     close_popups(page)
     assert_page(page)
-    switch_to_page(page)
-    close_popups(page)
 
-    # open composer
     opened = False
-    for sel in [
-        'span:has-text("Ne düşünüyorsun")',
-        'span:has-text("Bir düşünceni paylaş")',
-        'span:has-text("What\'s on your mind")',
-        'span:has-text("Güncelleme yaz")',
-        'div[role="button"]:has-text("Gönderi oluştur")',
-        'div[role="button"]:has-text("Create post")',
-    ]:
-        if page.locator(sel).count():
-            page.locator(sel).first.click(timeout=8000, force=True)
+    for attempt in range(3):
+        switch_to_page(page)
+        close_popups(page)
+        if open_composer(page):
             opened = True
             break
+        log(f"composer retry {attempt + 1}")
+        time.sleep(3)
     if not opened:
         raise RuntimeError("composer not found — maybe not switched to page")
     time.sleep(3)
 
-    editor = page.locator('div[contenteditable="true"][role="textbox"]').last
+    editors = page.locator('div[role="dialog"] div[contenteditable="true"][role="textbox"]')
+    editor = editors.first if editors.count() else page.locator('div[contenteditable="true"][role="textbox"]').last
     editor.click(timeout=8000)
     page.keyboard.type(text, delay=2)
-    time.sleep(2)
+    # wait for link preview / media spinner to settle
+    for _ in range(20):
+        time.sleep(1)
+        try:
+            if page.get_by_text("İleri", exact=True).count():
+                break
+        except Exception:
+            pass
+    time.sleep(3)
     snap(page, f"post-{idx}-draft")
 
     # Next then Share (new Pages UI) OR direct Paylaş
@@ -302,24 +349,37 @@ def main():
             except Exception as e:
                 log(f"bio err: {e}")
 
+        ok = 0
+        fail = 0
         if not args.no_post:
             for i, post in enumerate(day["posts"][: args.limit], 1):
+                if post.get("status") == "published":
+                    log(f"post {i} already published, skip")
+                    ok += 1
+                    continue
                 try:
                     publish_post(page, post["summary"], i)
+                    post["status"] = "published"
+                    ok += 1
                     time.sleep(8)
                 except Exception as e:
                     log(f"post {i} err: {e}")
                     snap(page, f"post-{i}-err")
+                    post["status"] = "failed"
+                    fail += 1
 
         page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
         time.sleep(5)
         snap(page, "day-final")
         ctx.close()
 
-    day["status"] = "published"
+    if fail == 0 and ok > 0:
+        day["status"] = "published"
+    elif ok > 0:
+        day["status"] = "partial"
     CAL.write_text(json.dumps(cal, indent=2, ensure_ascii=False) + "\n")
-    log("DONE")
-    return 0
+    log(f"DONE ok={ok} fail={fail}")
+    return 0 if fail == 0 else 2
 
 
 if __name__ == "__main__":
