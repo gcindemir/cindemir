@@ -23,11 +23,11 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 0,
+    "scheduled_posts": 15,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-08-28",
-    "published_posts": 210,
+    "date_range": "2026-07-18 → 2026-09-04",
+    "published_posts": 230,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
   "days": [
@@ -2102,6 +2102,335 @@
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — website legal services%e2%80%8b.\n\nRead the full article:\nhttps://cindemirlaw.com/website-legal-services%e2%80%8b/",
           "scheduled_at": "2026-08-28T20:00:00+03:00",
           "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 43,
+      "date": "2026-08-29",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d43-1",
+          "title": "The Structure of Board of Directors According to Turkish Commercial Code",
+          "url": "https://cindemir.av.tr/en/the-structure-of-board-of-directors-according-to-turkish-commercial-code/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — the structure of board of directors according to turkish commercial code.\n\nRead the full article:\nhttps://cindemir.av.tr/en/the-structure-of-board-of-directors-according-to-turkish-commercial-code/",
+          "scheduled_at": "2026-08-29T10:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d43-2",
+          "title": "International Private Law and Conventions That Turkey Is Party",
+          "url": "https://cindemir.av.tr/en/international-private-law-and-conventions-that-turkey-is-party/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international private law and conventions that turkey is party.\n\nRead the full article:\nhttps://cindemir.av.tr/en/international-private-law-and-conventions-that-turkey-is-party/",
+          "scheduled_at": "2026-08-29T12:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d43-3",
+          "title": "Traffic Collision in Turkey",
+          "url": "https://cindemir.av.tr/en/traffic-collision-in-turkey/",
+          "summary": "After an accident in Türkiye, early medical care and written evidence can shape later remedies.\n\nThis guide covers the key procedures, documents and risks for foreign clients — traffic collision in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/traffic-collision-in-turkey/",
+          "scheduled_at": "2026-08-29T15:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d43-4",
+          "title": "Turkish Succession Law",
+          "url": "https://cindemir.av.tr/en/turkish-succession-law/",
+          "summary": "Family and succession disputes with a Turkish nexus often turn on jurisdiction and documents.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish succession law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkish-succession-law/",
+          "scheduled_at": "2026-08-29T17:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d43-5",
+          "title": "Private International Law Regarding the Tort in Turkey",
+          "url": "https://cindemir.av.tr/en/private-international-law-regarding-the-tort-in-turkey/",
+          "summary": "After an accident in Türkiye, early medical care and written evidence can shape later remedies.\n\nThis guide covers the key procedures, documents and risks for foreign clients — private international law regarding the tort in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/private-international-law-regarding-the-tort-in-turkey/",
+          "scheduled_at": "2026-08-29T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 44,
+      "date": "2026-08-30",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d44-1",
+          "title": "Foreigners and International Protection in Turkey 2",
+          "url": "https://cindemir.av.tr/en/foreigners-and-international-protection-in-turkey-2/",
+          "summary": "Immigration and detention matters in Türkiye move on short deadlines — procedure matters.\n\nThis guide covers the key procedures, documents and risks for foreign clients — foreigners and international protection in turkey 2.\n\nRead the full article:\nhttps://cindemir.av.tr/en/foreigners-and-international-protection-in-turkey-2/",
+          "scheduled_at": "2026-08-30T10:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d44-2",
+          "title": "Humanitarian Residence Application in Turkey",
+          "url": "https://cindemir.av.tr/en/humanitarian-residence-application-in-turkey/",
+          "summary": "Immigration and detention matters in Türkiye move on short deadlines — procedure matters.\n\nThis guide covers the key procedures, documents and risks for foreign clients — humanitarian residence application in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/humanitarian-residence-application-in-turkey/",
+          "scheduled_at": "2026-08-30T12:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d44-3",
+          "title": "Website Privacy Policy under Turkish Law",
+          "url": "https://cindemir.av.tr/en/website-privacy-policy-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — website privacy policy under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/website-privacy-policy-under-turkish-law/",
+          "scheduled_at": "2026-08-30T15:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d44-4",
+          "title": "Social Media Law",
+          "url": "https://cindemir.av.tr/en/social-media-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — social media law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/social-media-law/",
+          "scheduled_at": "2026-08-30T17:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d44-5",
+          "title": "Human Trafficking under Turkish Law",
+          "url": "https://cindemir.av.tr/en/human-trafficking-under-turkish-law/",
+          "summary": "After an accident in Türkiye, early medical care and written evidence can shape later remedies.\n\nThis guide covers the key procedures, documents and risks for foreign clients — human trafficking under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/human-trafficking-under-turkish-law/",
+          "scheduled_at": "2026-08-30T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 45,
+      "date": "2026-08-31",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d45-1",
+          "title": "Termination of the Contract of Employment with Just Cause",
+          "url": "https://cindemir.av.tr/en/termination-of-the-contract-of-employment-with-just-cause/",
+          "summary": "Turkish employment disputes have strict form and timing rules for foreign and local staff.\n\nThis guide covers the key procedures, documents and risks for foreign clients — termination of the contract of employment with just cause.\n\nRead the full article:\nhttps://cindemir.av.tr/en/termination-of-the-contract-of-employment-with-just-cause/",
+          "scheduled_at": "2026-08-31T10:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d45-2",
+          "title": "Re Employment Lawsuit",
+          "url": "https://cindemir.av.tr/en/re-employment-lawsuit/",
+          "summary": "Turkish employment disputes have strict form and timing rules for foreign and local staff.\n\nThis guide covers the key procedures, documents and risks for foreign clients — re employment lawsuit.\n\nRead the full article:\nhttps://cindemir.av.tr/en/re-employment-lawsuit/",
+          "scheduled_at": "2026-08-31T12:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d45-3",
+          "title": "Foreigners and International Protection in Turkey",
+          "url": "https://cindemir.av.tr/en/foreigners-and-international-protection-in-turkey/",
+          "summary": "Immigration and detention matters in Türkiye move on short deadlines — procedure matters.\n\nThis guide covers the key procedures, documents and risks for foreign clients — foreigners and international protection in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/foreigners-and-international-protection-in-turkey/",
+          "scheduled_at": "2026-08-31T15:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d45-4",
+          "title": "Liquidation in Turkey",
+          "url": "https://cindemir.av.tr/en/liquidation-in-turkey/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — liquidation in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/liquidation-in-turkey/",
+          "scheduled_at": "2026-08-31T17:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d45-5",
+          "title": "Escrow in Turkey",
+          "url": "https://cindemir.av.tr/en/escrow-in-turkey/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — escrow in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/escrow-in-turkey/",
+          "scheduled_at": "2026-08-31T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 46,
+      "date": "2026-09-01",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d46-1",
+          "title": "Escrow Account Turkiye",
+          "url": "https://cindemir.av.tr/en/escrow-account-turkiye/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — escrow account turkiye.\n\nRead the full article:\nhttps://cindemir.av.tr/en/escrow-account-turkiye/",
+          "scheduled_at": "2026-09-01T10:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d46-2",
+          "title": "Private International Law Rules",
+          "url": "https://cindemir.av.tr/en/private-international-law-rules/",
+          "summary": "Foreign judgments and awards need recognition/enforcement steps before they bite in Türkiye.\n\nThis guide covers the key procedures, documents and risks for foreign clients — private international law rules.\n\nRead the full article:\nhttps://cindemir.av.tr/en/private-international-law-rules/",
+          "scheduled_at": "2026-09-01T12:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d46-3",
+          "title": "Company Establishment in Turkeys Free Trade Zone Benefits and Requirements",
+          "url": "https://cindemir.av.tr/en/company-establishment-in-turkeys-free-trade-zone-benefits-and-requirements/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — company establishment in turkeys free trade zone benefits and requirements.\n\nRead the full article:\nhttps://cindemir.av.tr/en/company-establishment-in-turkeys-free-trade-zone-benefits-and-requirements/",
+          "scheduled_at": "2026-09-01T15:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d46-4",
+          "title": "Risks for Being Foreigner Company Director in Turkey Nominee Director",
+          "url": "https://cindemir.av.tr/en/risks-for-being-foreigner-company-director-in-turkey-nominee-director/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — risks for being foreigner company director in turkey nominee director.\n\nRead the full article:\nhttps://cindemir.av.tr/en/risks-for-being-foreigner-company-director-in-turkey-nominee-director/",
+          "scheduled_at": "2026-09-01T17:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d46-5",
+          "title": "Compulsory Earthquake Insurance in Turkey Damage Claim",
+          "url": "https://cindemir.av.tr/en/compulsory-earthquake-insurance-in-turkey-damage-claim/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compulsory earthquake insurance in turkey damage claim.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compulsory-earthquake-insurance-in-turkey-damage-claim/",
+          "scheduled_at": "2026-09-01T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 47,
+      "date": "2026-09-02",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d47-1",
+          "title": "Nominee Directory Services in Turkey",
+          "url": "https://cindemir.av.tr/en/nominee-directory-services-in-turkey/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — nominee directory services in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/nominee-directory-services-in-turkey/",
+          "scheduled_at": "2026-09-02T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d47-2",
+          "title": "Company Establishment for Russian Nationals in Turkey",
+          "url": "https://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — company establishment for russian nationals in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/company-establishment-for-russian-nationals-in-turkey/",
+          "scheduled_at": "2026-09-02T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d47-3",
+          "title": "Inheritance Rights for Divorced Spouses",
+          "url": "https://cindemir.av.tr/en/inheritance-rights-for-divorced-spouses/",
+          "summary": "Family and succession disputes with a Turkish nexus often turn on jurisdiction and documents.\n\nThis guide covers the key procedures, documents and risks for foreign clients — inheritance rights for divorced spouses.\n\nRead the full article:\nhttps://cindemir.av.tr/en/inheritance-rights-for-divorced-spouses/",
+          "scheduled_at": "2026-09-02T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d47-4",
+          "title": "Institutionalized Nominee Director Services in Turkey a Legal and Secure Solution for Investors",
+          "url": "https://cindemir.av.tr/en/institutionalized-nominee-director-services-in-turkey-a-legal-and-secure-solution-for-investors/",
+          "summary": "Corporate setup and director roles in Türkiye carry registration, tax and liability consequences.\n\nThis guide covers the key procedures, documents and risks for foreign clients — institutionalized nominee director services in turkey a legal and secure solution for investors.\n\nRead the full article:\nhttps://cindemir.av.tr/en/institutionalized-nominee-director-services-in-turkey-a-legal-and-secure-solution-for-investors/",
+          "scheduled_at": "2026-09-02T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d47-5",
+          "title": "Overcoming the 5 Year Entry Ban in Turkey a Path to Redemption",
+          "url": "https://cindemir.av.tr/en/overcoming-the-5-year-entry-ban-in-turkey-a-path-to-redemption/",
+          "summary": "Immigration and detention matters in Türkiye move on short deadlines — procedure matters.\n\nThis guide covers the key procedures, documents and risks for foreign clients — overcoming the 5 year entry ban in turkey a path to redemption.\n\nRead the full article:\nhttps://cindemir.av.tr/en/overcoming-the-5-year-entry-ban-in-turkey-a-path-to-redemption/",
+          "scheduled_at": "2026-09-02T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 48,
+      "date": "2026-09-03",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d48-1",
+          "title": "Turkish Lawyer Online Consultancy",
+          "url": "https://cindemir.av.tr/en/turkish-lawyer-online-consultancy/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish lawyer online consultancy.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkish-lawyer-online-consultancy/",
+          "scheduled_at": "2026-09-03T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d48-2",
+          "title": "Form a Document Legal Proof of Birth in Turkey and Application Procedures",
+          "url": "https://cindemir.av.tr/en/form-a-document-legal-proof-of-birth-in-turkey-and-application-procedures/",
+          "summary": "Family and succession disputes with a Turkish nexus often turn on jurisdiction and documents.\n\nThis guide covers the key procedures, documents and risks for foreign clients — form a document legal proof of birth in turkey and application procedures.\n\nRead the full article:\nhttps://cindemir.av.tr/en/form-a-document-legal-proof-of-birth-in-turkey-and-application-procedures/",
+          "scheduled_at": "2026-09-03T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d48-3",
+          "title": "Legal Statement Preparation",
+          "url": "https://cindemir.av.tr/en/legal-statement-preparation/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal statement preparation.\n\nRead the full article:\nhttps://cindemir.av.tr/en/legal-statement-preparation/",
+          "scheduled_at": "2026-09-03T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d48-4",
+          "title": "Website Legal Services",
+          "url": "https://cindemir.av.tr/en/website-legal-services%e2%80%8b/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — website legal services.\n\nRead the full article:\nhttps://cindemir.av.tr/en/website-legal-services%e2%80%8b/",
+          "scheduled_at": "2026-09-03T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d48-5",
+          "title": "Divorce Regulations in Turkey",
+          "url": "https://cindemir.av.tr/en/divorce-regulations-in-turkey/",
+          "summary": "Family and succession disputes with a Turkish nexus often turn on jurisdiction and documents.\n\nThis guide covers the key procedures, documents and risks for foreign clients — divorce regulations in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/divorce-regulations-in-turkey/",
+          "scheduled_at": "2026-09-03T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 49,
+      "date": "2026-09-04",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d49-1",
+          "title": "Turkish Descents Claiming Right of Succession",
+          "url": "https://cindemir.av.tr/en/turkish-descents-claiming-right-of-succession/",
+          "summary": "Family and succession disputes with a Turkish nexus often turn on jurisdiction and documents.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish descents claiming right of succession.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkish-descents-claiming-right-of-succession/",
+          "scheduled_at": "2026-09-04T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d49-2",
+          "title": "Enforcement of a Foreign Decision in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-decision-in-turkey/",
+          "summary": "Foreign judgments and awards need recognition/enforcement steps before they bite in Türkiye.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign decision in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-decision-in-turkey/",
+          "scheduled_at": "2026-09-04T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d49-3",
+          "title": "Tort Law in Turkey",
+          "url": "https://cindemir.av.tr/en/tort-law-in-turkey/",
+          "summary": "After an accident in Türkiye, early medical care and written evidence can shape later remedies.\n\nThis guide covers the key procedures, documents and risks for foreign clients — tort law in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/tort-law-in-turkey/",
+          "scheduled_at": "2026-09-04T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d49-4",
+          "title": "Recognition and Enforcement of Russian Federation Decisions in Turkey",
+          "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-russian-federation-decisions-in-turkey/",
+          "summary": "Foreign judgments and awards need recognition/enforcement steps before they bite in Türkiye.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition and enforcement of russian federation decisions in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-and-enforcement-of-russian-federation-decisions-in-turkey/",
+          "scheduled_at": "2026-09-04T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d49-5",
+          "title": "Recognition and Enforcement of Bosnia and Herzegovina Court Decisions in Turkey",
+          "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-bosnia-and-herzegovina-court-decisions-in-turkey/",
+          "summary": "Foreign judgments and awards need recognition/enforcement steps before they bite in Türkiye.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition and enforcement of bosnia and herzegovina court decisions in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-and-enforcement-of-bosnia-and-herzegovina-court-decisions-in-turkey/",
+          "scheduled_at": "2026-09-04T20:00:00+03:00",
+          "status": "scheduled"
         }
       ]
     }
