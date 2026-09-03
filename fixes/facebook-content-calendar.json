@@ -26,8 +26,8 @@
     "scheduled_posts": 15,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-09-10",
-    "published_posts": 260,
+    "date_range": "2026-07-18 → 2026-09-13",
+    "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
   "days": [
@@ -2578,7 +2578,7 @@
     {
       "day": 53,
       "date": "2026-09-08",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d53-1",
@@ -2586,7 +2586,7 @@
           "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-bulgarian-court-decisions/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition and enforcement of bulgarian court decisions.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-and-enforcement-of-bulgarian-court-decisions/",
           "scheduled_at": "2026-09-08T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d53-2",
@@ -2594,7 +2594,7 @@
           "url": "https://cindemir.av.tr/en/building-owner-liability-and-compensation-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — building owner liability and compensation in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/building-owner-liability-and-compensation-in-turkey/",
           "scheduled_at": "2026-09-08T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d53-3",
@@ -2602,7 +2602,7 @@
           "url": "https://cindemir.av.tr/en/compensation-lawsuits-for-doctor-errors-malpractice-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation lawsuits for doctor errors malpractice in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-lawsuits-for-doctor-errors-malpractice-in-turkey/",
           "scheduled_at": "2026-09-08T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d53-4",
@@ -2610,7 +2610,7 @@
           "url": "https://cindemir.av.tr/en/compensation-lawsuit-for-elevator-accidents-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation lawsuit for elevator accidents in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-lawsuit-for-elevator-accidents-in-turkey/",
           "scheduled_at": "2026-09-08T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d53-5",
@@ -2618,14 +2618,14 @@
           "url": "https://cindemir.av.tr/en/compensation-lawsuit-for-finger-amputation-in-workplace-accidents/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation lawsuit for finger amputation in workplace accidents.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-lawsuit-for-finger-amputation-in-workplace-accidents/",
           "scheduled_at": "2026-09-08T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         }
       ]
     },
     {
       "day": 54,
       "date": "2026-09-09",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d54-1",
@@ -2633,7 +2633,7 @@
           "url": "https://cindemir.av.tr/en/compensation-in-bicycle-accidents/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation in bicycle accidents.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-in-bicycle-accidents/",
           "scheduled_at": "2026-09-09T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d54-2",
@@ -2641,7 +2641,7 @@
           "url": "https://cindemir.av.tr/en/facial-scar-traffic-accident-compensation-in-turkey-your-legal-rights-explained/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — facial scar traffic accident compensation in turkey your legal rights explained.\n\nRead the full article:\nhttps://cindemir.av.tr/en/facial-scar-traffic-accident-compensation-in-turkey-your-legal-rights-explained/",
           "scheduled_at": "2026-09-09T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d54-3",
@@ -2649,7 +2649,7 @@
           "url": "https://cindemir.av.tr/en/fracture-compensation-lawsuits-in-turkey-your-rights-and-legal-process-2025-guide/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — fracture compensation lawsuits in turkey your rights and legal process 2025 guide.\n\nRead the full article:\nhttps://cindemir.av.tr/en/fracture-compensation-lawsuits-in-turkey-your-rights-and-legal-process-2025-guide/",
           "scheduled_at": "2026-09-09T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d54-4",
@@ -2657,7 +2657,7 @@
           "url": "https://cindemir.av.tr/en/legal-services-for-digital-asset-businesses/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal services for digital asset businesses.\n\nRead the full article:\nhttps://cindemir.av.tr/en/legal-services-for-digital-asset-businesses/",
           "scheduled_at": "2026-09-09T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d54-5",
@@ -2665,14 +2665,14 @@
           "url": "https://cindemir.av.tr/en/exit-bans-in-turkey-a-critical-exploration-of-judicial-control/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — exit bans in turkey a critical exploration of judicial control.\n\nRead the full article:\nhttps://cindemir.av.tr/en/exit-bans-in-turkey-a-critical-exploration-of-judicial-control/",
           "scheduled_at": "2026-09-09T20:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         }
       ]
     },
     {
       "day": 55,
       "date": "2026-09-10",
-      "status": "scheduled",
+      "status": "published",
       "posts": [
         {
           "id": "d55-1",
@@ -2680,7 +2680,7 @@
           "url": "https://cindemir.av.tr/en/how-to-find-nominee-director-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — how to find nominee director in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/how-to-find-nominee-director-in-turkey/",
           "scheduled_at": "2026-09-10T10:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d55-2",
@@ -2688,7 +2688,7 @@
           "url": "https://cindemir.av.tr/en/understanding-positive-and-negative-inheritance-contracts-under-turkish-civil-code/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — understanding positive and negative inheritance contracts under turkish civil code.\n\nRead the full article:\nhttps://cindemir.av.tr/en/understanding-positive-and-negative-inheritance-contracts-under-turkish-civil-code/",
           "scheduled_at": "2026-09-10T12:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d55-3",
@@ -2696,7 +2696,7 @@
           "url": "https://cindemir.av.tr/en/offences-of-bodily-harm/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — offences of bodily harm.\n\nRead the full article:\nhttps://cindemir.av.tr/en/offences-of-bodily-harm/",
           "scheduled_at": "2026-09-10T15:00:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d55-4",
@@ -2704,7 +2704,7 @@
           "url": "https://cindemir.av.tr/en/escrow-agreement-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — escrow agreement in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/escrow-agreement-in-turkey/",
           "scheduled_at": "2026-09-10T17:30:00+03:00",
-          "status": "scheduled"
+          "status": "published"
         },
         {
           "id": "d55-5",
@@ -2712,6 +2712,147 @@
           "url": "https://cindemir.av.tr/en/nominee-director-in-turkey-2/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — nominee director in turkey 2.\n\nRead the full article:\nhttps://cindemir.av.tr/en/nominee-director-in-turkey-2/",
           "scheduled_at": "2026-09-10T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 56,
+      "date": "2026-09-11",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d56-1",
+          "title": "Termination of Labor Contract on Notice in Turkey",
+          "url": "https://cindemir.av.tr/en/termination-of-labor-contract-on-notice-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — termination of labor contract on notice in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/termination-of-labor-contract-on-notice-in-turkey/",
+          "scheduled_at": "2026-09-11T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d56-2",
+          "title": "Branch Office in Turkey",
+          "url": "https://cindemir.av.tr/en/branch-office-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — branch office in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/branch-office-in-turkey/",
+          "scheduled_at": "2026-09-11T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d56-3",
+          "title": "Foreigners Prohibited From Entry to Turkey",
+          "url": "https://cindemir.av.tr/en/foreigners-prohibited-from-entry-to-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — foreigners prohibited from entry to turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/foreigners-prohibited-from-entry-to-turkey/",
+          "scheduled_at": "2026-09-11T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d56-4",
+          "title": "Lawyer in Sapanca and Legal Assistance",
+          "url": "https://cindemir.av.tr/en/lawyer-in-sapanca-and-legal-assistance/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — lawyer in sapanca and legal assistance.\n\nRead the full article:\nhttps://cindemir.av.tr/en/lawyer-in-sapanca-and-legal-assistance/",
+          "scheduled_at": "2026-09-11T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d56-5",
+          "title": "Consequences of a Divorce Decision in Turkey",
+          "url": "https://cindemir.av.tr/en/consequences-of-a-divorce-decision-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — consequences of a divorce decision in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/consequences-of-a-divorce-decision-in-turkey/",
+          "scheduled_at": "2026-09-11T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 57,
+      "date": "2026-09-12",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d57-1",
+          "title": "Trade Law of Turkey",
+          "url": "https://cindemir.av.tr/en/trade-law-of-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — trade law of turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/trade-law-of-turkey/",
+          "scheduled_at": "2026-09-12T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d57-2",
+          "title": "Establishing a Commercial Enterprise in Turkey",
+          "url": "https://cindemir.av.tr/en/establishing-a-commercial-enterprise-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — establishing a commercial enterprise in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/establishing-a-commercial-enterprise-in-turkey/",
+          "scheduled_at": "2026-09-12T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d57-3",
+          "title": "Definition Regarding Conflict of Laws in Turkey",
+          "url": "https://cindemir.av.tr/en/definition-regarding-conflict-of-laws-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — definition regarding conflict of laws in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/definition-regarding-conflict-of-laws-in-turkey/",
+          "scheduled_at": "2026-09-12T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d57-4",
+          "title": "Cosmetic Surgery Malpractice in Turkish Law",
+          "url": "https://cindemir.av.tr/en/cosmetic-surgery-malpractice-in-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — cosmetic surgery malpractice in turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/cosmetic-surgery-malpractice-in-turkish-law/",
+          "scheduled_at": "2026-09-12T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d57-5",
+          "title": "Enforcement of Icsid Awards in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-icsid-awards-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of icsid awards in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-icsid-awards-in-turkey/",
+          "scheduled_at": "2026-09-12T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 58,
+      "date": "2026-09-13",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d58-1",
+          "title": "Malpractice Personal Injury and Proof in Turkey",
+          "url": "https://cindemir.av.tr/en/malpractice-personal-injury-and-proof-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — malpractice personal injury and proof in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/malpractice-personal-injury-and-proof-in-turkey/",
+          "scheduled_at": "2026-09-13T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d58-2",
+          "title": "Who Can Collect Debt in Turkey",
+          "url": "https://cindemir.av.tr/en/who-can-collect-debt-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — who can collect debt in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/who-can-collect-debt-in-turkey/",
+          "scheduled_at": "2026-09-13T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d58-3",
+          "title": "Company Establishment in Turkey No Pre Permits",
+          "url": "https://cindemir.av.tr/en/company-establishment-in-turkey-no-pre-permits/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — company establishment in turkey no pre permits.\n\nRead the full article:\nhttps://cindemir.av.tr/en/company-establishment-in-turkey-no-pre-permits/",
+          "scheduled_at": "2026-09-13T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d58-4",
+          "title": "Recognition of Russian Court Decisions in Turkey",
+          "url": "https://cindemir.av.tr/en/recognition-of-russian-court-decisions-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition of russian court decisions in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-of-russian-court-decisions-in-turkey/",
+          "scheduled_at": "2026-09-13T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d58-5",
+          "title": "Enforcement of a Foreign Iran Judgment in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-iran-judgment-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign iran judgment in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-iran-judgment-in-turkey/",
+          "scheduled_at": "2026-09-13T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
