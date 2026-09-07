@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 15,
+    "scheduled_posts": 30,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-09-13",
+    "date_range": "2026-07-18 → 2026-09-16",
     "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
@@ -2853,6 +2853,147 @@
           "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-iran-judgment-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign iran judgment in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-iran-judgment-in-turkey/",
           "scheduled_at": "2026-09-13T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 59,
+      "date": "2026-09-14",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d59-1",
+          "title": "Notice of Termination for Employement Contracts in Turkish Labor Law",
+          "url": "https://cindemir.av.tr/en/notice-of-termination-for-employement-contracts-in-turkish-labor-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — notice of termination for employement contracts in turkish labor law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/notice-of-termination-for-employement-contracts-in-turkish-labor-law/",
+          "scheduled_at": "2026-09-14T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d59-2",
+          "title": "Introduction to Jurisdiction of Divorce in Turkey",
+          "url": "https://cindemir.av.tr/en/introduction-to-jurisdiction-of-divorce-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — introduction to jurisdiction of divorce in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/introduction-to-jurisdiction-of-divorce-in-turkey/",
+          "scheduled_at": "2026-09-14T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d59-3",
+          "title": "Statute of Limitations Related to Personal Injury Cases in Turkey",
+          "url": "https://cindemir.av.tr/en/statute-of-limitations-related-to-personal-injury-cases-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — statute of limitations related to personal injury cases in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/statute-of-limitations-related-to-personal-injury-cases-in-turkey/",
+          "scheduled_at": "2026-09-14T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d59-4",
+          "title": "Paternity in Turkish Law under New Turkish Constitution Court Decision",
+          "url": "https://cindemir.av.tr/en/paternity-in-turkish-law-under-new-turkish-constitution-court-decision/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — paternity in turkish law under new turkish constitution court decision.\n\nRead the full article:\nhttps://cindemir.av.tr/en/paternity-in-turkish-law-under-new-turkish-constitution-court-decision/",
+          "scheduled_at": "2026-09-14T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d59-5",
+          "title": "Enforcement of a Foreign Austria Judgments in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-austria-judgments-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign austria judgments in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-austria-judgments-in-turkey/",
+          "scheduled_at": "2026-09-14T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 60,
+      "date": "2026-09-15",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d60-1",
+          "title": "Enforcement and Recognition of Arbitral Awards in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-and-recognition-of-arbitral-awards-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement and recognition of arbitral awards in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-and-recognition-of-arbitral-awards-in-turkey/",
+          "scheduled_at": "2026-09-15T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d60-2",
+          "title": "Enforcement of a Foreign Ukraine Judgements in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-ukraine-judgements-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign ukraine judgements in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-ukraine-judgements-in-turkey/",
+          "scheduled_at": "2026-09-15T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d60-3",
+          "title": "Enforcement of Us Judgements in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-us-judgements-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of us judgements in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-us-judgements-in-turkey/",
+          "scheduled_at": "2026-09-15T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d60-4",
+          "title": "Enforcement of Uk Judgements in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-uk-judgements-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of uk judgements in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-uk-judgements-in-turkey/",
+          "scheduled_at": "2026-09-15T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d60-5",
+          "title": "Enforcement of a Foreign Romania Judgment in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-romania-judgment-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign romania judgment in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-romania-judgment-in-turkey/",
+          "scheduled_at": "2026-09-15T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 61,
+      "date": "2026-09-16",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d61-1",
+          "title": "Enforcement of a Foreign Poland Judgment in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-foreign-poland-judgment-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a foreign poland judgment in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-foreign-poland-judgment-in-turkey/",
+          "scheduled_at": "2026-09-16T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d61-2",
+          "title": "Enforcement of a Chinese Foreign Judgment in Turkey",
+          "url": "https://cindemir.av.tr/en/enforcement-of-a-chinese-foreign-judgment-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of a chinese foreign judgment in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-a-chinese-foreign-judgment-in-turkey/",
+          "scheduled_at": "2026-09-16T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d61-3",
+          "title": "Compensation of Damages for Foreign Victims Due to Terror under Turkish Law",
+          "url": "https://cindemir.av.tr/en/compensation-of-damages-for-foreign-victims-due-to-terror-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation of damages for foreign victims due to terror under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-of-damages-for-foreign-victims-due-to-terror-under-turkish-law/",
+          "scheduled_at": "2026-09-16T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d61-4",
+          "title": "Basic Principles of Turkish Labor Law",
+          "url": "https://cindemir.av.tr/en/basic-principles-of-turkish-labor-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — basic principles of turkish labor law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/basic-principles-of-turkish-labor-law/",
+          "scheduled_at": "2026-09-16T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d61-5",
+          "title": "Sales of Real Estate to Foreigners in Turkey",
+          "url": "https://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — sales of real estate to foreigners in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
+          "scheduled_at": "2026-09-16T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
