@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 30,
+    "scheduled_posts": 45,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-09-16",
+    "date_range": "2026-07-18 → 2026-09-19",
     "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
@@ -2994,6 +2994,147 @@
           "url": "https://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — sales of real estate to foreigners in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/sales-of-real-estate-to-foreigners-in-turkey/",
           "scheduled_at": "2026-09-16T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 62,
+      "date": "2026-09-17",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d62-1",
+          "title": "Anti Dumping Measures",
+          "url": "https://cindemir.av.tr/en/anti-dumping-measures/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — anti dumping measures.\n\nRead the full article:\nhttps://cindemir.av.tr/en/anti-dumping-measures/",
+          "scheduled_at": "2026-09-17T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d62-2",
+          "title": "Concept of Settlement",
+          "url": "https://cindemir.av.tr/en/concept-of-settlement/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — concept of settlement.\n\nRead the full article:\nhttps://cindemir.av.tr/en/concept-of-settlement/",
+          "scheduled_at": "2026-09-17T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d62-3",
+          "title": "Direct Foreign Invesment Law in Turkey",
+          "url": "https://cindemir.av.tr/en/direct-foreign-invesment-law-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — direct foreign invesment law in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/direct-foreign-invesment-law-in-turkey/",
+          "scheduled_at": "2026-09-17T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d62-4",
+          "title": "Alternative Dispute Resolutions in Turkey",
+          "url": "https://cindemir.av.tr/en/alternative-dispute-resolutions-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — alternative dispute resolutions in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/alternative-dispute-resolutions-in-turkey/",
+          "scheduled_at": "2026-09-17T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d62-5",
+          "title": "The Scope of Turkish Labor Law",
+          "url": "https://cindemir.av.tr/en/the-scope-of-turkish-labor-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — the scope of turkish labor law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/the-scope-of-turkish-labor-law/",
+          "scheduled_at": "2026-09-17T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 63,
+      "date": "2026-09-18",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d63-1",
+          "title": "Interim Injunctions in Turkish Law",
+          "url": "https://cindemir.av.tr/en/interim-injunctions-in-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — interim injunctions in turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/interim-injunctions-in-turkish-law/",
+          "scheduled_at": "2026-09-18T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d63-2",
+          "title": "Resolution in the Course of Litigation Proceedings Regarding Turkish Law",
+          "url": "https://cindemir.av.tr/en/resolution-in-the-course-of-litigation-proceedings-regarding-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — resolution in the course of litigation proceedings regarding turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/resolution-in-the-course-of-litigation-proceedings-regarding-turkish-law/",
+          "scheduled_at": "2026-09-18T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d63-3",
+          "title": "Legal Support for Foreign Lawyers Seeking to Visit Prisoners in Turkey Rights under Article 25 and Our Assistance As a Turkish Law Firm",
+          "url": "https://cindemir.av.tr/en/legal-support-for-foreign-lawyers-seeking-to-visit-prisoners-in-turkey-rights-under-article-25-and-our-assistance-as-a-turkish-law-firm/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal support for foreign lawyers seeking to visit prisoners in turkey rights under article 25 and our assistance as a turkish law firm.\n\nRead the full article:\nhttps://cindemir.av.tr/en/legal-support-for-foreign-lawyers-seeking-to-visit-prisoners-in-turkey-rights-under-article-25-and-our-assistance-as-a-turkish-law-firm/",
+          "scheduled_at": "2026-09-18T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d63-4",
+          "title": "Use of Ottoman Archival Documents in Contemporary Legal and Historical Matters",
+          "url": "https://cindemir.av.tr/en/use-of-ottoman-archival-documents-in-contemporary-legal-and-historical-matters/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — use of ottoman archival documents in contemporary legal and historical matters.\n\nRead the full article:\nhttps://cindemir.av.tr/en/use-of-ottoman-archival-documents-in-contemporary-legal-and-historical-matters/",
+          "scheduled_at": "2026-09-18T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d63-5",
+          "title": "Crypto Asset Fraud Methods and Legal Assessment",
+          "url": "https://cindemir.av.tr/en/crypto-asset-fraud-methods-and-legal-assessment/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset fraud methods and legal assessment.\n\nRead the full article:\nhttps://cindemir.av.tr/en/crypto-asset-fraud-methods-and-legal-assessment/",
+          "scheduled_at": "2026-09-18T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 64,
+      "date": "2026-09-19",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d64-1",
+          "title": "Crypto Asset Fraud Common Schemes Legal Evaluation and Victims Legal Remedies",
+          "url": "https://cindemir.av.tr/en/crypto-asset-fraud-common-schemes-legal-evaluation-and-victims-legal-remedies/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset fraud common schemes legal evaluation and victims legal remedies.\n\nRead the full article:\nhttps://cindemir.av.tr/en/crypto-asset-fraud-common-schemes-legal-evaluation-and-victims-legal-remedies/",
+          "scheduled_at": "2026-09-19T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d64-2",
+          "title": "A New Era in Crypto Asset Regulation a Comparative Analysis of Mica and Turkeys Law No 7518",
+          "url": "https://cindemir.av.tr/en/a-new-era-in-crypto-asset-regulation-a-comparative-analysis-of-mica-and-turkeys-law-no-7518/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — a new era in crypto asset regulation a comparative analysis of mica and turkeys law no 7518.\n\nRead the full article:\nhttps://cindemir.av.tr/en/a-new-era-in-crypto-asset-regulation-a-comparative-analysis-of-mica-and-turkeys-law-no-7518/",
+          "scheduled_at": "2026-09-19T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d64-3",
+          "title": "A Practical Overview of Crypto Asset Service Providers and Platforms in Turkiye",
+          "url": "https://cindemir.av.tr/en/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — a practical overview of crypto asset service providers and platforms in turkiye.\n\nRead the full article:\nhttps://cindemir.av.tr/en/a-practical-overview-of-crypto-asset-service-providers-and-platforms-in-turkiye/",
+          "scheduled_at": "2026-09-19T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d64-4",
+          "title": "The Historical Evolution of Title Deeds Tapu Senetleri in Turkey",
+          "url": "https://cindemir.av.tr/en/the-historical-evolution-of-title-deeds-tapu-senetleri-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — the historical evolution of title deeds tapu senetleri in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/the-historical-evolution-of-title-deeds-tapu-senetleri-in-turkey/",
+          "scheduled_at": "2026-09-19T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d64-5",
+          "title": "Authorized Representative Services in the European Union for Ai Companies",
+          "url": "https://cindemir.av.tr/en/authorized-representative-services-in-the-european-union-for-ai-companies/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — authorized representative services in the european union for ai companies.\n\nRead the full article:\nhttps://cindemir.av.tr/en/authorized-representative-services-in-the-european-union-for-ai-companies/",
+          "scheduled_at": "2026-09-19T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
