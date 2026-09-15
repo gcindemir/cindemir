@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 45,
+    "scheduled_posts": 60,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-09-19",
+    "date_range": "2026-07-18 → 2026-09-22",
     "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
@@ -3135,6 +3135,147 @@
           "url": "https://cindemir.av.tr/en/authorized-representative-services-in-the-european-union-for-ai-companies/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — authorized representative services in the european union for ai companies.\n\nRead the full article:\nhttps://cindemir.av.tr/en/authorized-representative-services-in-the-european-union-for-ai-companies/",
           "scheduled_at": "2026-09-19T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 65,
+      "date": "2026-09-20",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d65-1",
+          "title": "Survivor Pension in Turkey for Spouses of Deceased Turkish Citizens",
+          "url": "https://cindemir.av.tr/en/survivor-pension-in-turkey-for-spouses-of-deceased-turkish-citizens/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — survivor pension in turkey for spouses of deceased turkish citizens.\n\nRead the full article:\nhttps://cindemir.av.tr/en/survivor-pension-in-turkey-for-spouses-of-deceased-turkish-citizens/",
+          "scheduled_at": "2026-09-20T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d65-2",
+          "title": "Pig Butchering Cryptocurrency Scam How This Scheme Targets Investors and How to Stay Safe",
+          "url": "https://cindemir.av.tr/en/pig-butchering-cryptocurrency-scam-how-this-scheme-targets-investors-and-how-to-stay-safe/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — pig butchering cryptocurrency scam how this scheme targets investors and how to stay safe.\n\nRead the full article:\nhttps://cindemir.av.tr/en/pig-butchering-cryptocurrency-scam-how-this-scheme-targets-investors-and-how-to-stay-safe/",
+          "scheduled_at": "2026-09-20T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d65-3",
+          "title": "Investigating Inherited Assets in Turkey Key Considerations for Heirs and Legal Advisors",
+          "url": "https://cindemir.av.tr/en/investigating-inherited-assets-in-turkey-key-considerations-for-heirs-and-legal-advisors/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — investigating inherited assets in turkey key considerations for heirs and legal advisors.\n\nRead the full article:\nhttps://cindemir.av.tr/en/investigating-inherited-assets-in-turkey-key-considerations-for-heirs-and-legal-advisors/",
+          "scheduled_at": "2026-09-20T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d65-4",
+          "title": "Turkey Crypto Crimes Legal Framework Common Offenses and Enforcement Trends",
+          "url": "https://cindemir.av.tr/en/turkey-crypto-crimes-legal-framework-common-offenses-and-enforcement-trends/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkey crypto crimes legal framework common offenses and enforcement trends.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkey-crypto-crimes-legal-framework-common-offenses-and-enforcement-trends/",
+          "scheduled_at": "2026-09-20T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d65-5",
+          "title": "Understanding Turkeys Spk Information Systems Independent Audit Guide",
+          "url": "https://cindemir.av.tr/en/understanding-turkeys-spk-information-systems-independent-audit-guide/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — understanding turkeys spk information systems independent audit guide.\n\nRead the full article:\nhttps://cindemir.av.tr/en/understanding-turkeys-spk-information-systems-independent-audit-guide/",
+          "scheduled_at": "2026-09-20T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 66,
+      "date": "2026-09-21",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d66-1",
+          "title": "Military Service Status of Persons Who Acquired Turkish Citizenship by Descent",
+          "url": "https://cindemir.av.tr/en/military-service-status-of-persons-who-acquired-turkish-citizenship-by-descent/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — military service status of persons who acquired turkish citizenship by descent.\n\nRead the full article:\nhttps://cindemir.av.tr/en/military-service-status-of-persons-who-acquired-turkish-citizenship-by-descent/",
+          "scheduled_at": "2026-09-21T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d66-2",
+          "title": "Late Registered Turkish Citizens and Military Service Obligations",
+          "url": "https://cindemir.av.tr/en/late-registered-turkish-citizens-and-military-service-obligations/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — late registered turkish citizens and military service obligations.\n\nRead the full article:\nhttps://cindemir.av.tr/en/late-registered-turkish-citizens-and-military-service-obligations/",
+          "scheduled_at": "2026-09-21T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d66-3",
+          "title": "Application to the Bern Convention and the Protection of the Environment Within the Framework of the Council of Europe and Turkey",
+          "url": "https://cindemir.av.tr/en/application-to-the-bern-convention-and-the-protection-of-the-environment-within-the-framework-of-the-council-of-europe-and-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — application to the bern convention and the protection of the environment within the framework of the council of europe and turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/application-to-the-bern-convention-and-the-protection-of-the-environment-within-the-framework-of-the-council-of-europe-and-turkey/",
+          "scheduled_at": "2026-09-21T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d66-4",
+          "title": "Cases Brought by Turkish Companies Before the Court of Justice of the European Union",
+          "url": "https://cindemir.av.tr/en/cases-brought-by-turkish-companies-before-the-court-of-justice-of-the-european-union/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — cases brought by turkish companies before the court of justice of the european union.\n\nRead the full article:\nhttps://cindemir.av.tr/en/cases-brought-by-turkish-companies-before-the-court-of-justice-of-the-european-union/",
+          "scheduled_at": "2026-09-21T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d66-5",
+          "title": "Intentional Injury Resulting in Death under Turkish Criminal Law",
+          "url": "https://cindemir.av.tr/en/intentional-injury-resulting-in-death-under-turkish-criminal-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — intentional injury resulting in death under turkish criminal law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/intentional-injury-resulting-in-death-under-turkish-criminal-law/",
+          "scheduled_at": "2026-09-21T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 67,
+      "date": "2026-09-22",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d67-1",
+          "title": "Legal Rights of Foreign Nationals in Police Custody in Istanbul Asian Side",
+          "url": "https://cindemir.av.tr/en/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul-asian-side/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — legal rights of foreign nationals in police custody in istanbul asian side.\n\nRead the full article:\nhttps://cindemir.av.tr/en/legal-rights-of-foreign-nationals-in-police-custody-in-istanbul-asian-side/",
+          "scheduled_at": "2026-09-22T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d67-2",
+          "title": "How to Apply to the European Court of Human Rights Echr Conditions and Procedure",
+          "url": "https://cindemir.av.tr/en/how-to-apply-to-the-european-court-of-human-rights-echr-conditions-and-procedure/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — how to apply to the european court of human rights echr conditions and procedure.\n\nRead the full article:\nhttps://cindemir.av.tr/en/how-to-apply-to-the-european-court-of-human-rights-echr-conditions-and-procedure/",
+          "scheduled_at": "2026-09-22T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d67-3",
+          "title": "Fraud Allegations Arising From Binance P2p Transactions in Turkey Does Criminal Liability Arise in Every Transaction",
+          "url": "https://cindemir.av.tr/en/fraud-allegations-arising-from-binance-p2p-transactions-in-turkey-does-criminal-liability-arise-in-every-transaction/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — fraud allegations arising from binance p2p transactions in turkey does criminal liability arise in every transaction.\n\nRead the full article:\nhttps://cindemir.av.tr/en/fraud-allegations-arising-from-binance-p2p-transactions-in-turkey-does-criminal-liability-arise-in-every-transaction/",
+          "scheduled_at": "2026-09-22T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d67-4",
+          "title": "Hukuki Mutalaa Ile Uzman Gorusu Arasindaki Ayrim Ve Uygulamadaki Onemi",
+          "url": "https://cindemir.av.tr/en/hukuki-mutalaa-ile-uzman-gorusu-arasindaki-ayrim-ve-uygulamadaki-onemi/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hukuki mutalaa ile uzman gorusu arasindaki ayrim ve uygulamadaki onemi.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hukuki-mutalaa-ile-uzman-gorusu-arasindaki-ayrim-ve-uygulamadaki-onemi/",
+          "scheduled_at": "2026-09-22T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d67-5",
+          "title": "Offences of Bodily Harm under Turkish Law",
+          "url": "https://cindemir.av.tr/en/offences-of-bodily-harm-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — offences of bodily harm under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/offences-of-bodily-harm-under-turkish-law/",
+          "scheduled_at": "2026-09-22T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
