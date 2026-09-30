@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 60,
+    "scheduled_posts": 115,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-09-22",
+    "date_range": "2026-07-18 → 2026-10-03",
     "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
@@ -3276,6 +3276,523 @@
           "url": "https://cindemir.av.tr/en/offences-of-bodily-harm-under-turkish-law/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — offences of bodily harm under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/offences-of-bodily-harm-under-turkish-law/",
           "scheduled_at": "2026-09-22T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 68,
+      "date": "2026-09-23",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d68-1",
+          "title": "Certificate of Divorce in Turkey How to Obtain It with Apostille",
+          "url": "https://cindemir.av.tr/en/certificate-of-divorce-in-turkey-how-to-obtain-it-with-apostille/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — certificate of divorce in turkey how to obtain it with apostille.\n\nRead the full article:\nhttps://cindemir.av.tr/en/certificate-of-divorce-in-turkey-how-to-obtain-it-with-apostille/",
+          "scheduled_at": "2026-09-23T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d68-2",
+          "title": "Limits of the Will under Turkish Law",
+          "url": "https://cindemir.av.tr/en/limits-of-the-will-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — limits of the will under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/limits-of-the-will-under-turkish-law/",
+          "scheduled_at": "2026-09-23T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d68-3",
+          "title": "How to Obtain Turkish Citizenship",
+          "url": "https://cindemir.av.tr/en/how-to-obtain-turkish-citizenship/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — how to obtain turkish citizenship.\n\nRead the full article:\nhttps://cindemir.av.tr/en/how-to-obtain-turkish-citizenship/",
+          "scheduled_at": "2026-09-23T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d68-4",
+          "title": "Crypto Asset Law a Comparison of Mica and Turkish Law No 7518",
+          "url": "https://cindemir.av.tr/en/crypto-asset-law-a-comparison-of-mica-and-turkish-law-no-7518/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset law a comparison of mica and turkish law no 7518.\n\nRead the full article:\nhttps://cindemir.av.tr/en/crypto-asset-law-a-comparison-of-mica-and-turkish-law-no-7518/",
+          "scheduled_at": "2026-09-23T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d68-5",
+          "title": "Crypto Asset Regulation under the Turkish Capital Markets Law",
+          "url": "https://cindemir.av.tr/en/crypto-asset-regulation-under-the-turkish-capital-markets-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — crypto asset regulation under the turkish capital markets law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/crypto-asset-regulation-under-the-turkish-capital-markets-law/",
+          "scheduled_at": "2026-09-23T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 69,
+      "date": "2026-09-24",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d69-1",
+          "title": "Security Crypto Assets under Turkish Law",
+          "url": "https://cindemir.av.tr/en/security-crypto-assets-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — security crypto assets under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/security-crypto-assets-under-turkish-law/",
+          "scheduled_at": "2026-09-24T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d69-2",
+          "title": "Electronic Money Crypto Assets under Turkish Law",
+          "url": "https://cindemir.av.tr/en/electronic-money-crypto-assets-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — electronic money crypto assets under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/electronic-money-crypto-assets-under-turkish-law/",
+          "scheduled_at": "2026-09-24T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d69-3",
+          "title": "Utility Crypto Assets under Turkish Law",
+          "url": "https://cindemir.av.tr/en/utility-crypto-assets-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — utility crypto assets under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/utility-crypto-assets-under-turkish-law/",
+          "scheduled_at": "2026-09-24T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d69-4",
+          "title": "Criminal Record Certificate in Turkey How to Obtain and Legalize a Turkish Police Clearance Certificate",
+          "url": "https://cindemir.av.tr/en/criminal-record-certificate-in-turkey-how-to-obtain-and-legalize-a-turkish-police-clearance-certificate/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — criminal record certificate in turkey how to obtain and legalize a turkish police clearance certificate.\n\nRead the full article:\nhttps://cindemir.av.tr/en/criminal-record-certificate-in-turkey-how-to-obtain-and-legalize-a-turkish-police-clearance-certificate/",
+          "scheduled_at": "2026-09-24T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d69-5",
+          "title": "What Can Get You Detained At the Airport in Turkey",
+          "url": "https://cindemir.av.tr/en/what-can-get-you-detained-at-the-airport-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — what can get you detained at the airport in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/what-can-get-you-detained-at-the-airport-in-turkey/",
+          "scheduled_at": "2026-09-24T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 70,
+      "date": "2026-09-25",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d70-1",
+          "title": "Turkey Criminal Record Check a Guide for Understanding the Process",
+          "url": "https://cindemir.av.tr/en/turkey-criminal-record-check-a-guide-for-understanding-the-process/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkey criminal record check a guide for understanding the process.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkey-criminal-record-check-a-guide-for-understanding-the-process/",
+          "scheduled_at": "2026-09-25T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d70-2",
+          "title": "Tourism Law in Turkey",
+          "url": "https://cindemir.av.tr/en/tourism-law-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — tourism law in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/tourism-law-in-turkey/",
+          "scheduled_at": "2026-09-25T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d70-3",
+          "title": "Consensual Divorce in Turkey Uncontested Divorce",
+          "url": "https://cindemir.av.tr/en/consensual-divorce-in-turkey-uncontested-divorce/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — consensual divorce in turkey uncontested divorce.\n\nRead the full article:\nhttps://cindemir.av.tr/en/consensual-divorce-in-turkey-uncontested-divorce/",
+          "scheduled_at": "2026-09-25T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d70-4",
+          "title": "What Is a Dao Legal Status in Turkey",
+          "url": "https://cindemir.av.tr/en/what-is-a-dao-legal-status-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — what is a dao legal status in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/what-is-a-dao-legal-status-in-turkey/",
+          "scheduled_at": "2026-09-25T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d70-5",
+          "title": "Smart Contracts Turkish Law",
+          "url": "https://cindemir.av.tr/en/smart-contracts-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — smart contracts turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/smart-contracts-turkish-law/",
+          "scheduled_at": "2026-09-25T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 71,
+      "date": "2026-09-26",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d71-1",
+          "title": "Food Poisoning All Inclusive Hotel Turkey",
+          "url": "https://cindemir.av.tr/en/food-poisoning-all-inclusive-hotel-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — food poisoning all inclusive hotel turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/food-poisoning-all-inclusive-hotel-turkey/",
+          "scheduled_at": "2026-09-26T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d71-2",
+          "title": "Recognition and Enforcement of Uzbekistan Court Judgments in Turkey Treaty Based Grounds and Procedural Framework",
+          "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-uzbekistan-court-judgments-in-turkey-treaty-based-grounds-and-procedural-framework/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition and enforcement of uzbekistan court judgments in turkey treaty based grounds and procedural framework.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-and-enforcement-of-uzbekistan-court-judgments-in-turkey-treaty-based-grounds-and-procedural-framework/",
+          "scheduled_at": "2026-09-26T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d71-3",
+          "title": "Slip and Fall Accidents Hotels Turkey",
+          "url": "https://cindemir.av.tr/en/slip-and-fall-accidents-hotels-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — slip and fall accidents hotels turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/slip-and-fall-accidents-hotels-turkey/",
+          "scheduled_at": "2026-09-26T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d71-4",
+          "title": "Hotel Elevator Accidents Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-elevator-accidents-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel elevator accidents turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-elevator-accidents-turkey/",
+          "scheduled_at": "2026-09-26T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d71-5",
+          "title": "Hotel Balcony Falls Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-balcony-falls-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel balcony falls turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-balcony-falls-turkey/",
+          "scheduled_at": "2026-09-26T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 72,
+      "date": "2026-09-27",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d72-1",
+          "title": "Recognition and Enforcement of German Court Judgments in Turkey the Principle of Reciprocity and Practical Guidelines",
+          "url": "https://cindemir.av.tr/en/recognition-and-enforcement-of-german-court-judgments-in-turkey-the-principle-of-reciprocity-and-practical-guidelines/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — recognition and enforcement of german court judgments in turkey the principle of reciprocity and practical guidelines.\n\nRead the full article:\nhttps://cindemir.av.tr/en/recognition-and-enforcement-of-german-court-judgments-in-turkey-the-principle-of-reciprocity-and-practical-guidelines/",
+          "scheduled_at": "2026-09-27T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d72-2",
+          "title": "Hotel Accident Claims in Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-accident-claims-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel accident claims in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-accident-claims-in-turkey/",
+          "scheduled_at": "2026-09-27T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d72-3",
+          "title": "Insurance Arbitration and Compensation Claims Regarding Road Accidents in Turkey",
+          "url": "https://cindemir.av.tr/en/insurance-arbitration-and-compensation-claims-regarding-road-accidents-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — insurance arbitration and compensation claims regarding road accidents in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/insurance-arbitration-and-compensation-claims-regarding-road-accidents-in-turkey/",
+          "scheduled_at": "2026-09-27T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d72-4",
+          "title": "Compensation for Pedestrian Collisions in Turkey Know Your Legal Rights",
+          "url": "https://cindemir.av.tr/en/compensation-for-pedestrian-collisions-in-turkey-know-your-legal-rights/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation for pedestrian collisions in turkey know your legal rights.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-for-pedestrian-collisions-in-turkey-know-your-legal-rights/",
+          "scheduled_at": "2026-09-27T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d72-5",
+          "title": "Who Is Responsible Hotel Accident Turkey",
+          "url": "https://cindemir.av.tr/en/who-is-responsible-hotel-accident-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — who is responsible hotel accident turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/who-is-responsible-hotel-accident-turkey/",
+          "scheduled_at": "2026-09-27T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 73,
+      "date": "2026-09-28",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d73-1",
+          "title": "Hotel Swimming Pool Accidents Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-swimming-pool-accidents-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel swimming pool accidents turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-swimming-pool-accidents-turkey/",
+          "scheduled_at": "2026-09-28T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d73-2",
+          "title": "Car Collisions in Turkey and Injury Claims",
+          "url": "https://cindemir.av.tr/en/car-collisions-in-turkey-and-injury-claims/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — car collisions in turkey and injury claims.\n\nRead the full article:\nhttps://cindemir.av.tr/en/car-collisions-in-turkey-and-injury-claims/",
+          "scheduled_at": "2026-09-28T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d73-3",
+          "title": "Compensation for Traffic Accidents Involving Foreign Nationals in Turkey",
+          "url": "https://cindemir.av.tr/en/compensation-for-traffic-accidents-involving-foreign-nationals-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation for traffic accidents involving foreign nationals in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-for-traffic-accidents-involving-foreign-nationals-in-turkey/",
+          "scheduled_at": "2026-09-28T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d73-4",
+          "title": "Death At a Hotel in Turkey",
+          "url": "https://cindemir.av.tr/en/death-at-a-hotel-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — death at a hotel in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/death-at-a-hotel-in-turkey/",
+          "scheduled_at": "2026-09-28T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d73-5",
+          "title": "Compensation Hotel Accidents Turkey",
+          "url": "https://cindemir.av.tr/en/compensation-hotel-accidents-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation hotel accidents turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-hotel-accidents-turkey/",
+          "scheduled_at": "2026-09-28T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 74,
+      "date": "2026-09-29",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d74-1",
+          "title": "Hotel Water Slide Aquapark Accidents Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-water-slide-aquapark-accidents-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel water slide aquapark accidents turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-water-slide-aquapark-accidents-turkey/",
+          "scheduled_at": "2026-09-29T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d74-2",
+          "title": "Hotel Spa Turkish Bath Sauna Accidents Turkey",
+          "url": "https://cindemir.av.tr/en/hotel-spa-turkish-bath-sauna-accidents-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — hotel spa turkish bath sauna accidents turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/hotel-spa-turkish-bath-sauna-accidents-turkey/",
+          "scheduled_at": "2026-09-29T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d74-3",
+          "title": "International Marriage Certificate Form B Turkey Marriage Records",
+          "url": "https://cindemir.av.tr/en/international-marriage-certificate-form-b-turkey-marriage-records/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international marriage certificate form b turkey marriage records.\n\nRead the full article:\nhttps://cindemir.av.tr/en/international-marriage-certificate-form-b-turkey-marriage-records/",
+          "scheduled_at": "2026-09-29T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d74-4",
+          "title": "International Apostille Services in Istanbul",
+          "url": "https://cindemir.av.tr/en/international-apostille-services-in-istanbul/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international apostille services in istanbul.\n\nRead the full article:\nhttps://cindemir.av.tr/en/international-apostille-services-in-istanbul/",
+          "scheduled_at": "2026-09-29T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d74-5",
+          "title": "Title Deeds Tapu Research in Ottoman Archieve",
+          "url": "https://cindemir.av.tr/en/title-deeds-tapu-research-in-ottoman-archieve/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — title deeds tapu research in ottoman archieve.\n\nRead the full article:\nhttps://cindemir.av.tr/en/title-deeds-tapu-research-in-ottoman-archieve/",
+          "scheduled_at": "2026-09-29T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 75,
+      "date": "2026-09-30",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d75-1",
+          "title": "Financial Entitlements for Daughters under Turkish Social Security Law",
+          "url": "https://cindemir.av.tr/en/financial-entitlements-for-daughters-under-turkish-social-security-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — financial entitlements for daughters under turkish social security law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/financial-entitlements-for-daughters-under-turkish-social-security-law/",
+          "scheduled_at": "2026-09-30T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d75-2",
+          "title": "International Death Certificate Form C and Procedures for Obtaining in Turkey",
+          "url": "https://cindemir.av.tr/en/international-death-certificate-form-c-and-procedures-for-obtaining-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international death certificate form c and procedures for obtaining in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/international-death-certificate-form-c-and-procedures-for-obtaining-in-turkey/",
+          "scheduled_at": "2026-09-30T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d75-3",
+          "title": "Homicide and Suicide under Turkish Law",
+          "url": "https://cindemir.av.tr/en/homicide-and-suicide-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — homicide and suicide under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/homicide-and-suicide-under-turkish-law/",
+          "scheduled_at": "2026-09-30T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d75-4",
+          "title": "Domuz Kasapligi Pig Butchering Dolandiriciligi Kripto Yatirim Tuzagina Dusmemek Icin Bilinmesi Gerekenler",
+          "url": "https://cindemir.av.tr/en/domuz-kasapligi-pig-butchering-dolandiriciligi-kripto-yatirim-tuzagina-dusmemek-icin-bilinmesi-gerekenler/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — domuz kasapligi pig butchering dolandiriciligi kripto yatirim tuzagina dusmemek icin bilinmesi gerekenler.\n\nRead the full article:\nhttps://cindemir.av.tr/en/domuz-kasapligi-pig-butchering-dolandiriciligi-kripto-yatirim-tuzagina-dusmemek-icin-bilinmesi-gerekenler/",
+          "scheduled_at": "2026-09-30T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d75-5",
+          "title": "Webcam Blackmail under Turkish Law",
+          "url": "https://cindemir.av.tr/en/webcam-blackmail-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — webcam blackmail under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/webcam-blackmail-under-turkish-law/",
+          "scheduled_at": "2026-09-30T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 76,
+      "date": "2026-10-01",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d76-1",
+          "title": "Compensationstraffic",
+          "url": "https://cindemir.av.tr/en/compensationstraffic/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensationstraffic.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensationstraffic/",
+          "scheduled_at": "2026-10-01T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d76-2",
+          "title": "Wrongful Death Claim in Turkey under Turkish Law",
+          "url": "https://cindemir.av.tr/en/wrongful-death-claim-in-turkey-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — wrongful death claim in turkey under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/wrongful-death-claim-in-turkey-under-turkish-law/",
+          "scheduled_at": "2026-10-01T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d76-3",
+          "title": "To File a Case in Turkey Petition",
+          "url": "https://cindemir.av.tr/en/to-file-a-case-in-turkey-petition/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — to file a case in turkey petition.\n\nRead the full article:\nhttps://cindemir.av.tr/en/to-file-a-case-in-turkey-petition/",
+          "scheduled_at": "2026-10-01T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d76-4",
+          "title": "Narcotic Crimes Drugs and Cordials in Turkish Penal Code",
+          "url": "https://cindemir.av.tr/en/narcotic-crimes-drugs-and-cordials-in-turkish-penal-code/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — narcotic crimes drugs and cordials in turkish penal code.\n\nRead the full article:\nhttps://cindemir.av.tr/en/narcotic-crimes-drugs-and-cordials-in-turkish-penal-code/",
+          "scheduled_at": "2026-10-01T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d76-5",
+          "title": "Airport Customs Seizures and Smuggling Offences under Turkish Law",
+          "url": "https://cindemir.av.tr/en/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — airport customs seizures and smuggling offences under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/airport-customs-seizures-and-smuggling-offences-under-turkish-law/",
+          "scheduled_at": "2026-10-01T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 77,
+      "date": "2026-10-02",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d77-1",
+          "title": "Personal Injury Liability in Turkey",
+          "url": "https://cindemir.av.tr/en/personal-injury-liability-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — personal injury liability in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/personal-injury-liability-in-turkey/",
+          "scheduled_at": "2026-10-02T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d77-2",
+          "title": "To Obtain Criminal Record Certificate in Turkey",
+          "url": "https://cindemir.av.tr/en/to-obtain-criminal-record-certificate-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — to obtain criminal record certificate in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/to-obtain-criminal-record-certificate-in-turkey/",
+          "scheduled_at": "2026-10-02T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d77-3",
+          "title": "Social Media Defamation in Turkey Legal Remedies Against Online Insults and Anonymous Accounts",
+          "url": "https://cindemir.av.tr/en/social-media-defamation-in-turkey-legal-remedies-against-online-insults-and-anonymous-accounts/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — social media defamation in turkey legal remedies against online insults and anonymous accounts.\n\nRead the full article:\nhttps://cindemir.av.tr/en/social-media-defamation-in-turkey-legal-remedies-against-online-insults-and-anonymous-accounts/",
+          "scheduled_at": "2026-10-02T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d77-4",
+          "title": "Appointment of a Turkish Lawyer by Power of Attorney",
+          "url": "https://cindemir.av.tr/en/appointment-of-a-turkish-lawyer-by-power-of-attorney/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — appointment of a turkish lawyer by power of attorney.\n\nRead the full article:\nhttps://cindemir.av.tr/en/appointment-of-a-turkish-lawyer-by-power-of-attorney/",
+          "scheduled_at": "2026-10-02T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d77-5",
+          "title": "Attorney Partnership Regulations of the Union of Bar Associations of Turkey",
+          "url": "https://cindemir.av.tr/en/attorney-partnership-regulations-of-the-union-of-bar-associations-of-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — attorney partnership regulations of the union of bar associations of turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/attorney-partnership-regulations-of-the-union-of-bar-associations-of-turkey/",
+          "scheduled_at": "2026-10-02T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 78,
+      "date": "2026-10-03",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d78-1",
+          "title": "Demolition Orders in Turkiye Judicial Annulment and Stay of Execution",
+          "url": "https://cindemir.av.tr/en/demolition-orders-in-turkiye-judicial-annulment-and-stay-of-execution/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — demolition orders in turkiye judicial annulment and stay of execution.\n\nRead the full article:\nhttps://cindemir.av.tr/en/demolition-orders-in-turkiye-judicial-annulment-and-stay-of-execution/",
+          "scheduled_at": "2026-10-03T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d78-2",
+          "title": "Methods of Debt Collection in the Light of Turkish Law",
+          "url": "https://cindemir.av.tr/en/methods-of-debt-collection-in-the-light-of-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — methods of debt collection in the light of turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/methods-of-debt-collection-in-the-light-of-turkish-law/",
+          "scheduled_at": "2026-10-03T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d78-3",
+          "title": "Enforcement of Promissory Notes Bills of Exchange and Cheques in Turkey 2",
+          "url": "https://cindemir.av.tr/en/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey-2/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — enforcement of promissory notes bills of exchange and cheques in turkey 2.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-of-promissory-notes-bills-of-exchange-and-cheques-in-turkey-2/",
+          "scheduled_at": "2026-10-03T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d78-4",
+          "title": "Malpractice Cases in Turkey",
+          "url": "https://cindemir.av.tr/en/malpractice-cases-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — malpractice cases in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/malpractice-cases-in-turkey/",
+          "scheduled_at": "2026-10-03T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d78-5",
+          "title": "Turkeys 2026 Asset Repatriation Regime Bringing Foreign Assets to Turkey under Law No 7582",
+          "url": "https://cindemir.av.tr/en/turkeys-2026-asset-repatriation-regime-bringing-foreign-assets-to-turkey-under-law-no-7582/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkeys 2026 asset repatriation regime bringing foreign assets to turkey under law no 7582.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkeys-2026-asset-repatriation-regime-bringing-foreign-assets-to-turkey-under-law-no-7582/",
+          "scheduled_at": "2026-10-03T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
