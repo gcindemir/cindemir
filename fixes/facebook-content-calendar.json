@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 115,
+    "scheduled_posts": 130,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-10-03",
+    "date_range": "2026-07-18 → 2026-10-06",
     "published_posts": 275,
     "last_publish_run": "2026-08-30T18:51:55.860076+00:00"
   },
@@ -3793,6 +3793,147 @@
           "url": "https://cindemir.av.tr/en/turkeys-2026-asset-repatriation-regime-bringing-foreign-assets-to-turkey-under-law-no-7582/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkeys 2026 asset repatriation regime bringing foreign assets to turkey under law no 7582.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkeys-2026-asset-repatriation-regime-bringing-foreign-assets-to-turkey-under-law-no-7582/",
           "scheduled_at": "2026-10-03T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 79,
+      "date": "2026-10-04",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d79-1",
+          "title": "Turkish Procedural Law",
+          "url": "https://cindemir.av.tr/en/turkish-procedural-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish procedural law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkish-procedural-law/",
+          "scheduled_at": "2026-10-04T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d79-2",
+          "title": "Electric Distribution and Transmission in Turkey",
+          "url": "https://cindemir.av.tr/en/electric-distribution-and-transmission-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — electric distribution and transmission in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/electric-distribution-and-transmission-in-turkey/",
+          "scheduled_at": "2026-10-04T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d79-3",
+          "title": "Compensation Claims Arising From Elevator Accidents in Turkey",
+          "url": "https://cindemir.av.tr/en/compensation-claims-arising-from-elevator-accidents-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation claims arising from elevator accidents in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-claims-arising-from-elevator-accidents-in-turkey/",
+          "scheduled_at": "2026-10-04T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d79-4",
+          "title": "Mandatory Retained Counsel Requirement for Joint Stock Companies in Turkey",
+          "url": "https://cindemir.av.tr/en/mandatory-retained-counsel-requirement-for-joint-stock-companies-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — mandatory retained counsel requirement for joint stock companies in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/mandatory-retained-counsel-requirement-for-joint-stock-companies-in-turkey/",
+          "scheduled_at": "2026-10-04T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d79-5",
+          "title": "How to Divorce in Turkey",
+          "url": "https://cindemir.av.tr/en/how-to-divorce-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — how to divorce in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/how-to-divorce-in-turkey/",
+          "scheduled_at": "2026-10-04T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 80,
+      "date": "2026-10-05",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d80-1",
+          "title": "Turkish Inheritance Law",
+          "url": "https://cindemir.av.tr/en/turkish-inheritance-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — turkish inheritance law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/turkish-inheritance-law/",
+          "scheduled_at": "2026-10-05T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d80-2",
+          "title": "Deportation Law in Turkey",
+          "url": "https://cindemir.av.tr/en/deportation-law-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — deportation law in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/deportation-law-in-turkey/",
+          "scheduled_at": "2026-10-05T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d80-3",
+          "title": "Debt Recovery in Turkey",
+          "url": "https://cindemir.av.tr/en/debt-recovery-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — debt recovery in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/debt-recovery-in-turkey/",
+          "scheduled_at": "2026-10-05T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d80-4",
+          "title": "Testamentary Disposition and Testaments in Turkish Inheritance Law",
+          "url": "https://cindemir.av.tr/en/testamentary-disposition-and-testaments-in-turkish-inheritance-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — testamentary disposition and testaments in turkish inheritance law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/testamentary-disposition-and-testaments-in-turkish-inheritance-law/",
+          "scheduled_at": "2026-10-05T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d80-5",
+          "title": "Child Abduction and Retention under Turkish Criminal Law Article 234 Tpc",
+          "url": "https://cindemir.av.tr/en/child-abduction-and-retention-under-turkish-criminal-law-article-234-tpc/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — child abduction and retention under turkish criminal law article 234 tpc.\n\nRead the full article:\nhttps://cindemir.av.tr/en/child-abduction-and-retention-under-turkish-criminal-law-article-234-tpc/",
+          "scheduled_at": "2026-10-05T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 81,
+      "date": "2026-10-06",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d81-1",
+          "title": "Smart Drug Reimbursement Cases in Turkey New Legal Approach in Sgk Payment Disputes",
+          "url": "https://cindemir.av.tr/en/smart-drug-reimbursement-cases-in-turkey-new-legal-approach-in-sgk-payment-disputes/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — smart drug reimbursement cases in turkey new legal approach in sgk payment disputes.\n\nRead the full article:\nhttps://cindemir.av.tr/en/smart-drug-reimbursement-cases-in-turkey-new-legal-approach-in-sgk-payment-disputes/",
+          "scheduled_at": "2026-10-06T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d81-2",
+          "title": "International Organ Trafficking and Its Legal Implications under Turkish Law",
+          "url": "https://cindemir.av.tr/en/international-organ-trafficking-and-its-legal-implications-under-turkish-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — international organ trafficking and its legal implications under turkish law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/international-organ-trafficking-and-its-legal-implications-under-turkish-law/",
+          "scheduled_at": "2026-10-06T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d81-3",
+          "title": "Compensation Claims Based on the Liability of Building and Structure Owners in Turkey",
+          "url": "https://cindemir.av.tr/en/compensation-claims-based-on-the-liability-of-building-and-structure-owners-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation claims based on the liability of building and structure owners in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-claims-based-on-the-liability-of-building-and-structure-owners-in-turkey/",
+          "scheduled_at": "2026-10-06T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d81-4",
+          "title": "Compensation Claims for Medical Malpractice in Turkey",
+          "url": "https://cindemir.av.tr/en/compensation-claims-for-medical-malpractice-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — compensation claims for medical malpractice in turkey.\n\nRead the full article:\nhttps://cindemir.av.tr/en/compensation-claims-for-medical-malpractice-in-turkey/",
+          "scheduled_at": "2026-10-06T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d81-5",
+          "title": "European Union and Turkey Crypto Assets Regulations Gaps and Recommendations",
+          "url": "https://cindemir.av.tr/en/european-union-and-turkey-crypto-assets-regulations-gaps-and-recommendations/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — european union and turkey crypto assets regulations gaps and recommendations.\n\nRead the full article:\nhttps://cindemir.av.tr/en/european-union-and-turkey-crypto-assets-regulations-gaps-and-recommendations/",
+          "scheduled_at": "2026-10-06T20:00:00+03:00",
           "status": "scheduled"
         }
       ]
