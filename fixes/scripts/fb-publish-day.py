@@ -303,6 +303,11 @@ def main():
     ap.add_argument("--design", action="store_true", help="upload cover + refresh bio")
     ap.add_argument("--no-post", action="store_true")
     ap.add_argument("--limit", type=int, default=5)
+    ap.add_argument(
+        "--cdp",
+        action="store_true",
+        help="Attach to already-open desktop Chrome on 127.0.0.1:9222 (do not kill/relaunch)",
+    )
     args = ap.parse_args()
 
     LOG.write_text("")
@@ -320,23 +325,32 @@ def main():
             f"-o {LOGO}"
         )
 
-    # Avoid matching this shell command line: kill only chrome with this profile
-    os.system(
-        "pgrep -af 'user-data-dir=/home/ubuntu/.chrome-agent' | awk '{print $1}' | "
-        "xargs -r kill -9 2>/dev/null"
-    )
-    time.sleep(2)
+    own_ctx = False
+    if not args.cdp:
+        # Avoid matching this shell command line: kill only chrome with this profile
+        os.system(
+            "pgrep -af 'user-data-dir=/home/ubuntu/.chrome-agent' | awk '{print $1}' | "
+            "xargs -r kill -9 2>/dev/null"
+        )
+        time.sleep(2)
 
     with sync_playwright() as p:
-        ctx = p.chromium.launch_persistent_context(
-            str(PROFILE),
-            headless=False,
-            channel="chrome",
-            args=["--no-sandbox", "--disable-dev-shm-usage"],
-            env={**os.environ, "DISPLAY": ":1"},
-            viewport={"width": 1500, "height": 950},
-        )
-        page = ctx.pages[0] if ctx.pages else ctx.new_page()
+        if args.cdp:
+            browser = p.chromium.connect_over_cdp("http://127.0.0.1:9222")
+            ctx = browser.contexts[0] if browser.contexts else browser.new_context()
+            page = ctx.pages[0] if ctx.pages else ctx.new_page()
+            log("attached to desktop Chrome via CDP")
+        else:
+            own_ctx = True
+            ctx = p.chromium.launch_persistent_context(
+                str(PROFILE),
+                headless=False,
+                channel="chrome",
+                args=["--no-sandbox", "--disable-dev-shm-usage"],
+                env={**os.environ, "DISPLAY": ":1"},
+                viewport={"width": 1500, "height": 950},
+            )
+            page = ctx.pages[0] if ctx.pages else ctx.new_page()
 
         if args.design:
             try:
@@ -371,7 +385,8 @@ def main():
         page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
         time.sleep(5)
         snap(page, "day-final")
-        ctx.close()
+        if own_ctx:
+            ctx.close()
 
     if fail == 0 and ok > 0:
         day["status"] = "published"
