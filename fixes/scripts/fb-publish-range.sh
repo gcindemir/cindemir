@@ -14,7 +14,7 @@ fi
 
 for day in $DAYS; do
   echo "===== DAY $day $(date -u +%H:%M:%S) ====="
-  python3 -u fixes/scripts/fb-publish-day.py --day "$day" $CDP_FLAG 2>&1 | tee "/tmp/fb-day${day}.log"
+  python3 -u fixes/scripts/fb-publish-day.py --day "$day" $CDP_FLAG 2>&1 | tee "/tmp/fb-day${day}.log" || true
   echo "exit:${PIPESTATUS[0]}"
 done
 

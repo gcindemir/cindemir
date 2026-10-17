@@ -6,6 +6,7 @@ Usage: python3 fb-publish-day.py --day 1 [--design] [--no-post]
 import argparse
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -30,24 +31,74 @@ def log(msg):
         f.write(msg + "\n")
 
 
+def fb_safe_text(text: str) -> str:
+    """Meta One blocks further posts that contain links/domains this month (2 used).
+
+    Keep the English summary and title; drop URLs/domains so İleri can reach Paylaş.
+    """
+    t = re.sub(r"https?://\S+", "", text)
+    t = re.sub(r"\b(?:www\.)?cindemir(?:law)?\.(?:av\.tr|com)(?:/\S*)?", "", t, flags=re.I)
+    lines = []
+    for ln in t.splitlines():
+        s = ln.strip().lower().rstrip(":")
+        if s in {"read the full article", "read more", "full article"}:
+            continue
+        lines.append(ln)
+    t = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+    if "search this article title" not in t.lower():
+        t += "\n\nSearch this article title on the Cindemir Law Office English site."
+    return t
+
+
 def snap(page, name):
     page.screenshot(path=str(ROOT / f"fixes/fb-pub-{name}.png"), full_page=True)
 
 
-def close_popups(page):
+def close_popups(page, *, allow_escape=False):
+    if allow_escape:
+        for _ in range(2):
+            try:
+                page.keyboard.press("Escape")
+                time.sleep(0.2)
+            except Exception:
+                pass
     for sel in ['[aria-label="Kapat"]', '[aria-label="Close"]']:
         try:
-            if page.locator(sel).count():
-                page.locator(sel).first.click(timeout=1500)
+            loc = page.locator(sel)
+            if loc.count():
+                loc.last.click(timeout=1500, force=True)
         except Exception:
             pass
+    try:
+        body = page.locator("body").inner_text(timeout=4000)
+        if "Meta One" in body and ("bağlantı" in body.lower() or "abon" in body.lower()):
+            for sel in ['[aria-label="Kapat"]', '[aria-label="Close"]']:
+                loc = page.locator(sel)
+                if loc.count():
+                    loc.last.click(timeout=1500, force=True)
+                    time.sleep(0.5)
+                    break
+    except Exception:
+        pass
 
 
 def assert_page(page):
-    body = page.locator("body").inner_text(timeout=15000)
-    if "Cindemir" not in body:
+    url = page.url.lower()
+    if PAGE_ID not in page.url and "cindemir" not in url:
         raise RuntimeError(f"not on Cindemir page: {page.url}")
-    if "Karadeniz" in body or "Ereğli" in body:
+    heading = ""
+    for sel in ['h1', '[role="main"] h1', 'title']:
+        try:
+            loc = page.locator(sel)
+            if loc.count():
+                heading = loc.first.inner_text(timeout=3000)
+                break
+        except Exception:
+            pass
+    if heading and "Cindemir" not in heading and PAGE_ID not in page.url:
+        raise RuntimeError(f"not on Cindemir page heading={heading!r} url={page.url}")
+    # Identity check: reject the unrelated local-association page, not sidebar shortcuts
+    if "karadeniz" in url or "eregli" in url:
         raise RuntimeError("wrong business page")
 
 
@@ -224,9 +275,10 @@ def open_composer(page):
 
 
 def publish_post(page, text, idx):
+    text = fb_safe_text(text)
     page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
     time.sleep(5)
-    close_popups(page)
+    close_popups(page, allow_escape=True)
     assert_page(page)
 
     opened = False
@@ -257,27 +309,131 @@ def publish_post(page, text, idx):
     time.sleep(3)
     snap(page, f"post-{idx}-draft")
 
-    # Next then Share (new Pages UI) OR direct Paylaş
-    page.get_by_text("İleri", exact=True).last.click(timeout=8000, force=True)
-    time.sleep(3)
+    def dismiss_meta_one():
+        """Close the Meta One upsell card (gray X, top-right of the card — not composer Close)."""
+        try:
+            info = page.evaluate(
+                """() => {
+                  const needle = 'Meta One ile bağlantılardan';
+                  const nodes = [...document.querySelectorAll('span,div,h1,h2,h3')].filter(el => {
+                    const t = (el.innerText || '').trim();
+                    return t.startsWith(needle) && t.length < 90;
+                  });
+                  if (!nodes.length) return {r: 'none'};
+                  nodes.sort((a, b) => {
+                    const ra = a.getBoundingClientRect();
+                    const rb = b.getBoundingClientRect();
+                    return (ra.width * ra.height) - (rb.width * rb.height);
+                  });
+                  const hit = nodes[0];
+                  let root = hit;
+                  for (let i = 0; i < 22 && root.parentElement; i++) {
+                    root = root.parentElement;
+                    const txt = root.innerText || '';
+                    const r = root.getBoundingClientRect();
+                    const looksModal = r.width >= 360 && r.width <= 820 && r.height >= 220 && r.height <= 720
+                      && (txt.includes("Meta One'a abone") || txt.includes('Daha fazla bilgi')
+                          || txt.includes('bağlantı içeren'));
+                    if (!looksModal) continue;
+                    const closes = [...root.querySelectorAll('[aria-label], [role="button"], button')];
+                    for (const el of closes) {
+                      const a = (el.getAttribute('aria-label') || '').trim();
+                      const b = el.getBoundingClientRect();
+                      const inCorner = b.width > 8 && b.width < 56 && b.height < 56
+                        && b.x > r.x + r.width * 0.72 && b.y < r.y + 70 && b.y >= r.y - 8;
+                      if ((a === 'Kapat' || a === 'Close') && inCorner) {
+                        el.click();
+                        return {r: 'clicked', x: b.x + b.width / 2, y: b.y + b.height / 2};
+                      }
+                      if (inCorner && a !== 'Kapat' && a !== 'Close') {
+                        // likely the circular X without a useful label
+                        el.click();
+                        return {r: 'corner', x: b.x + b.width / 2, y: b.y + b.height / 2};
+                      }
+                    }
+                    return {
+                      r: 'needmouse',
+                      x: r.x + r.width - 22,
+                      y: r.y + 22,
+                      rw: r.width, rh: r.height, rx: r.x, ry: r.y,
+                    };
+                  }
+                  const hb = hit.getBoundingClientRect();
+                  return {r: 'heading', x: hb.x + hb.width - 8, y: hb.y - 18, hw: hb.width, hx: hb.x, hy: hb.y};
+                }"""
+            )
+        except Exception as e:
+            log(f"meta-one eval {e}")
+            return False
+        log(f"meta-one dismiss={info}")
+        if info.get("r") in ("none",):
+            return False
+        if info.get("r") in ("clicked", "corner"):
+            time.sleep(1)
+            return True
+        x, y = info.get("x"), info.get("y")
+        if x and y:
+            page.mouse.click(x, y)
+            time.sleep(1)
+            log(f"meta-one mouse {x:.0f},{y:.0f}")
+            return True
+        return False
 
-    dialog = page.locator('div[role="dialog"]').filter(has_text="Şimdi yayınla")
-    if not dialog.count():
-        dialog = page.locator('div[role="dialog"]').filter(has_text="Gönderi ayarları")
-    share = dialog.last.get_by_role("button", name="Paylaş", exact=True) if dialog.count() else page.get_by_role("button", name="Paylaş", exact=True)
-    if share.count():
-        share.last.click(timeout=12000, force=True)
-    else:
-        page.evaluate(
-            """() => {
-              const dialogs=[...document.querySelectorAll('[role=dialog]')];
-              const d=dialogs.find(x => x.innerText.includes('Şimdi yayınla')) || dialogs.at(-1);
-              const cand=[...d.querySelectorAll('[role=button],button')]
-                .filter(el => el.innerText.trim()==='Paylaş');
-              if(!cand.length) throw new Error('no Paylaş');
-              cand.at(-1).click();
-            }"""
+    for _ in range(3):
+        if not dismiss_meta_one():
+            break
+
+    def click_dialog_label(name):
+        """Mouse-click the largest visible control with exact label inside a dialog."""
+        info = page.evaluate(
+            """(name) => {
+              const hits = [];
+              for (const d of document.querySelectorAll('[role=dialog]')) {
+                const dt = (d.innerText || '').slice(0, 60);
+                if (dt.includes('Bildirimler') && name !== 'Kapat') continue;
+                for (const el of d.querySelectorAll('[role=button], button')) {
+                  const t = (el.innerText || '').trim();
+                  if (t !== name) continue;
+                  const r = el.getBoundingClientRect();
+                  if (r.width >= 48 && r.height >= 24 && r.y >= 0 && r.x >= 0)
+                    hits.push({x: r.x + r.width / 2, y: r.y + r.height / 2, w: r.width, h: r.height, dt});
+                }
+              }
+              hits.sort((a, b) => (b.w * b.h) - (a.w * a.h));
+              return hits[0] || null;
+            }""",
+            name,
         )
+        if not info:
+            log(f"click {name}: no dialog hit")
+            return False
+        page.mouse.click(info["x"], info["y"])
+        log(f"click {name} @ {info['x']:.0f},{info['y']:.0f} {info['w']:.0f}x{info['h']:.0f}")
+        return True
+
+    settings_ok = False
+    for _ in range(8):
+        dismiss_meta_one()
+        if page.get_by_text("Gönderi ayarları", exact=True).count():
+            settings_ok = True
+            break
+        if not click_dialog_label("İleri"):
+            loc = page.get_by_text("İleri", exact=True)
+            if loc.count():
+                box = loc.last.bounding_box()
+                if box:
+                    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                    log("click İleri fallback bbox")
+        time.sleep(2.5)
+        dismiss_meta_one()
+        if page.get_by_text("Gönderi ayarları", exact=True).count():
+            settings_ok = True
+            break
+    if not settings_ok:
+        page.get_by_text("Gönderi ayarları", exact=True).first.wait_for(state="visible", timeout=8000)
+    time.sleep(1)
+    if not click_dialog_label("Paylaş"):
+        page.get_by_text("Paylaş", exact=True).last.click(timeout=12000, force=True)
     time.sleep(4)
     # dismiss accidental group-share dialog
     body = page.locator("body").inner_text(timeout=10000)
@@ -338,8 +494,15 @@ def main():
         if args.cdp:
             browser = p.chromium.connect_over_cdp("http://127.0.0.1:9222")
             ctx = browser.contexts[0] if browser.contexts else browser.new_context()
-            page = ctx.pages[0] if ctx.pages else ctx.new_page()
-            log("attached to desktop Chrome via CDP")
+            page = None
+            for pg in ctx.pages:
+                if "facebook.com" in pg.url:
+                    page = pg
+                    break
+            if page is None:
+                page = ctx.pages[0] if ctx.pages else ctx.new_page()
+            page.bring_to_front()
+            log(f"attached to desktop Chrome via CDP url={page.url[:80]}")
         else:
             own_ctx = True
             ctx = p.chromium.launch_persistent_context(
@@ -388,7 +551,8 @@ def main():
         if own_ctx:
             ctx.close()
 
-    if fail == 0 and ok > 0:
+    all_pub = all(p.get("status") == "published" for p in day["posts"])
+    if fail == 0 and ok > 0 and all_pub:
         day["status"] = "published"
     elif ok > 0:
         day["status"] = "partial"
