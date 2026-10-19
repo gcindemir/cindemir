@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 0,
-    "queued_posts": 0,
+    "scheduled_posts": 15,
+    "queued_posts": 15,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-10-06",
+    "date_range": "2026-07-18 → 2026-10-09",
     "published_posts": 405,
     "last_publish_run": "2026-10-17T10:03:17.576439+00:00"
   },
@@ -3935,6 +3935,147 @@
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nThis guide covers the key procedures, documents and risks for foreign clients — european union and turkey crypto assets regulations gaps and recommendations.\n\nRead the full article:\nhttps://cindemir.av.tr/en/european-union-and-turkey-crypto-assets-regulations-gaps-and-recommendations/",
           "scheduled_at": "2026-10-06T20:00:00+03:00",
           "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 82,
+      "date": "2026-10-07",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d82-1",
+          "title": "Enforcement of an UNCITRAL Arbitral Award in Turkey: Important 2026 Court of Cassation Decision",
+          "url": "https://cindemir.av.tr/en/enforcement-uncitral-arbitration-award-turkey-supreme-court-2026/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nTurkey's Court of Cassation upheld enforcement of an UNCITRAL arbitral award in favour of Turkmenistan. Analysis of the New York Convention and Turkish enforcement law.\n\nRead the full article:\nhttps://cindemir.av.tr/en/enforcement-uncitral-arbitration-award-turkey-supreme-court-2026/",
+          "scheduled_at": "2026-10-07T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d82-2",
+          "title": "What Is a DAO and What Is Its Legal Status in Turkey?",
+          "url": "https://cindemirlaw.com/dao-regulation-legal-status-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nLearn about DAO regulation in Turkey, including legal status, token-holder liability and applicable Turkish crypto asset legislation.\n\nRead the full article:\nhttps://cindemirlaw.com/dao-regulation-legal-status-turkey/",
+          "scheduled_at": "2026-10-07T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d82-3",
+          "title": "Are Smart Contracts Legally Enforceable in Turkey?",
+          "url": "https://cindemirlaw.com/smart-contracts-legal-enforceability-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nLegal guide to smart contracts in Turkey for foreign companies, including validity, applicable law, jurisdiction and enforcement.\n\nRead the full article:\nhttps://cindemirlaw.com/smart-contracts-legal-enforceability-turkey/",
+          "scheduled_at": "2026-10-07T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d82-4",
+          "title": "Cautio Judicatum Solvi — Security Payment under Turkish International Private Law",
+          "url": "https://cindemirlaw.com/cautio-judicatum-solvi-security-payment-under-turkish-international-private-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nSecurity for costs (cautio judicatum solvi) that foreign litigants may face in Turkish courts, and how it is applied under private international law.\n\nRead the full article:\nhttps://cindemirlaw.com/cautio-judicatum-solvi-security-payment-under-turkish-international-private-law/",
+          "scheduled_at": "2026-10-07T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d82-5",
+          "title": "Ease Your Business Operations in Turkey with Nominee Director and Shareholder Services",
+          "url": "https://cindemir.av.tr/en/ease-your-business-operations-in-turkey-with-nominee-director-and-shareholder-services/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nNominee director and nominee shareholder services in Turkey: bank account opening for foreign-owned companies, legal structure and associated risks.\n\nRead the full article:\nhttps://cindemir.av.tr/en/ease-your-business-operations-in-turkey-with-nominee-director-and-shareholder-services/",
+          "scheduled_at": "2026-10-07T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 83,
+      "date": "2026-10-08",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d83-1",
+          "title": "Hotel Accident Claims in Turkey",
+          "url": "https://cindemirlaw.com/hotel-accident-claims-in-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nGeneral information on hotel accident claims in Turkey, including insurance coverage, arbitration documents and building-owner liability.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-accident-claims-in-turkey/",
+          "scheduled_at": "2026-10-08T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d83-2",
+          "title": "Ill After Eating at a Hotel in Turkey: What Should You Do?",
+          "url": "https://cindemirlaw.com/food-poisoning-hotel-turkey-what-to-do/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical information for foreign tourists who become ill after eating at a hotel in Turkey, including medical evidence and records to preserve.\n\nRead the full article:\nhttps://cindemirlaw.com/food-poisoning-hotel-turkey-what-to-do/",
+          "scheduled_at": "2026-10-08T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d83-3",
+          "title": "Slipped and Fell at a Hotel in Turkey: What Should You Do?",
+          "url": "https://cindemirlaw.com/slip-and-fall-hotel-turkey-what-to-do/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical information for foreign tourists after a slip and fall at a hotel in Turkey, including evidence to collect before returning home.\n\nRead the full article:\nhttps://cindemirlaw.com/slip-and-fall-hotel-turkey-what-to-do/",
+          "scheduled_at": "2026-10-08T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d83-4",
+          "title": "Fell from a Hotel Balcony in Turkey: What Should the Family Do?",
+          "url": "https://cindemirlaw.com/hotel-balcony-fall-turkey-what-to-do/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical information for foreign tourists and families after a hotel balcony fall in Turkey, including evidence and immediate steps.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-balcony-fall-turkey-what-to-do/",
+          "scheduled_at": "2026-10-08T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d83-5",
+          "title": "Injured on a Water Slide at a Hotel in Turkey?",
+          "url": "https://cindemirlaw.com/injured-hotel-water-slide-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical guidance for foreign tourists on evidence and potential claims after a water slide or hotel aquapark accident in Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/injured-hotel-water-slide-turkey/",
+          "scheduled_at": "2026-10-08T20:00:00+03:00",
+          "status": "scheduled"
+        }
+      ]
+    },
+    {
+      "day": 84,
+      "date": "2026-10-09",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d84-1",
+          "title": "What to Do After a Hotel Spa Accident in Turkey",
+          "url": "https://cindemirlaw.com/hotel-spa-accident-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical guidance for foreign tourists after a burn, fall, massage injury or allergic reaction at a hotel spa in Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-spa-accident-turkey/",
+          "scheduled_at": "2026-10-09T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d84-2",
+          "title": "Injured at a Hotel in Turkey? Evidence to Collect Before Returning Home",
+          "url": "https://cindemirlaw.com/hotel-accident-turkey-evidence-before-returning-home/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nEvidence foreign tourists may consider collecting after a hotel accident in Turkey and before returning home.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-accident-turkey-evidence-before-returning-home/",
+          "scheduled_at": "2026-10-09T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d84-3",
+          "title": "Hotel, Tour Operator or Insurer: Who Should a Foreign Tourist Contact?",
+          "url": "https://cindemirlaw.com/hotel-tour-operator-insurer-accident-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nInformation for foreign tourists on whether the hotel, tour operator, booking company or insurer may be relevant after an accident in Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-tour-operator-insurer-accident-turkey/",
+          "scheduled_at": "2026-10-09T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d84-4",
+          "title": "Software Escrow Agent Services",
+          "url": "https://cindemir.av.tr/en/software-escrow-agent-services/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nSoftware escrow agent agreements: source code deposit, verification and release conditions under escrow arrangements.\n\nRead the full article:\nhttps://cindemir.av.tr/en/software-escrow-agent-services/",
+          "scheduled_at": "2026-10-09T17:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d84-5",
+          "title": "Software Licensing Services",
+          "url": "https://cindemir.av.tr/en/software-licensing-services/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nSoftware licensing in Turkey: licence agreements and intellectual property protection for software overview.\n\nRead the full article:\nhttps://cindemir.av.tr/en/software-licensing-services/",
+          "scheduled_at": "2026-10-09T20:00:00+03:00",
+          "status": "scheduled"
         }
       ]
     }
