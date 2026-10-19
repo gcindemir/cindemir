@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cindemir LCP Safe
  * Description: Design-safe site-wide LCP speedups — WebP, first-viewport opacity unlock, smart image preload. Does not change layout/colors.
- * Version: 1.2.1
+ * Version: 1.3.0
  * Author: Cindemir Law Office
  */
 
@@ -16,7 +16,7 @@ if ( defined( 'CINDEMIR_LCP_SAFE_LOADED' ) ) {
 define( 'CINDEMIR_LCP_SAFE_LOADED', true );
 
 final class Cindemir_LCP_Safe {
-	const VERSION   = '1.2.1';
+	const VERSION   = '1.3.0';
 	const HERO_JPG  = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg';
 	const HERO_WEBP = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430.jpg.webp';
 	const HERO_768  = 'https://cindemirlaw.com/wp-content/uploads/2020/10/540664430-768x512.jpg.webp';
@@ -45,25 +45,7 @@ final class Cindemir_LCP_Safe {
 			return;
 		}
 		echo '<style id="cindemir-lcp-safe" data-v="' . esc_attr( self::VERSION ) . '">'
-			/* Text fonts: prefer swap so LCP text paints (icon fonts stay optional via Enfold). */
-			. '@font-face{font-display:swap!important}'
-			. '.avia-font-entypo-fontello,.av-icon-char{'
-			. 'font-display:optional}'
-			/* —— First section unlock (all pages) —— */
-			. '#top #main .avia-section:first-of-type,'
-			. '#top #main .avia-section:first-of-type .av-special-heading,'
-			. '#top #main .avia-section:first-of-type .av-special-heading-tag,'
-			. '#top #main .avia-section:first-of-type .avia_textblock,'
-			. '#top #main .avia-section:first-of-type .avia_textblock p,'
-			. '#top #main .avia-section:first-of-type .avia_image,'
-			. '#top #main .avia-section:first-of-type img,'
-			. '#top #main .avia-section:first-of-type .flex_column,'
-			. '#top #main .avia-section:first-of-type .avia_start_animation,'
-			. '#top #main .avia-section:first-of-type .av-animated-when,'
-			. '#top #main .avia-section:first-of-type .av-animated-when-visible,'
-			. '#top #main h1,'
-			. '#top #main .entry-content-wrapper > .avia-section:first-of-type *{'
-			. 'opacity:1!important;visibility:visible!important}'
+			. self::unlock_css()
 			/* Services / RU press custom heroes */
 			. '#top #main .cindemir-services__hero,'
 			. '#top #main .cindemir-services__hero-media,'
@@ -108,6 +90,40 @@ final class Cindemir_LCP_Safe {
 			. 'background-size:cover!important;background-position:center 35%!important;'
 			. 'transform:none!important;animation:none!important}'
 			. '</style>' . "\n";
+	}
+
+	/**
+	 * Beat Enfold pre-JS hide (.av-animated-generic {opacity:0}) so text LCP
+	 * on articles/contacts/press paints immediately. Layout/colors unchanged.
+	 *
+	 * @return string
+	 */
+	private static function unlock_css() {
+		return '@font-face{font-display:swap!important}'
+			. '.avia-font-entypo-fontello,.av-icon-char{font-display:optional}'
+			/* Enfold waits for JS before fading columns in — keep transform, drop hide. */
+			. 'html #top.avia_transform .av-animated-generic,'
+			. 'html #top.avia_transform .av-animated-when-visible,'
+			. 'html #top.avia_transform .av-animated-when-almost-visible,'
+			. 'html #top.avia_transform .av-animated-when-visible-95,'
+			. 'html #top.avia_transform .avia_animated_image,'
+			. 'html #top .fade-in,'
+			. 'html #top #main .avia-section:nth-of-type(-n+3),'
+			. 'html #top #main .avia-section:nth-of-type(-n+3) *,'
+			. 'html #top #main .flex_column,'
+			. 'html #top #main .avia_textblock,'
+			. 'html #top #main .avia_textblock p,'
+			. 'html #top #main .av-special-heading,'
+			. 'html #top #main .av-special-heading-tag,'
+			. 'html #top #main h1,html #top #main h2,'
+			. 'html #top #main .av-alb-blogposts article.post-entry:nth-child(-n+4),'
+			. 'html #top #main .av-alb-blogposts article.post-entry:nth-child(-n+4) *,'
+			. 'html #top #main article.post-entry .entry-content-wrapper,'
+			. 'html #top #main article.post-entry .entry-content-wrapper p,'
+			. 'html #top #main .post-title{'
+			. 'opacity:1!important;visibility:visible!important}'
+			. '@keyframes cinRuPressIn{from{opacity:1;transform:none}to{opacity:1;transform:none}}'
+			. '@keyframes avia-fadein{from{opacity:1}to{opacity:1}}';
 	}
 
 	/** Page-aware image preload for the likely LCP candidate. */
@@ -220,6 +236,31 @@ final class Cindemir_LCP_Safe {
 			$html = self::clean_robots_txt( $html );
 		}
 
+		$html = self::inject_late_style( $html );
+
+		return $html;
+	}
+
+	/**
+	 * Re-print unlock CSS at the end of <head> so Enfold/Rocket CSS cannot hide LCP text.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	private static function inject_late_style( $html ) {
+		$tag = '<style id="cindemir-lcp-safe-late" data-v="' . esc_attr( self::VERSION ) . '">'
+			. self::unlock_css()
+			. '#top #main .cin-ru-press,#top #main .cin-ru-press *{'
+			. 'opacity:1!important;visibility:visible!important;animation:none!important}'
+			. '</style>';
+		if ( false !== strpos( $html, 'id="cindemir-lcp-safe-late"' ) ) {
+			$html = preg_replace( '/<style id="cindemir-lcp-safe-late"[^>]*>.*?<\/style>/is', $tag, $html, 1 );
+			return is_string( $html ) ? $html : '';
+		}
+		if ( false !== stripos( $html, '</head>' ) ) {
+			$out = preg_replace( '/<\/head>/i', $tag . '</head>', $html, 1 );
+			return is_string( $out ) ? $out : $html;
+		}
 		return $html;
 	}
 
