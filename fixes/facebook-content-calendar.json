@@ -26,9 +26,9 @@
     "scheduled_posts": 0,
     "queued_posts": 0,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-10-09",
-    "published_posts": 420,
-    "last_publish_run": "2026-10-26T11:26:59.840328+00:00"
+    "date_range": "2026-07-18 → 2026-10-10",
+    "published_posts": 425,
+    "last_publish_run": "2026-10-27T07:03:39.517331+00:00"
   },
   "days": [
     {
@@ -4075,6 +4075,53 @@
           "url": "https://cindemir.av.tr/en/software-licensing-services/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nSoftware licensing in Turkey: licence agreements and intellectual property protection for software overview.\n\nRead the full article:\nhttps://cindemir.av.tr/en/software-licensing-services/",
           "scheduled_at": "2026-10-09T20:00:00+03:00",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 85,
+      "date": "2026-10-10",
+      "status": "published",
+      "posts": [
+        {
+          "id": "d85-1",
+          "title": "Recognition and Enforcement of Austrian Judgments in Türkiye: Treaty Reciprocity and Court Practice",
+          "url": "https://cindemirlaw.com/recognition-and-enforcement-of-austrian-judgments-in-turkiye-treaty-reciprocity-and-court-practice/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nHow Austrian court judgments may be recognised and enforced in Türkiye, including treaty reciprocity and Court of Cassation practice.\n\nRead the full article:\nhttps://cindemirlaw.com/recognition-and-enforcement-of-austrian-judgments-in-turkiye-treaty-reciprocity-and-court-practice/",
+          "scheduled_at": "2026-10-10T10:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d85-2",
+          "title": "German Court Judgments in Turkey: Reciprocity and the Limits of the Case Law",
+          "url": "https://cindemirlaw.com/german-court-judgments-in-turkey-reciprocity-and-the-limits-of-the-case-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nRecognition and enforcement of German court judgments in Turkey, including reciprocity and the limits of the case law.\n\nRead the full article:\nhttps://cindemirlaw.com/german-court-judgments-in-turkey-reciprocity-and-the-limits-of-the-case-law/",
+          "scheduled_at": "2026-10-10T12:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d85-3",
+          "title": "Enforcing Italian Court Judgments in Turkey: Treaty Reciprocity and Key Case Law",
+          "url": "https://cindemirlaw.com/enforcing-italian-court-judgments-in-turkey-treaty-reciprocity-and-key-case-law/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nTreaty, reciprocity and Court of Cassation issues when enforcing Italian court judgments in Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/enforcing-italian-court-judgments-in-turkey-treaty-reciprocity-and-key-case-law/",
+          "scheduled_at": "2026-10-10T15:00:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d85-4",
+          "title": "Legal Help for Travel and Tourism Disputes in Turkey",
+          "url": "https://cindemirlaw.com/travel-lawyer-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nLegal guidance for foreign tourists, insurers and overseas lawyers handling accidents and travel or tourism disputes connected with Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/travel-lawyer-turkey/",
+          "scheduled_at": "2026-10-10T17:30:00+03:00",
+          "status": "published"
+        },
+        {
+          "id": "d85-5",
+          "title": "Website Legal Services",
+          "url": "https://cindemir.av.tr/en/website-legal-services/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nWebsite legal issues in Turkey: digital law, cyber law and compliance matters for website operators.\n\nRead the full article:\nhttps://cindemir.av.tr/en/website-legal-services/",
+          "scheduled_at": "2026-10-10T20:00:00+03:00",
           "status": "published"
         }
       ]
