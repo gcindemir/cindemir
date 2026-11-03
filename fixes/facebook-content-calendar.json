@@ -23,10 +23,10 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 0,
-    "queued_posts": 0,
+    "scheduled_posts": 1,
+    "queued_posts": 1,
     "failed_posts": 0,
-    "date_range": "2026-07-18 → 2026-10-10",
+    "date_range": "2026-07-18 → 2026-10-11",
     "published_posts": 425,
     "last_publish_run": "2026-10-27T07:03:39.517331+00:00"
   },
@@ -4123,6 +4123,21 @@
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nWebsite legal issues in Turkey: digital law, cyber law and compliance matters for website operators.\n\nRead the full article:\nhttps://cindemir.av.tr/en/website-legal-services/",
           "scheduled_at": "2026-10-10T20:00:00+03:00",
           "status": "published"
+        }
+      ]
+    },
+    {
+      "day": 86,
+      "date": "2026-10-11",
+      "status": "scheduled",
+      "posts": [
+        {
+          "id": "d86-1",
+          "title": "Injured in a Hotel Elevator in Turkey: What to Do",
+          "url": "https://cindemirlaw.com/hotel-elevator-accident-turkey-what-to-do/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical information for foreign tourists after a hotel elevator accident in Turkey, including immediate steps and technical evidence.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-elevator-accident-turkey-what-to-do/",
+          "scheduled_at": "2026-10-11T10:00:00+03:00",
+          "status": "scheduled"
         }
       ]
     }

@@ -275,7 +275,10 @@ def open_composer(page):
 
 
 def publish_post(page, text, idx):
-    text = fb_safe_text(text)
+    # Meta One hard-capped this Page at 2 link posts in Oct 2026; from Nov, try URLs again.
+    now = time.localtime()
+    if now.tm_year == 2026 and now.tm_mon == 10:
+        text = fb_safe_text(text)
     page.goto(PAGE_HOME, wait_until="domcontentloaded", timeout=120000)
     time.sleep(5)
     close_popups(page, allow_escape=True)
