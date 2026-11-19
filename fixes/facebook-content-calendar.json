@@ -23,8 +23,8 @@
   },
   "stats": {
     "published_day1": 5,
-    "scheduled_posts": 1,
-    "queued_posts": 1,
+    "scheduled_posts": 4,
+    "queued_posts": 4,
     "failed_posts": 0,
     "date_range": "2026-07-18 → 2026-10-11",
     "published_posts": 425,
@@ -4137,6 +4137,30 @@
           "url": "https://cindemirlaw.com/hotel-elevator-accident-turkey-what-to-do/",
           "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical information for foreign tourists after a hotel elevator accident in Turkey, including immediate steps and technical evidence.\n\nRead the full article:\nhttps://cindemirlaw.com/hotel-elevator-accident-turkey-what-to-do/",
           "scheduled_at": "2026-10-11T10:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d86-2",
+          "title": "Can a Lawyer Collect Lost Property on Your Behalf at Sabiha Gökçen Airport?",
+          "url": "https://cindemirlaw.com/lawyer-representation-lost-property-sabiha-gokcen-airport/",
+          "summary": "Airport detention or customs issues can escalate quickly for foreign travellers in Türkiye.\n\nLearn how representation may work when personal property is held by Sabiha Gökçen Airport, and why the airport’s authorization requirements must be confirmed.\n\nRead the full article:\nhttps://cindemirlaw.com/lawyer-representation-lost-property-sabiha-gokcen-airport/",
+          "scheduled_at": "2026-10-11T12:30:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d86-3",
+          "title": "Requesting Old Residence, Work Permit and SGK Records from Turkey",
+          "url": "https://cindemirlaw.com/request-old-residence-work-permit-sgk-records-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nInformation for former foreign residents seeking old Turkish residence permit, work permit or SGK records after leaving Turkey.\n\nRead the full article:\nhttps://cindemirlaw.com/request-old-residence-work-permit-sgk-records-turkey/",
+          "scheduled_at": "2026-10-11T15:00:00+03:00",
+          "status": "scheduled"
+        },
+        {
+          "id": "d86-4",
+          "title": "What Can Tourists Do After Buying a Misrepresented Carpet in Turkey?",
+          "url": "https://cindemirlaw.com/tourist-bought-misrepresented-carpet-turkey/",
+          "summary": "Practical English guidance from Cindemir Law Office for foreign clients dealing with Turkish law.\n\nPractical English guidance for foreign tourists after buying a misrepresented carpet in Turkey, including evidence, complaints and possible remedies.\n\nRead the full article:\nhttps://cindemirlaw.com/tourist-bought-misrepresented-carpet-turkey/",
+          "scheduled_at": "2026-10-11T17:30:00+03:00",
           "status": "scheduled"
         }
       ]
